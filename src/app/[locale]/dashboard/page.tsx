@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
 import { AppDispatch, RootState } from '@/lib/store/store'; // Adjust path to your store
 import { fetchDashboardData, fetchAlerts } from '@/lib/store/slices/dashboardSlice';
-import { StatCard } from '@/components/dashboard/statCard';
-import { NewScanBanner } from '@/components/dashboard/newScanBanner';
+import { StatCard } from '@/components/dashboard/StatCard';
+import { NewScanBanner } from '@/components/dashboard/NewScanBanner';
 import { CheckCircle2, ChevronRight, Bell, AlertTriangle } from 'lucide-react';
 
 export default function DashboardPage() {
