@@ -1,3 +1,23 @@
 {
-    
+  "Dashboard": {
+    "welcome": "환영합니다, {name}님",
+    "overview": "이미지 인텔리전스 개요입니다.",
+    "totalScans": "총 스캔 수",
+    "matchesFound": "발견된 일치 항목",
+    "activeMonitors": "활성 모니터",
+    "startScanTitle": "새 스캔 시작",
+    "startScanSub": "이미지를 업로드하여 역방향 검색 분석을 시작하세요",
+    "uploadBtn": "이미지 업로드",
+    "recentScans": "최근 스캔",
+    "viewAll": "모두 보기",
+    "matches": "일치",
+    "completed": "완료됨",
+    "processing": "처리 중",
+    "recentAlerts": "최근 알림",
+    "viewAllAlerts": "모든 알림 보기",
+    "quickActions": "빠른 작업",
+    "newScanAction": "새 스캔",
+    "viewMonitoringAction": "모니터링 보기",
+    "generateReportAction": "보고서 생성"
+  }
 }

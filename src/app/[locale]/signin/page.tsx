@@ -10,7 +10,7 @@ import {
   googleAuthThunk,
   selectSigninStatus,
   selectAuthError,
-} from "@/lib/store/userSlice";
+} from "@/lib/store/slices/userSlice";
 
 // ─── i18n messages (co-located) ───────────────────────────────────────────────
 const messages = {

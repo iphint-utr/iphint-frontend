@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from './store' // adjust path to your store
-import type { BillingCycle, PlanId, Locale } from '../../app/[locale]/pricing/pricing'
+import type { RootState } from '../store' // adjust path to your store
+import type { BillingCycle, PlanId, Locale } from '../../../app/[locale]/pricing/pricing'
 
 // ─── State ─────────────────────────────────────────────────────────────────
 export interface PricingState {

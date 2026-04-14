@@ -13,7 +13,7 @@ import {
   selectHighlightedFeature,
   selectCtaLoading,
   selectIsAnnual,
-} from '../../../lib/store/pricingSlice'
+} from '../../../lib/store/slices/pricingSlice'
 import type { Translations, PlanId, Plan } from './pricing'
 import { ChevronRight } from 'lucide-react'
 

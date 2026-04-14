@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./userSlice";
-import pricingReducer from "./pricingSlice";
+import userReducer from "./slices/userSlice";
+import pricingReducer from "./slices/pricingSlice";
+import dashboardReducer from "./slices/dashboardSlice"
 // Import your slices here
 //import counterReducer from "./features/counterSlice";
 
@@ -9,6 +10,7 @@ export const makeStore = () => {
     reducer: {
       user:userReducer,
       pricing: pricingReducer,
+      dashboard: dashboardReducer
     },
   });
 };

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { RootState } from "./store";
+import type { RootState } from "../store";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface UserProfile {

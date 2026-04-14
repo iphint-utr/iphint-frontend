@@ -1,3 +1,23 @@
 {
-    
+  "Dashboard": {
+    "welcome": "Welcome back, {name}",
+    "overview": "Here's your image intelligence overview",
+    "totalScans": "Total Scans",
+    "matchesFound": "Matches Found",
+    "activeMonitors": "Active Monitors",
+    "startScanTitle": "Start a New Scan",
+    "startScanSub": "Upload an image to begin reverse search analysis",
+    "uploadBtn": "Upload Image",
+    "recentScans": "Recent Scans",
+    "viewAll": "View All",
+    "matches": "matches",
+    "completed": "completed",
+    "processing": "processing",
+    "recentAlerts": "Recent Alerts",
+    "viewAllAlerts": "View All Alerts",
+    "quickActions": "Quick Actions",
+    "newScanAction": "New Scan",
+    "viewMonitoringAction": "View Monitoring",
+    "generateReportAction": "Generate Report"
+  }
 }
