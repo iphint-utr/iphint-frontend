@@ -1,14 +1,17 @@
 import type { NextConfig } from "next";
-const withNextIntl = require('next-intl/plugin')();
+const withNextIntl = require('next-intl/plugin')('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  // Ensure your images from Cloudinary/S3 are allowed
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Adjust this to your specific image provider for security
+        hostname: '**', // This allows images from any HTTPS domain
+      },
+      {
+        protocol: 'http',
+        hostname: '**', // This allows images from any HTTP domain (optional)
       },
     ],
   },

@@ -35,8 +35,8 @@ export default function DashboardPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard title={t('totalScans')} value={stats?.totalScans || 0} trend="+12%" />
-        <StatCard title={t('matchesFound')} value={stats?.totalMatches || 0} trend="+8%" />
+        <StatCard title={t('totalScans')} value={stats?.totalScans || 0} />
+        <StatCard title={t('matchesFound')} value={stats?.totalMatches || 0} />
         <StatCard title={t('activeMonitors')} value={stats?.activeMonitors || 0} />
       </div>
 

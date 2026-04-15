@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { DashboardState } from '../../../types/dashboard';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 const initialState: DashboardState = {
   stats: null,
