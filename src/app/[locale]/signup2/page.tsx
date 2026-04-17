@@ -4,17 +4,29 @@ import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser, clearError } from '../../../lib/store/slices/authSlice';
+import { registerUser, clearError } from '../../../lib/store/slices/userSlice';
 import { AppDispatch, RootState } from '../../../lib/store/store';
 import { countries } from './countries';
+import { useRouter } from 'next/navigation';
+import { selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/slices/userSlice';
+
+
 
 // We separate the form logic to safely use useSearchParams inside a Suspense boundary
 function SignupForm() {
   const t = useTranslations('Auth');
   const searchParams = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { authError } = useSelector((state: RootState) => state.user);
+const router = useRouter();
+const isAuthenticated = useSelector(selectIsAuthenticated);
+const authLoading = useSelector(selectAuthLoading);
 
+useEffect(() => {
+  if (!authLoading && isAuthenticated) {
+    router.push('/dashboard');
+  }
+}, [isAuthenticated, authLoading]);
   const [formData, setFormData] = useState({
     name: '',
     companyName: '',
@@ -57,6 +69,7 @@ function SignupForm() {
     };
     
     dispatch(registerUser(submitData));
+
   };
 
   const uniqueDialCodes = Array.from(new Set(countries.map(c => c.dial)))
@@ -168,23 +181,23 @@ function SignupForm() {
         {/* Hidden Referral Code input (Optional: for visual confirmation in DOM) */}
         <input type="hidden" name="referralCode" value={formData.referralCode} />
 
-        {error && (
+        {authError && (
           <div className="text-red-600 bg-red-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" fill="#EF4444"/>
               <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            {error}
+            {authError}
           </div>
         )}
 
         <div className="flex justify-center mt-10">
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={authLoading}
             className="w-full md:w-[400px] bg-black text-white font-semibold py-4 sm:py-5 rounded-2xl hover:bg-gray-900 transition-all disabled:opacity-50 text-sm sm:text-base"
           >
-            {loading ? '...' : t('submitSignup')}
+            {authLoading ? '...' : t('submitSignup')}
           </button>
         </div>
       </form>

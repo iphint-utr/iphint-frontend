@@ -9,6 +9,7 @@ import Footer from "@/components/footer";
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import AuthGuard from '../../components/AuthGuard';
 
 const comfortaa = Comfortaa({
   subsets: ["latin"],
@@ -49,17 +50,21 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body className={`${comfortaa.className} antialiased bg-white`}>
-        {/* Pass both 'locale' and 'messages' to the provider */}
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <StoreProvider>
+    
+      <html lang={locale}>
+        <body className={`${comfortaa.className} antialiased bg-white`}>
+          {/* Pass both 'locale' and 'messages' to the provider */}
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <StoreProvider>
             <Navbar />
+            <AuthGuard>
               {children}
+            </AuthGuard>
             <Footer />
           </StoreProvider>
         </NextIntlClientProvider>
       </body>
     </html>
+  
   );
 }

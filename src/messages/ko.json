@@ -21,5 +21,32 @@
     "newScanAction": "새 스캔",
     "viewMonitoringAction": "모니터링 보기",
     "generateReportAction": "보고서 생성"
+  },
+  "Auth": {
+    "signupTitle": "회원가입",
+    "nameLabel": "이름이 무엇인가요?",
+    "namePlaceholder": "성함을 입력해주세요",
+    "businessLabel": "비즈니스 환경은 무엇인가요?",
+    "businessPlaceholder": "회사 또는 프로젝트 이름",
+    "roleLabel": "구체적인 역할은 무엇인가요?",
+    "rolePlaceholder": "예: 디자이너, CEO, 프리랜서",
+    "contactLabel": "알림 연락처",
+    "countryLabel": "주요 국가/지역",
+    "emailLabel": "보고서 수신 이메일",
+    "emailPlaceholder": "업무용 또는 활성 이메일 주소",
+    "passwordLabel": "비밀번호",
+    "passwordPlaceholder": "비밀번호를 입력해주세요",
+    "submitSignup": "7일 무료로 시작하기",
+    
+    "loginTitle": "로그인",
+    "continueWithGoogle": "Google로 계속하기",
+    "emailOnlyLabel": "이메일",
+    "loginEmailPlaceholder": "이메일 주소를 입력해주세요",
+    "passwordOnlyLabel": "비밀번호",
+    "loginPasswordPlaceholder": "비밀번호를 입력해주세요",
+    "forgetPassword": "비밀번호 찾기",
+    "submitLogin": "로그인",
+    "noAccountText": "계정이 없으신가요?",
+    "noAccountLink": "가입하기"
   }
 }

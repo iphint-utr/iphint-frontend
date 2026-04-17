@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
 import { AppDispatch, RootState } from '@/lib/store/store'; 
-import { fetchDashboardData, fetchAlerts } from '@/lib/store/slices/dashboardSlice';
+import { fetchDashboardData, fetchAlerts } from '@/lib/store/slices/userSlice';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { NewScanBanner } from '@/components/dashboard/NewScanBanner';
 import { 
@@ -21,8 +21,8 @@ export default function DashboardPage() {
   const dispatch = useDispatch<AppDispatch>();
   
   // Get user data for name and referral code
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { stats, latestSearches, alerts, loading } = useSelector((state: RootState) => state.dashboard);
+  const  user  = useSelector((state: RootState) => state.user);
+  const { stats, latestSearches, alerts, loading } = useSelector((state: RootState) => state.user);
 
   // State for copy feedback
   const [copied, setCopied] = useState(false);
@@ -36,7 +36,7 @@ export default function DashboardPage() {
   const handleCopyReferral = async () => {
     const code = user?.referralCode || 'WELCOME';
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const referralUrl = `${baseUrl}/signup?ref=${code}`;
+    const referralUrl = `${baseUrl}/signup2?ref=${code}`;
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
