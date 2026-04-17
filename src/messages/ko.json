@@ -1,6 +1,8 @@
 {
   "Dashboard": {
     "welcome": "환영합니다, {name}님",
+    "referralLink": "추천 링크 복사",
+    "copied": "복사 완료!",
     "overview": "이미지 인텔리전스 개요입니다.",
     "totalScans": "총 스캔 수",
     "matchesFound": "발견된 일치 항목",

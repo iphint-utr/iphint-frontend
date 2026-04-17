@@ -31,8 +31,10 @@ export const fetchDashboardData = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get('/user-details/dashboard');
+      console.log("API SCCESS")
       return response.data;
     } catch (error: any) {
+      console.error("API ERROR:", error);
       return rejectWithValue(error.response?.data?.message || 'Failed to load dashboard');
     }
   }

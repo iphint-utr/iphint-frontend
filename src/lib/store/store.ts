@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./slices/authSlice";
 import userReducer from "./slices/userSlice";
 import pricingReducer from "./slices/pricingSlice";
 import dashboardReducer from "./slices/dashboardSlice"
@@ -8,6 +9,7 @@ import dashboardReducer from "./slices/dashboardSlice"
 export const makeStore = () => {
   return configureStore({
     reducer: {
+      auth:authReducer,
       user:userReducer,
       pricing: pricingReducer,
       dashboard: dashboardReducer

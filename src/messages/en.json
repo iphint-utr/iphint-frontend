@@ -1,6 +1,8 @@
 {
   "Dashboard": {
     "welcome": "Welcome back, {name}",
+    "referralLink": "Referral Link",
+    "copied": "Copied!",
     "overview": "Here's your image intelligence overview",
     "totalScans": "Total Scans",
     "matchesFound": "Matches Found",
