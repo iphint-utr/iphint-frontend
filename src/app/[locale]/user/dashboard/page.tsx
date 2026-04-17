@@ -66,7 +66,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6 lg:p-10 font-sans text-gray-900">
+    <div className="min-h-screen  p-6 lg:p-10 font-sans text-gray-900">
       
       {/* --- HEADER WITH POPPING BUTTON --- */}
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -139,7 +139,9 @@ export default function DashboardPage() {
                       <img src={search.image} alt="scan" className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900 group-hover:text-[#6366f1] transition-colors">{search.fileName}</p>
+                      <p className="font-bold text-red-900 group-hover:text-[#6366f1] transition-colors truncate max-w-[200px]">
+  {search.fileName}
+</p>
                       <p className="text-xs text-gray-400 mt-0.5 font-medium">
                         {new Date(search.time).toLocaleDateString()}
                       </p>

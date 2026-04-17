@@ -48,5 +48,15 @@
     "submitLogin": "로그인",
     "noAccountText": "계정이 없으신가요?",
     "noAccountLink": "가입하기"
+  },
+  "userSidebar": {
+    "dashboard": "대시보드",
+    "newScan": "새 스캔",
+    "history": "히스토리",
+    "monitoring": "모니터링",
+    "reports": "리포트",
+    "billing": "결제",
+    "settings": "설정",
+    "logout": "로그아웃"
   }
 }

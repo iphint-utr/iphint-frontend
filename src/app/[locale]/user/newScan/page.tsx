@@ -4,8 +4,8 @@ import React, { useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDropzone } from 'react-dropzone';
 import { Upload, Link as LinkIcon, Search, RefreshCw, ExternalLink, Image as ImageIcon, AlertCircle } from 'lucide-react';
-import { AppDispatch, RootState } from '../../../lib/store/store'; // Adjust based on your store path
-import { performScan, clearResults } from '../../../lib/store/slices/scanSlice'; // Adjust based on your slice path
+import { AppDispatch, RootState } from '../../../../lib/store/store'; // Adjust based on your store path
+import { performScan, clearResults } from '../../../../lib/store/slices/scanSlice'; // Adjust based on your slice path
 
 export default function ScanPage() {
   const dispatch = useDispatch<AppDispatch>();

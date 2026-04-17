@@ -48,6 +48,16 @@
     "submitLogin": "로그인",
     "noAccountText": "Don't have an account?",
     "noAccountLink": "Sign in"
+  },
+  "userSidebar": {
+    "dashboard": "Dashboard",
+    "newScan": "New Scan",
+    "history": "History",
+    "monitoring": "Monitoring",
+    "reports": "Reports",
+    "billing": "Billing",
+    "settings": "Settings",
+    "logout": "Logout"
   }
 
 }
