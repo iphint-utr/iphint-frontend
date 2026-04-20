@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { DashboardState } from '../../../types/dashboard';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -108,7 +108,7 @@ const initialState: UserState = {
 // ─── Axios instance (untouched) ───────────────────────────────────────────────
 
 const apiClient = axios.create({
-  baseURL: `${BASE_URL}`,
+  baseURL: `${BASE_URL}/api/v1`,
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -153,7 +153,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: string }
 >('user/login', async (credentials, { rejectWithValue }) => {
   try {
-    const { data } = await axios.post<AuthResponse>(`${BASE_URL}/auth/login`, credentials);
+    const { data } = await axios.post<AuthResponse>(`${BASE_URL}/api/v1/auth/login`, credentials);
     return data;
   } catch (err) {
     if (axios.isAxiosError(err)) {
@@ -169,7 +169,7 @@ export const registerUser = createAsyncThunk<
   { rejectValue: string }
 >('user/register', async (userData, { rejectWithValue }) => {
   try {
-    const { data } = await axios.post<AuthResponse>(`${BASE_URL}/auth/register`, userData);
+    const { data } = await axios.post<AuthResponse>(`${BASE_URL}/api/v1/auth/register`, userData);
     return data;
   } catch (err) {
     if (axios.isAxiosError(err)) {

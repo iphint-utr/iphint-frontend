@@ -4,6 +4,7 @@ import userReducer from "./slices/userSlice";
 import pricingReducer from "./slices/pricingSlice";
 import dashboardReducer from "./slices/dashboardSlice"
 import scanReducer from "./slices/scanSlice";
+import monitoringReducer from "./slices/monitoringSlice";
 // Import your slices here
 //import counterReducer from "./features/counterSlice";
 
@@ -13,6 +14,7 @@ export const makeStore = () => {
       scan: scanReducer,
       user:userReducer,
       pricing: pricingReducer,
+      monitoring: monitoringReducer,
       
     },
   });

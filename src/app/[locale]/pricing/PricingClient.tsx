@@ -225,7 +225,7 @@ export default function PricingClient({
   const isAnnual        = useSelector(selectIsAnnual)
 
   useEffect(() => {
-    if (locale === 'en' || locale === 'ko') dispatch(setLocale(locale))
+    if (locale === 'en' || locale === 'kr') dispatch(setLocale(locale))
   }, [locale, dispatch])
 
   const handleCta = async (planId: PlanId) => {

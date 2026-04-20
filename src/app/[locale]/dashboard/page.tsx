@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { AppDispatch, RootState } from '@/lib/store/store'; 
 import { fetchDashboardData, fetchAlerts } from '@/lib/store/slices/userSlice';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { NewScanBanner } from '@/components/dashboard/NewScanBanner';
+import axios from 'axios';
 import { 
   CheckCircle2, 
   ChevronRight, 
@@ -15,6 +17,15 @@ import {
   Check, 
   Copy 
 } from 'lucide-react';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
+
+const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
+apiClient.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 export default function DashboardPage() {
   const t = useTranslations('Dashboard');
@@ -34,11 +45,15 @@ export default function DashboardPage() {
 
   // Fail-safe copy logic for all devices
   const handleCopyReferral = async () => {
-    const code = user?.referralCode || 'WELCOME';
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const referralUrl = `${baseUrl}/signup2?ref=${code}`;
+    let code = user?.referralCode || 'WELCOME';
 
     try {
+      // Keep the quick-copy behavior, but activate the 24-hour window first.
+      const genRes = await apiClient.post('/referral/generate');
+      code = genRes?.data?.referralCode || code;
+
+      const referralUrl = `${baseUrl}/register?ref=${code}`;
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(referralUrl);
       } else {
@@ -57,7 +72,7 @@ export default function DashboardPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch (err) {
-      console.error(`Failed to copy: ${referralUrl}`, err);
+      console.error('Failed to generate/copy referral link', err);
     }
   };
 
@@ -82,7 +97,7 @@ export default function DashboardPage() {
                 group relative flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300
                 ${copied 
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' 
-                  : 'bg-gradient-to-r from-[#6366f1] via-[#a855f7] to-[#ec4899] text-white shadow-xl hover:shadow-[#a855f7]/40 hover:-translate-y-0.5 active:scale-95'
+                  : 'bg-linear-to-r from-[#6366f1] via-[#a855f7] to-[#ec4899] text-white shadow-xl hover:shadow-[#a855f7]/40 hover:-translate-y-0.5 active:scale-95'
                 }
               `}
             >
@@ -110,10 +125,11 @@ export default function DashboardPage() {
       </div>
 
       {/* --- STATS ROW --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <StatCard title={t('totalScans')} value={stats?.totalScans || 0} />
         <StatCard title={t('matchesFound')} value={stats?.totalMatches || 0} />
-        <StatCard title={t('activeMonitors')} value={stats?.activeMonitors || 0} />
+        <StatCard title="Monitor Complete" value={stats?.monitorComplete || 0} />
+        <StatCard title="Pending Review" value={stats?.pendingReview || 0} />
       </div>
 
       {/* --- MAIN CONTENT GRID --- */}
@@ -191,15 +207,15 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
             <h3 className="text-xl font-bold mb-6 text-black">{t('quickActions')}</h3>
             <div className="space-y-3">
-              <button className="w-full text-left px-5 py-4 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 border border-gray-100 transition-all hover:border-[#8b5cf6]/30">
+              <Link href="/dashboard/searches" className="block w-full text-left px-5 py-4 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 border border-gray-100 transition-all hover:border-[#8b5cf6]/30">
                 {t('newScanAction')}
-              </button>
-              <button className="w-full text-left px-5 py-4 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 border border-gray-100 transition-all hover:border-[#8b5cf6]/30">
+              </Link>
+              <Link href="/dashboard/monitoring" className="block w-full text-left px-5 py-4 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 border border-gray-100 transition-all hover:border-[#8b5cf6]/30">
                 {t('viewMonitoringAction')}
-              </button>
-              <button className="w-full text-left px-5 py-4 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 border border-gray-100 transition-all hover:border-[#8b5cf6]/30">
+              </Link>
+              <Link href="/dashboard/billing" className="block w-full text-left px-5 py-4 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 border border-gray-100 transition-all hover:border-[#8b5cf6]/30">
                 {t('generateReportAction')}
-              </button>
+              </Link>
             </div>
           </div>
 

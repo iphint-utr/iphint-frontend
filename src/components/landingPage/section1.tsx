@@ -1,21 +1,21 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useParams } from "next/navigation";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     heading:   "역추적 검색엔진은\n쉬지않고 당신의 이미지를\n발견합니다",
     body:      "회사 도구와 연결하고 데이터 보안을 유지하고 팀이 진행하는 모든 프로젝트를 개선하세요. 여러분이 아는 챗피티기가 업무용으로 설계 되었습니다.",
     secondary: { label: "문의하기",      href: "/contact" },
-    primary:   { label: "무료로 시작 >", href: "/signup"  },
+    primary:   { label: "무료로 시작 >", href: "/register"  },
   },
   en: {
     heading:   "The reverse-search engine\nnever stops finding\nyour images",
     body:      "Connect your work tools, maintain data security, and improve every project your team works on. The ChatGPT you know, designed for business.",
     secondary: { label: "Contact Us",       href: "/contact" },
-    primary:   { label: "Start for Free >", href: "/signup"  },
+    primary:   { label: "Start for Free >", href: "/register"  },
   },
 } as const;
 
@@ -24,7 +24,7 @@ type Locale = keyof typeof translations;
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Section1() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   return (

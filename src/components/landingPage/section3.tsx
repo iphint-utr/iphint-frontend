@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     heading:     "콘텐츠 보호의 시작",
     subheading1: "개인정보 보호 및 보안이 기본적으로 포함된 ChatGPT가 제공하는 최고의 기능을 팀이 활용하도록 하세요.",
     subheading2: "간편하게 플랜 규모를 조정하고 옵션 크레딧을 추가할 수 있으며 언제든지 취소할 수 있습니다.",
@@ -70,7 +70,7 @@ type Locale = keyof typeof translations;
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function Section3() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   return (

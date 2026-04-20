@@ -5,8 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, clearError, selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/slices/userSlice';
 import { AppDispatch, RootState } from '../../../lib/store/store';
-import { Link } from '@/i18n/routing';
-import { useRouter } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/routing';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -100,7 +99,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center text-sm sm:text-base text-black font-medium">
           {t('noAccountText')}{' '}
-          <Link href="/signup" className="font-semibold border-b border-black pb-0.5 ml-1 hover:text-gray-600 transition-colors">
+          <Link href="/register" className="font-semibold border-b border-black pb-0.5 ml-1 hover:text-gray-600 transition-colors">
             {t('noAccountLink')}
           </Link>
         </div>

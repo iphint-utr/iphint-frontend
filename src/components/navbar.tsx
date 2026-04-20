@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     navItems: [
       { label: "소개",     href: "/about"    },
       { label: "기능",     href: "/features" },
@@ -15,7 +15,7 @@ const translations = {
       { label: "비즈니스", href: "/business" },
     ],
     ctaSecondary: { label: "문의하기",      href: "/contact" },
-    ctaPrimary:   { label: "무료로 시작 >", href: "/signup"  },
+    ctaPrimary:   { label: "무료로 시작 >", href: "/register"  },
   },
   en: {
     navItems: [
@@ -25,7 +25,7 @@ const translations = {
       { label: "Business", href: "/business" },
     ],
     ctaSecondary: { label: "Contact Us",       href: "/contact" },
-    ctaPrimary:   { label: "Start for Free >", href: "/signup"  },
+    ctaPrimary:   { label: "Start for Free >", href: "/register"  },
   },
 } as const;
 
@@ -147,7 +147,7 @@ function LanguageSwitcher({
             {languages.map((lang, i) => (
               <li key={i} role="option" aria-selected={lang === selected}>
                 <button
-                  onClick={() => { onSelect(lang === "English" ? "en" : "ko"); setOpen(false); }}
+                  onClick={() => { onSelect(lang === "English" ? "en" : "kr"); setOpen(false); }}
                   className={`w-full text-left px-4 py-2 text-[13px] transition-colors duration-150 ${
                     lang === selected
                       ? "text-gray-950 font-semibold bg-gray-50"
@@ -225,7 +225,7 @@ function MobileMenu({
             {languages.map((lang) => (
               <button
                 key={lang}
-                onClick={() => onSelectLang(lang === "English" ? "en" : "ko")}
+                onClick={() => onSelectLang(lang === "English" ? "en" : "kr")}
                 className={`px-3 py-1.5 text-[12px] rounded-full border transition-all duration-150 ${
                   lang === selectedLang
                     ? "border-gray-900 text-gray-950 font-semibold bg-gray-50"
@@ -261,7 +261,7 @@ export default function Navbar() {
   const router   = useRouter();
   const pathname = usePathname();
 
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   const [selectedLang, setSelectedLang] = useState<string>(

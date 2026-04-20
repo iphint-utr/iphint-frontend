@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // ─── Locale ────────────────────────────────────────────────────────────────
-export const LocaleSchema = z.enum(['en', 'ko'])
+export const LocaleSchema = z.enum(['en', 'kr'])
 export type Locale = z.infer<typeof LocaleSchema>
 
 // ─── Plan ──────────────────────────────────────────────────────────────────

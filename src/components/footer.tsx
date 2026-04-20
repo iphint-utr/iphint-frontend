@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -8,7 +8,7 @@ import { StarIcon } from "@/components/navbar";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     columns: [
       {
         heading: "투스타",
@@ -165,7 +165,7 @@ function FooterLangSwitcher({
             {languages.map((lang) => (
               <li key={lang} role="option" aria-selected={lang === selected}>
                 <button
-                  onClick={() => { onSelect(lang === "English" ? "en" : "ko"); setOpen(false); }}
+                  onClick={() => { onSelect(lang === "English" ? "en" : "kr"); setOpen(false); }}
                   className={`w-full text-left px-4 py-2 text-[13px] transition-colors duration-150 ${
                     lang === selected
                       ? "text-gray-950 font-semibold bg-gray-50"
@@ -189,7 +189,7 @@ export default function Footer() {
   const router   = useRouter();
   const pathname = usePathname();
 
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   const [selectedLang, setSelectedLang] = useState<string>(

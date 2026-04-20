@@ -30,7 +30,7 @@ async function getTranslations(locale: Locale) {
 
 // ─── Static locale params ───────────────────────────────────────────────────
 export async function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'ko' }]
+  return [{ locale: 'en' }, { locale: 'kr' }]
 }
 
 // ─── Page ───────────────────────────────────────────────────────────────────
