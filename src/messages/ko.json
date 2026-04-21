@@ -48,5 +48,244 @@
     "submitLogin": "로그인",
     "noAccountText": "계정이 없으신가요?",
     "noAccountLink": "가입하기"
+  },
+  "Admin": {
+    "sidebar": {
+      "brand": "관리자 콘솔",
+      "dashboard": "대시보드",
+      "users": "사용자 관리",
+      "searches": "검색 목록",
+      "apiUsage": "API 사용량",
+      "secureAccess": "보안 관리자 접근",
+      "secureAccessHint": "관리자 전용 권한으로 보호된 경로입니다."
+    },
+    "topbar": {
+      "eyebrow": "운영",
+      "title": "관리자 제어 센터",
+      "session": "관리자 세션"
+    },
+    "common": {
+      "refresh": "새로고침",
+      "loading": "관리자 데이터를 불러오는 중입니다...",
+      "noResults": "표시할 데이터가 없습니다.",
+      "unknownMember": "알 수 없는 회원",
+      "previous": "이전",
+      "next": "다음",
+      "paginationSummary": "전체 {total}개 중 {count}개 표시",
+      "apply": "필터 적용",
+      "reset": "초기화",
+      "viewDetails": "상세 보기",
+      "statusLabels": {
+        "active": "활성",
+        "inactive": "비활성",
+        "completed": "완료",
+        "processing": "처리 중",
+        "failed": "실패",
+        "reviewPending": "검토 대기",
+        "underAnalysis": "분석 중",
+        "approved": "승인됨",
+        "cancelled": "취소됨",
+        "expired": "만료됨"
+      },
+      "activityTypes": {
+        "search": "검색",
+        "subscription": "구독",
+        "userJoined": "회원 가입",
+        "payment": "결제"
+      },
+      "goToAdmin": "관리자 콘솔 열기",
+      "goToUserDashboard": "사용자 대시보드로 이동",
+      "logout": "로그아웃"
+    },
+    "dashboard": {
+      "eyebrow": "관리자 개요",
+      "title": "플랫폼 대시보드",
+      "description": "콘텐츠 볼륨, 구독 현황, 최근 운영 활동을 하나의 화면에서 확인합니다.",
+      "metrics": {
+        "totalContent": "전체 콘텐츠",
+        "members": "회원 수",
+        "activeSubscriptions": "활성 구독",
+        "revenue": "이번 달 매출"
+      },
+      "metricHints": {
+        "totalContent": "인덱싱된 모든 검색과 분석 작업 수입니다.",
+        "members": "플랫폼에 등록된 전체 회원 수입니다.",
+        "activeSubscriptions": "유료 구독이 활성화된 회원 수입니다.",
+        "revenue": "이번 달 기준 보고된 총 구독 매출입니다."
+      },
+      "recentActivityTitle": "최근 활동",
+      "recentActivityDescription": "관리자 대시보드 API가 반환한 최신 회원 및 구독 이벤트입니다.",
+      "systemSnapshotTitle": "시스템 스냅샷",
+      "systemSnapshotDescription": "처리량과 검색 수요를 빠르게 확인할 수 있습니다.",
+      "snapshot": {
+        "analysisComplete": "분석 완료율",
+        "underAnalysis": "분석 중",
+        "searchesToday": "오늘의 검색 수"
+      },
+      "quickLinksTitle": "운영 바로가기",
+      "quickLinksDescription": "추가 확인이 필요한 관리자 목록으로 바로 이동합니다.",
+      "quickLinks": {
+        "usersTitle": "사용자 검토",
+        "usersDescription": "사용자 관리에서 요금제, 활동, 계정 상태를 확인합니다.",
+        "searchesTitle": "검색 검토",
+        "searchesDescription": "전체 회원 계정의 업로드 검색 내역을 추적합니다.",
+        "apiUsageTitle": "API 사용량 확인",
+        "apiUsageDescription": "문서화된 관리자 엔드포인트 기반의 파생 사용량 지표를 확인합니다."
+      }
+    },
+    "users": {
+      "eyebrow": "회원 운영",
+      "title": "사용자 관리",
+      "description": "모든 회원의 구독 등급과 계정 활동을 필터링하여 검토합니다.",
+      "summary": {
+        "totalMembers": "전체 회원",
+        "totalMembersHint": "현재 사용자 조회 쿼리가 반환한 전체 레코드 수입니다.",
+        "visibleMembers": "현재 페이지 회원",
+        "visibleMembersHint": "현재 필터 조건으로 반환된 회원 수입니다.",
+        "activeAccounts": "활성 계정",
+        "activeAccountsHint": "현재 결과 창에 포함된 활성 회원 수입니다.",
+        "proPlans": "프로 요금제",
+        "proPlansHint": "현재 페이지에서 프로 요금제를 사용하는 회원 수입니다."
+      },
+      "tableTitle": "회원 목록",
+      "tableDescription": "이름으로 검색하고 상태로 필터링한 뒤 전체 회원 기록을 열어봅니다.",
+      "filters": {
+        "searchPlaceholder": "이름으로 회원 검색",
+        "allStatuses": "모든 상태",
+        "perPage": "페이지당 {count}개"
+      },
+      "columns": {
+        "member": "회원",
+        "status": "상태",
+        "plan": "요금제",
+        "searches": "검색 수",
+        "joined": "가입일",
+        "actions": "작업"
+      },
+      "loading": "사용자 목록을 불러오는 중입니다...",
+      "empty": "현재 필터에 맞는 회원이 없습니다.",
+      "planFallback": "구독 없음",
+      "subscriptionUnavailable": "구독 정보 없음"
+    },
+    "memberDetails": {
+      "eyebrow": "회원 상세",
+      "title": "{name} 회원 상세",
+      "description": "조치를 취하기 전에 구독 상태, 계정 상태, 최근 검색을 검토합니다.",
+      "backToUsers": "사용자 목록으로",
+      "loadingTitle": "회원 불러오는 중",
+      "loadingDescription": "회원 프로필과 최근 검색을 가져오고 있습니다.",
+      "loading": "회원 상세 정보를 불러오는 중입니다...",
+      "errorTitle": "회원 정보를 불러올 수 없습니다",
+      "errorDescription": "요청한 회원 프로필을 가져오지 못했습니다.",
+      "metrics": {
+        "credits": "크레딧",
+        "monitors": "모니터 수",
+        "searches": "총 검색 수",
+        "referrals": "추천 수"
+      },
+      "metricHints": {
+        "credits": "현재 계정에 남아 있는 크레딧입니다.",
+        "monitors": "이 회원 계정에 연결된 모니터링 작업 수입니다.",
+        "searches": "관리자 API가 반환한 누적 검색 수입니다.",
+        "referrals": "추천 코드로 연결된 성공 추천 수입니다."
+      },
+      "profileTitle": "프로필 요약",
+      "profileDescription": "신원, 승인 상태, 주요 계정 메타데이터입니다.",
+      "fields": {
+        "contact": "연락처",
+        "joined": "가입일",
+        "referralCode": "추천 코드",
+        "subscriptionId": "구독 ID"
+      },
+      "unavailable": "없음",
+      "searchesTitle": "최근 검색",
+      "searchesDescription": "관리자 사용자 검색 엔드포인트의 페이징 검색 기록입니다.",
+      "searchColumns": {
+        "image": "이미지",
+        "status": "상태",
+        "date": "날짜"
+      },
+      "searchesLoading": "회원 검색 기록을 불러오는 중입니다...",
+      "searchesEmpty": "현재 범위에 검색 기록이 없습니다.",
+      "subscriptionTitle": "구독",
+      "subscriptionDescription": "연결된 구독 레코드의 청구 식별자와 상태입니다.",
+      "subscriptionFields": {
+        "plan": "요금제 ID",
+        "status": "상태",
+        "billingCycle": "청구 주기"
+      },
+      "adminActionsTitle": "관리자 작업",
+      "adminActionsDescription": "정책 위반이나 운영 조치가 필요할 때 계정을 비활성화합니다.",
+      "deactivateReasonLabel": "비활성화 사유",
+      "deactivateReasonPlaceholder": "계정을 비활성화하는 이유를 선택적으로 기록하세요.",
+      "deactivateButton": "회원 비활성화",
+      "alreadyInactive": "이미 비활성화된 회원입니다"
+    },
+    "searches": {
+      "eyebrow": "검색 운영",
+      "title": "검색 목록",
+      "description": "모든 회원의 업로드 검색 작업을 확인하고 상태별로 필터링합니다.",
+      "summary": {
+        "total": "전체 검색",
+        "totalHint": "현재 검색 쿼리가 반환한 전체 레코드 수입니다.",
+        "completed": "현재 페이지 완료",
+        "completedHint": "현재 페이지에서 완료된 검색 작업 수입니다.",
+        "averageDiscoveries": "평균 발견 수",
+        "averageDiscoveriesHint": "현재 표시 중인 검색의 평균 발견 수입니다.",
+        "uploaders": "업로더 수",
+        "uploadersHint": "현재 결과 창에 포함된 회원 수입니다."
+      },
+      "tableTitle": "검색 기록",
+      "tableDescription": "업로더 이름이나 검색 상태로 필터링하고 필요 시 회원 계정으로 이동합니다.",
+      "filters": {
+        "memberPlaceholder": "업로더 이름으로 필터링",
+        "allStatuses": "모든 상태"
+      },
+      "columns": {
+        "file": "파일",
+        "uploader": "업로더",
+        "status": "상태",
+        "discoveries": "발견 수",
+        "uploadDate": "업로드 날짜"
+      },
+      "loading": "검색 목록을 불러오는 중입니다...",
+      "empty": "현재 필터에 맞는 검색이 없습니다."
+    },
+    "apiUsage": {
+      "eyebrow": "파생 사용량",
+      "title": "API 사용량",
+      "description": "문서화된 관리자 대시보드와 검색 엔드포인트를 기반으로 계산한 운영 사용량 지표입니다.",
+      "metrics": {
+        "totalRequests": "총 요청 수",
+        "successRate": "성공률",
+        "averageDiscoveries": "평균 발견 수",
+        "activeMembers": "활성 회원"
+      },
+      "metricHints": {
+        "totalRequests": "대시보드 엔드포인트가 반환한 전체 분석 콘텐츠 수입니다.",
+        "successRate": "분석 완료 수를 전체 콘텐츠 수로 나눈 값입니다.",
+        "averageDiscoveries": "최근 검색 샘플의 평균 발견 수입니다.",
+        "activeMembers": "대시보드 엔드포인트가 반환한 회원 수입니다."
+      },
+      "breakdownTitle": "상태 분포",
+      "breakdownDescription": "최근 검색 기록을 관리자 상태 기준으로 분포화한 값입니다.",
+      "loading": "API 사용량 지표를 불러오는 중입니다...",
+      "empty": "표시할 사용량 데이터가 없습니다.",
+      "topUploadersTitle": "상위 업로더",
+      "topUploadersDescription": "최근 검색 샘플에서 검색량이 가장 많은 회원입니다.",
+      "topUploaderHint": "샘플 검색 기록 기준 최근 업로드 수",
+      "snapshotTitle": "요청 스냅샷",
+      "snapshotDescription": "빠른 운영 검토를 위한 핵심 카운터입니다.",
+      "snapshot": {
+        "searchesToday": "오늘의 검색 수",
+        "completed": "완료",
+        "pending": "대기",
+        "failed": "실패"
+      },
+      "methodologyTitle": "산출 방식",
+      "methodologyDescription": "사용 가능한 관리자 API를 기반으로 이 페이지를 계산하는 방식입니다.",
+      "methodologyCopy": "문서화된 관리자 API에는 전용 사용량 분석 엔드포인트가 없기 때문에, 이 페이지는 관리자 대시보드 응답과 최근 검색 {count}건을 결합해 계산합니다.",
+      "generatedAt": "생성 시각"
+    }
   }
 }

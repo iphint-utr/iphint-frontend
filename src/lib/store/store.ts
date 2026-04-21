@@ -1,26 +1,22 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./slices/userSlice";
-import userReducer from "./slices/userSlice";
-import pricingReducer from "./slices/pricingSlice";
-import dashboardReducer from "./slices/dashboardSlice"
-import scanReducer from "./slices/scanSlice";
-import monitoringReducer from "./slices/monitoringSlice";
-// Import your slices here
-//import counterReducer from "./features/counterSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import userReducer from './slices/userSlice';
+import pricingReducer from './slices/pricingSlice';
+import scanReducer from './slices/scanSlice';
+import monitoringReducer from './slices/monitoringSlice';
+import adminReducer from './slices/adminSlice';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       scan: scanReducer,
-      user:userReducer,
+      user: userReducer,
       pricing: pricingReducer,
       monitoring: monitoringReducer,
-      
+      admin: adminReducer,
     },
   });
 };
 
-// Infer types
 export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore["dispatch"];
+export type RootState = ReturnType<AppStore['getState']>;
+export type AppDispatch = AppStore['dispatch'];

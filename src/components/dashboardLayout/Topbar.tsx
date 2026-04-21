@@ -2,9 +2,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { Menu, Languages, Bell, Check, Search, Trash2 } from 'lucide-react';
+import { Menu, Bell, Check, Search, Trash2 } from 'lucide-react';
 import { usePathname, useRouter } from '@/i18n/routing';
-import { useLocale } from 'next-intl';
+import LocaleSwitcher from '@/components/layout/LocaleSwitcher';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
@@ -27,7 +27,6 @@ interface NotificationItem {
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	const router = useRouter();
 	const pathname = usePathname();
-	const locale = useLocale();
 	const [notificationOpen, setNotificationOpen] = useState(false);
 	const [notificationQuery, setNotificationQuery] = useState('');
 	const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -44,11 +43,6 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 		if (pathname.startsWith('/dashboard/searches')) return 'Searches';
 		return 'Dashboard';
 	})();
-
-	const handleLanguageChange = (nextLocale: 'en' | 'kr') => {
-		if (nextLocale === locale) return;
-		router.replace(pathname, { locale: nextLocale });
-	};
 
 	const loadNotifications = async (q = '') => {
 		const { data } = await apiClient.get('/user-details/notifications', {
@@ -223,33 +217,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 						)}
 					</div>
 
-					<div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-2 py-1.5 shadow-xs">
-						<Languages className="h-4 w-4 text-gray-600" strokeWidth={1.9} />
-						<div className="inline-flex items-center rounded-lg bg-gray-100 p-0.5">
-						<button
-							type="button"
-							onClick={() => handleLanguageChange('en')}
-							aria-label="Switch language to English"
-							className={[
-								'cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold tracking-wide transition-colors',
-								locale === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900',
-							].join(' ')}
-						>
-							EN
-						</button>
-						<button
-							type="button"
-							onClick={() => handleLanguageChange('kr')}
-							aria-label="Switch language to Korean"
-							className={[
-								'cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold tracking-wide transition-colors',
-								locale === 'kr' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900',
-							].join(' ')}
-						>
-							KR
-						</button>
-						</div>
-					</div>
+					<LocaleSwitcher />
 				</div>
 			</div>
 		</header>

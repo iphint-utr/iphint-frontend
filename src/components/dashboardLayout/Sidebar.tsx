@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { LayoutDashboard, Search, Activity, CreditCard, Settings, LogOut, UserCircle2, FileText, Crown, Users } from 'lucide-react';
+import { LayoutDashboard, Search, Activity, CreditCard, Settings, LogOut, UserCircle2, FileText, Crown, Users, ShieldCheck } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { AppDispatch, RootState } from '@/lib/store/store';
 import { logout } from '@/lib/store/slices/userSlice';
@@ -35,6 +36,7 @@ const closeOnMobileOnly = (onClose: () => void) => {
 };
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const t = useTranslations('Admin');
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const pathname = usePathname();
@@ -55,6 +57,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
 
   const displayName = user.name || 'User';
   const company = user.role || 'Organization';
+  const isAdmin = user.role === 'admin';
   const needsUpgrade = planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired';
   const showUpgradeAction = needsUpgrade || planInfo.isTrial;
 
@@ -163,6 +166,20 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 </button>
               )}
             </div>
+
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => {
+                  closeOnMobileOnly(onClose);
+                  router.push('/admin');
+                }}
+                className="mb-2 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm leading-5 font-medium text-white hover:bg-gray-800"
+              >
+                <ShieldCheck size={16} strokeWidth={2} className="text-white" />
+                <span>{t('common.goToAdmin')}</span>
+              </button>
+            )}
 
             <div className="mb-2 flex items-center gap-3 rounded-lg px-3 py-2">
               <UserCircle2 className="h-8 w-8 text-gray-500" strokeWidth={1.8} />
