@@ -82,6 +82,8 @@
         "processing": "Processing",
         "failed": "Failed",
         "reviewPending": "Review pending",
+        "notReviewed": "Not reviewed",
+        "reviewed": "Reviewed",
         "underAnalysis": "Under analysis",
         "approved": "Approved",
         "cancelled": "Cancelled",
@@ -203,7 +205,8 @@
       "searchColumns": {
         "image": "Image",
         "status": "Status",
-        "date": "Date"
+        "date": "Date",
+        "actions": "Actions"
       },
       "searchesLoading": "Loading member searches...",
       "searchesEmpty": "This member has no searches in the current range.",
@@ -246,10 +249,57 @@
         "uploader": "Uploader",
         "status": "Status",
         "discoveries": "Discoveries",
-        "uploadDate": "Upload date"
+        "uploadDate": "Upload date",
+        "actions": "Actions"
       },
       "loading": "Loading searches...",
       "empty": "No searches matched the current filters."
+    },
+    "searchDetails": {
+      "eyebrow": "Search Detail",
+      "title": "Search details",
+      "description": "Review the selected search record, uploader information, rescan schedule, and all associated result entries.",
+      "backToSearches": "Back to searches",
+      "loadingTitle": "Loading search",
+      "loadingDescription": "Fetching the selected search document and related results.",
+      "loading": "Loading search details...",
+      "errorTitle": "Unable to load search",
+      "errorDescription": "The requested search record could not be fetched.",
+      "metrics": {
+        "results": "Results",
+        "reviewed": "Reviewed",
+        "pendingReview": "Pending review",
+        "status": "Search status"
+      },
+      "metricHints": {
+        "results": "Total result records linked to this search.",
+        "reviewed": "Reviewed results in the current page.",
+        "pendingReview": "Results in the current page still waiting for admin review.",
+        "status": "Current lifecycle state of the selected search."
+      },
+      "overviewTitle": "Search overview",
+      "overviewDescription": "Primary metadata returned by the admin search details endpoint.",
+      "fields": {
+        "uploader": "Uploader",
+        "uploaderEmail": "Uploader email",
+        "uploadedAt": "Uploaded at",
+        "nextRescan": "Next rescan",
+        "lastRescan": "Last rescan"
+      },
+      "searchImageAlt": "Search image",
+      "resultsTitle": "Matched results",
+      "resultsDescription": "Paginated result entries associated with this search. Total records: {total}.",
+      "resultsPerPageLabel": "Results per page",
+      "resultsLoading": "Loading search results...",
+      "resultsEmpty": "No result records were returned for this search.",
+      "resultTitle": "Result {index}",
+      "resultImageAlt": "Result image",
+      "resultFields": {
+        "reviewStatus": "Review status",
+        "reviewedAt": "Reviewed at",
+        "details": "Details"
+      },
+      "resultDetailsEmpty": "No detail fields are available for this result."
     },
     "apiUsage": {
       "eyebrow": "Derived Usage",

@@ -20,6 +20,10 @@ export const getAdminStatusToken = (value: string) => {
       return 'failed';
     case 'reviewpending':
       return 'reviewPending';
+    case 'notreviewed':
+      return 'notReviewed';
+    case 'reviewed':
+      return 'reviewed';
     case 'underanalysis':
       return 'underAnalysis';
     case 'approved':

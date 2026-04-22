@@ -13,21 +13,26 @@ const toneMap = {
 
 const getTone = (value: string) => {
   const normalizedValue = value.toLowerCase();
+  const compactValue = normalizedValue.replace(/[_\s]+/g, '');
 
-  if (['active', 'completed', 'approved'].includes(normalizedValue)) {
+  if (['active', 'completed', 'approved', 'reviewed'].includes(compactValue)) {
     return 'success';
   }
 
-  if (['processing', 'underanalysis', 'reviewpending', 'pending'].includes(normalizedValue.replace(/\s+/g, ''))) {
+  if (['processing', 'underanalysis', 'reviewpending', 'pending'].includes(compactValue)) {
     return 'warning';
   }
 
-  if (['failed', 'inactive', 'cancelled', 'expired'].includes(normalizedValue)) {
+  if (['failed', 'inactive', 'cancelled', 'expired'].includes(compactValue)) {
     return 'danger';
   }
 
-  if (['admin', 'pro'].includes(normalizedValue)) {
+  if (['admin', 'pro'].includes(compactValue)) {
     return 'info';
+  }
+
+  if (compactValue === 'notreviewed') {
+    return 'neutral';
   }
 
   return 'neutral';

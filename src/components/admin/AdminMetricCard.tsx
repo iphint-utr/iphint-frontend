@@ -24,18 +24,18 @@ export default function AdminMetricCard({
   accent?: keyof typeof accentStyles;
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
+        <div className="min-w-0">
+          <p className="text-sm font-medium break-words text-slate-500">{title}</p>
+          <p className="mt-3 break-words text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{value}</p>
         </div>
         {icon ? (
-          <div className={cn('flex h-11 w-11 items-center justify-center rounded-2xl', accentStyles[accent])}>{icon}</div>
+          <div className={cn('flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl', accentStyles[accent])}>{icon}</div>
         ) : null}
       </div>
 
-      {hint ? <p className="text-sm text-slate-500">{hint}</p> : null}
+      {hint ? <p className="text-sm break-words text-slate-500">{hint}</p> : null}
     </div>
   );
 }

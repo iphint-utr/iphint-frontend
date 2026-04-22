@@ -10,6 +10,7 @@ import AdminStatusBadge from '@/components/admin/AdminStatusBadge';
 import { formatAdminDate, formatAdminNumber } from '@/lib/adminFormat';
 import { getAdminStatusToken, humanizeAdminValue } from '@/lib/adminLabels';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { truncateText } from '@/lib/utils';
 import { fetchAdminApiUsage } from '@/lib/store/slices/adminSlice';
 
 export default function AdminApiUsagePage() {
@@ -37,7 +38,7 @@ export default function AdminApiUsagePage() {
           <button
             type="button"
             onClick={() => dispatch(fetchAdminApiUsage({ limit: 100 }))}
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
           >
             {t('common.refresh')}
           </button>
@@ -88,7 +89,7 @@ export default function AdminApiUsagePage() {
                   const width = data.sampleSize ? Math.max((item.count / data.sampleSize) * 100, 8) : 8;
                   return (
                     <div key={item.status}>
-                      <div className="mb-2 flex items-center justify-between gap-3">
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                         <AdminStatusBadge value={item.status} label={getStatusLabel(item.status)} />
                         <span className="text-sm font-medium text-slate-700">{formatAdminNumber(item.count, locale)}</span>
                       </div>
@@ -108,12 +109,12 @@ export default function AdminApiUsagePage() {
             {data?.topUploaders.length ? (
               <div className="space-y-3">
                 {data.topUploaders.map((item, index) => (
-                  <div key={`${item.name}-${index}`} className="flex items-center justify-between rounded-3xl border border-slate-100 bg-slate-50 px-4 py-4">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-950">{item.name}</p>
+                  <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-3 rounded-3xl border border-slate-100 bg-slate-50 px-4 py-4">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-950" title={item.name}>{truncateText(item.name, 30)}</p>
                       <p className="mt-1 text-xs text-slate-500">{t('apiUsage.topUploaderHint')}</p>
                     </div>
-                    <div className="inline-flex h-11 min-w-11 items-center justify-center rounded-2xl bg-white px-3 text-sm font-semibold text-slate-900 shadow-sm">
+                    <div className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-2xl bg-white px-3 text-sm font-semibold text-slate-900 shadow-sm">
                       {formatAdminNumber(item.uploads, locale)}
                     </div>
                   </div>
@@ -154,7 +155,7 @@ export default function AdminApiUsagePage() {
                 <Activity className="h-4 w-4 text-slate-900" />
                 <span>{t('apiUsage.generatedAt')}</span>
               </div>
-              <p className="text-sm text-slate-900">{formatAdminDate(data?.generatedAt ?? '', locale)}</p>
+              <p className="text-sm break-all text-slate-900">{formatAdminDate(data?.generatedAt ?? '', locale)}</p>
             </div>
           </AdminPanel>
         </div>

@@ -12,6 +12,7 @@ import AdminStatusBadge from '@/components/admin/AdminStatusBadge';
 import { formatAdminDate, formatAdminNumber } from '@/lib/adminFormat';
 import { getAdminStatusToken, humanizeAdminValue } from '@/lib/adminLabels';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { truncateText } from '@/lib/utils';
 import { fetchAdminUsers } from '@/lib/store/slices/adminSlice';
 
 const pageSizeOptions = [10, 20, 50];
@@ -74,7 +75,7 @@ export default function AdminUsersPage() {
           <button
             type="button"
             onClick={() => dispatch(fetchAdminUsers({ page, limit, status: statusFilter === 'all' ? undefined : statusFilter, search: appliedSearch || undefined }))}
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
           >
             {t('common.refresh')}
           </button>
@@ -113,7 +114,7 @@ export default function AdminUsersPage() {
       </div>
 
       <AdminPanel title={t('users.tableTitle')} description={t('users.tableDescription')}>
-        <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_220px_140px_auto]">
+        <div className="mb-6 grid gap-3 xl:grid-cols-[minmax(0,1.3fr)_220px_140px_auto]">
           <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
             <Search className="h-4 w-4 text-slate-400" />
             <input
@@ -162,14 +163,14 @@ export default function AdminUsersPage() {
               type="button"
               disabled={isPending}
               onClick={applyFilters}
-              className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-950 px-5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60"
+              className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-slate-950 px-5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60 sm:w-auto"
             >
               {t('common.apply')}
             </button>
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              className="inline-flex h-12 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
             >
               <RotateCcw className="mr-2 h-4 w-4" />
               {t('common.reset')}
@@ -177,8 +178,65 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+        <div className="space-y-3 md:hidden">
+          {loading ? (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-12 text-center text-sm text-slate-500">
+              {t('users.loading')}
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-12 text-center text-sm text-slate-800">
+              {error}
+            </div>
+          ) : data.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-12 text-center text-sm text-slate-500">
+              {t('users.empty')}
+            </div>
+          ) : (
+            data.map((member) => (
+              <article key={member._id} className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-slate-950" title={member.name}>{truncateText(member.name, 36)}</p>
+                    <p className="mt-1 text-xs text-slate-500" title={member.email}>{truncateText(member.email, 40)}</p>
+                  </div>
+                  <div className="shrink-0">
+                    <AdminStatusBadge value={member.status} label={getStatusLabel(member.status)} />
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('users.columns.plan')}</p>
+                    <p className="mt-2 text-sm font-medium text-slate-900" title={member.subscription?.tier ?? t('users.planFallback')}>
+                      {truncateText(member.subscription?.tier ?? t('users.planFallback'), 24)}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500" title={member.subscription?.status ?? t('users.subscriptionUnavailable')}>
+                      {truncateText(member.subscription?.status ?? t('users.subscriptionUnavailable'), 28)}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('users.columns.searches')}</p>
+                    <p className="mt-2 text-sm font-medium text-slate-900">{formatAdminNumber(member.searchCount, locale)}</p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:col-span-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('users.columns.joined')}</p>
+                    <p className="mt-2 text-sm font-medium text-slate-900">{formatAdminDate(member.joiningDate, locale)}</p>
+                  </div>
+                </div>
+
+                <Link
+                  href={`/admin/members/${member._id}`}
+                  className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                >
+                  {t('common.viewDetails')}
+                </Link>
+              </article>
+            ))
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-[820px] w-full border-collapse text-left">
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t('users.columns.member')}</th>
@@ -211,27 +269,31 @@ export default function AdminUsersPage() {
               ) : (
                 data.map((member) => (
                   <tr key={member._id} className="hover:bg-slate-50/70">
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-950">{member.name}</p>
-                        <p className="mt-1 text-sm text-slate-500">{member.email}</p>
+                    <td className="px-4 py-4 align-top">
+                      <div className="min-w-0 max-w-[18rem]">
+                        <p className="text-sm font-semibold text-slate-950" title={member.name}>{truncateText(member.name, 34)}</p>
+                        <p className="mt-1 text-sm text-slate-500" title={member.email}>{truncateText(member.email, 38)}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 align-top">
                       <AdminStatusBadge value={member.status} label={getStatusLabel(member.status)} />
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-slate-700">
-                        <p className="font-medium text-slate-900">{member.subscription?.tier ?? t('users.planFallback')}</p>
-                        <p className="mt-1 text-xs text-slate-500">{member.subscription?.status ?? t('users.subscriptionUnavailable')}</p>
+                    <td className="px-4 py-4 align-top">
+                      <div className="max-w-[14rem] text-sm text-slate-700">
+                        <p className="font-medium text-slate-900" title={member.subscription?.tier ?? t('users.planFallback')}>
+                          {truncateText(member.subscription?.tier ?? t('users.planFallback'), 22)}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500" title={member.subscription?.status ?? t('users.subscriptionUnavailable')}>
+                          {truncateText(member.subscription?.status ?? t('users.subscriptionUnavailable'), 26)}
+                        </p>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-sm font-medium text-slate-700">{formatAdminNumber(member.searchCount, locale)}</td>
-                    <td className="px-4 py-4 text-sm text-slate-600">{formatAdminDate(member.joiningDate, locale)}</td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 text-sm font-medium whitespace-nowrap text-slate-700 align-top">{formatAdminNumber(member.searchCount, locale)}</td>
+                    <td className="px-4 py-4 text-sm whitespace-nowrap text-slate-600 align-top">{formatAdminDate(member.joiningDate, locale)}</td>
+                    <td className="px-4 py-4 align-top">
                       <Link
                         href={`/admin/members/${member._id}`}
-                        className="inline-flex h-10 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                        className="inline-flex h-10 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-medium whitespace-nowrap text-slate-700 transition hover:bg-slate-50"
                       >
                         {t('common.viewDetails')}
                       </Link>

@@ -132,6 +132,42 @@ export interface AdminSearchesResponse {
   pagination: AdminPagination;
 }
 
+export interface AdminSearchUploader {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+export interface AdminSearchResultItem {
+  _id: string;
+  image: string;
+  reviewStatus: string;
+  reviewedAt: string | null;
+  details: Record<string, unknown>;
+}
+
+export interface AdminSearchDetailsResults {
+  data: AdminSearchResultItem[];
+  pagination: AdminPagination;
+}
+
+export interface AdminSearchDetailsQuery {
+  searchId: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface AdminSearchDetails {
+  _id: string;
+  image: string;
+  status: string;
+  uploader: AdminSearchUploader;
+  date: string;
+  nextRescanAt: string | null;
+  lastRescanAt: string | null;
+  results: AdminSearchDetailsResults;
+}
+
 export interface AdminUsageStatusItem {
   status: string;
   count: number;

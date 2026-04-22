@@ -13,6 +13,7 @@ import AdminStatusBadge from '@/components/admin/AdminStatusBadge';
 import { formatAdminDate, formatAdminNumber } from '@/lib/adminFormat';
 import { getAdminStatusToken, humanizeAdminValue } from '@/lib/adminLabels';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { truncateText } from '@/lib/utils';
 import {
   clearAdminDeactivationFeedback,
   clearAdminMemberState,
@@ -95,7 +96,7 @@ export default function AdminMemberDetailsPage() {
         actions={
           <Link
             href="/admin/users"
-            className="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t('memberDetails.backToUsers')}
@@ -141,8 +142,10 @@ export default function AdminMemberDetailsPage() {
               <div className="space-y-4 rounded-3xl border border-slate-100 bg-slate-50 p-5">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('memberDetails.fields.contact')}</p>
-                  <p className="mt-2 text-base font-semibold text-slate-950">{data.email}</p>
-                  <p className="mt-1 text-sm text-slate-500">{data.phoneNumber || t('memberDetails.unavailable')}</p>
+                  <p className="mt-2 text-base font-semibold text-slate-950" title={data.email}>{truncateText(data.email, 44)}</p>
+                  <p className="mt-1 text-sm text-slate-500" title={data.phoneNumber || t('memberDetails.unavailable')}>
+                    {truncateText(data.phoneNumber || t('memberDetails.unavailable'), 26)}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <AdminStatusBadge value={data.isActive ? 'active' : 'inactive'} label={getStatusLabel(data.isActive ? 'active' : 'inactive')} />
@@ -152,24 +155,28 @@ export default function AdminMemberDetailsPage() {
               </div>
 
               <div className="space-y-3 rounded-3xl border border-slate-100 bg-slate-50 p-5 text-sm text-slate-600">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span>{t('memberDetails.fields.joined')}</span>
-                  <span className="font-medium text-slate-900">{formatAdminDate(data.joiningDate, locale)}</span>
+                  <span className="w-full font-medium break-all text-left text-slate-900 sm:w-auto sm:text-right">{formatAdminDate(data.joiningDate, locale)}</span>
                 </div>
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span>{t('memberDetails.fields.referralCode')}</span>
-                  <span className="font-medium text-slate-900">{data.referralCode || t('memberDetails.unavailable')}</span>
+                  <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.referralCode || t('memberDetails.unavailable')}>
+                    {truncateText(data.referralCode || t('memberDetails.unavailable'), 24)}
+                  </span>
                 </div>
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span>{t('memberDetails.fields.subscriptionId')}</span>
-                  <span className="font-medium text-slate-900">{data.subscriptionId || t('memberDetails.unavailable')}</span>
+                  <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.subscriptionId || t('memberDetails.unavailable')}>
+                    {truncateText(data.subscriptionId || t('memberDetails.unavailable'), 24)}
+                  </span>
                 </div>
               </div>
             </div>
           </AdminPanel>
 
           <AdminPanel title={t('memberDetails.searchesTitle')} description={t('memberDetails.searchesDescription')}>
-            <div className="mb-4 flex justify-end">
+            <div className="mb-4 flex justify-start sm:justify-end">
               <select
                 value={searchLimit}
                 onChange={(event) => {
@@ -186,47 +193,91 @@ export default function AdminMemberDetailsPage() {
               </select>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
+            <div className="space-y-3 md:hidden">
+              {searchesState.loading ? (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-12 text-center text-sm text-slate-500">
+                  {t('memberDetails.searchesLoading')}
+                </div>
+              ) : searchesState.error ? (
+                <div className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-12 text-center text-sm text-slate-800">
+                  {searchesState.error}
+                </div>
+              ) : searchesState.data.length === 0 ? (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-12 text-center text-sm text-slate-500">
+                  {t('memberDetails.searchesEmpty')}
+                </div>
+              ) : (
+                searchesState.data.map((searchItem) => (
+                  <article key={searchItem._id} className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="flex items-start gap-3">
+                      <img src={searchItem.image} alt="search" className="h-14 w-14 shrink-0 rounded-2xl border border-slate-200 object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <p className="mt-2 text-sm text-slate-600">{formatAdminDate(searchItem.date, locale)}</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <AdminStatusBadge value={searchItem.status} label={getStatusLabel(searchItem.status)} />
+                    </div>
+                    <Link
+                      href={`/admin/searches/${searchItem._id}`}
+                      className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                    >
+                      {t('common.viewDetails')}
+                    </Link>
+                  </article>
+                ))
+              )}
+            </div>
+
+            <div className="hidden overflow-x-auto md:block">
+              <table className="min-w-[760px] w-full border-collapse text-left">
                 <thead className="bg-slate-50">
                   <tr>
                     <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t('memberDetails.searchColumns.image')}</th>
                     <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t('memberDetails.searchColumns.status')}</th>
                     <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t('memberDetails.searchColumns.date')}</th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t('memberDetails.searchColumns.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {searchesState.loading ? (
                     <tr>
-                      <td colSpan={3} className="px-4 py-12 text-center text-sm text-slate-500">
+                      <td colSpan={4} className="px-4 py-12 text-center text-sm text-slate-500">
                         {t('memberDetails.searchesLoading')}
                       </td>
                     </tr>
                   ) : searchesState.error ? (
                     <tr>
-                      <td colSpan={3} className="px-4 py-12 text-center text-sm text-slate-800">
+                      <td colSpan={4} className="px-4 py-12 text-center text-sm text-slate-800">
                         {searchesState.error}
                       </td>
                     </tr>
                   ) : searchesState.data.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="px-4 py-12 text-center text-sm text-slate-500">
+                      <td colSpan={4} className="px-4 py-12 text-center text-sm text-slate-500">
                         {t('memberDetails.searchesEmpty')}
                       </td>
                     </tr>
                   ) : (
                     searchesState.data.map((searchItem) => (
                       <tr key={searchItem._id} className="hover:bg-slate-50/70">
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            <img src={searchItem.image} alt="search" className="h-14 w-14 rounded-2xl border border-slate-200 object-cover" />
-                            <p className="text-sm font-medium text-slate-800">{searchItem._id}</p>
+                        <td className="px-4 py-4 align-top">
+                          <div className="flex items-start gap-3">
+                            <img src={searchItem.image} alt="search" className="h-14 w-14 shrink-0 rounded-2xl border border-slate-200 object-cover" />
                           </div>
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4 align-top">
                           <AdminStatusBadge value={searchItem.status} label={getStatusLabel(searchItem.status)} />
                         </td>
-                        <td className="px-4 py-4 text-sm text-slate-600">{formatAdminDate(searchItem.date, locale)}</td>
+                        <td className="px-4 py-4 text-sm whitespace-nowrap text-slate-600 align-top">{formatAdminDate(searchItem.date, locale)}</td>
+                        <td className="px-4 py-4 align-top">
+                          <Link
+                            href={`/admin/searches/${searchItem._id}`}
+                            className="inline-flex h-10 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-medium whitespace-nowrap text-slate-700 transition hover:bg-slate-50"
+                          >
+                            {t('common.viewDetails')}
+                          </Link>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -250,20 +301,24 @@ export default function AdminMemberDetailsPage() {
         <div className="space-y-6">
           <AdminPanel title={t('memberDetails.subscriptionTitle')} description={t('memberDetails.subscriptionDescription')}>
             <div className="space-y-3 text-sm text-slate-600">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.plan')}</span>
-                <span className="font-medium text-slate-900">{data.subscription?.planId || t('memberDetails.unavailable')}</span>
+                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.subscription?.planId || t('memberDetails.unavailable')}>
+                  {truncateText(data.subscription?.planId || t('memberDetails.unavailable'), 24)}
+                </span>
               </div>
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.status')}</span>
                 <AdminStatusBadge
                   value={data.subscription?.status || 'inactive'}
                   label={data.subscription?.status ? getStatusLabel(data.subscription.status) : t('memberDetails.unavailable')}
                 />
               </div>
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.billingCycle')}</span>
-                <span className="font-medium text-slate-900">{data.subscription?.billingCycle || t('memberDetails.unavailable')}</span>
+                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.subscription?.billingCycle || t('memberDetails.unavailable')}>
+                  {truncateText(data.subscription?.billingCycle || t('memberDetails.unavailable'), 24)}
+                </span>
               </div>
             </div>
           </AdminPanel>

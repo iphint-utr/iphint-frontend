@@ -9,9 +9,13 @@ import type {
   AdminMemberSearch,
   AdminPagination,
   AdminRecentActivity,
+  AdminSearchDetails,
+  AdminSearchDetailsQuery,
   AdminSearchListItem,
+  AdminSearchResultItem,
   AdminSearchesQuery,
   AdminSearchesResponse,
+  AdminSearchUploader,
   AdminSubscriptionSummary,
   AdminUserListItem,
   AdminUserSearchesQuery,
@@ -219,6 +223,51 @@ const normalizeSearchesResponse = (payload: unknown): AdminSearchesResponse => {
   };
 };
 
+const normalizeSearchUploader = (uploader: Record<string, unknown> | null | undefined): AdminSearchUploader => ({
+  _id: String(uploader?._id ?? ''),
+  name: String(uploader?.name ?? 'Unknown member'),
+  email: String(uploader?.email ?? ''),
+});
+
+const normalizeSearchResult = (result: Record<string, unknown>): AdminSearchResultItem => ({
+  _id: String(result._id ?? ''),
+  image: String(result.image ?? ''),
+  reviewStatus: String(result.reviewStatus ?? 'not_reviewed'),
+  reviewedAt: result.reviewedAt ? String(result.reviewedAt) : null,
+  details:
+    typeof result.details === 'object' && result.details !== null
+      ? (result.details as Record<string, unknown>)
+      : {},
+});
+
+const normalizeSearchDetails = (payload: unknown): AdminSearchDetails => {
+  const data = unwrapData<Record<string, unknown>>(payload) ?? {};
+  const uploader =
+    typeof data.uploader === 'object' && data.uploader !== null
+      ? (data.uploader as Record<string, unknown>)
+      : null;
+  const results =
+    typeof data.results === 'object' && data.results !== null
+      ? (data.results as { data?: unknown[]; pagination?: Partial<AdminPagination> })
+      : undefined;
+
+  return {
+    _id: String(data._id ?? ''),
+    image: String(data.image ?? ''),
+    status: String(data.status ?? 'unknown'),
+    uploader: normalizeSearchUploader(uploader),
+    date: String(data.date ?? data.uploadDate ?? data.createdAt ?? ''),
+    nextRescanAt: data.nextRescanAt ? String(data.nextRescanAt) : null,
+    lastRescanAt: data.lastRescanAt ? String(data.lastRescanAt) : null,
+    results: {
+      data: Array.isArray(results?.data)
+        ? results.data.map((item) => normalizeSearchResult((item ?? {}) as Record<string, unknown>))
+        : [],
+      pagination: normalizePagination(results?.pagination),
+    },
+  };
+};
+
 const createQueryParams = (params: Record<string, string | number | undefined>) => {
   const query = new URLSearchParams();
 
@@ -370,6 +419,19 @@ export const fetchAdminSearches = createAsyncThunk<AdminSearchesResponse, AdminS
   },
 );
 
+export const fetchAdminSearchDetails = createAsyncThunk<AdminSearchDetails, AdminSearchDetailsQuery, { rejectValue: string }>(
+  'admin/fetchSearchDetails',
+  async ({ searchId, page = 1, limit = 10 }, { rejectWithValue }) => {
+    try {
+      const params = createQueryParams({ page, limit });
+      const response = await adminApiClient.get(`/searchDetails/${searchId}?${params.toString()}`);
+      return normalizeSearchDetails(response.data);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch search details'));
+    }
+  },
+);
+
 export const fetchAdminApiUsage = createAsyncThunk<AdminApiUsageSummary, { limit?: number } | undefined, { rejectValue: string }>(
   'admin/fetchApiUsage',
   async (query, { rejectWithValue }) => {
@@ -420,6 +482,12 @@ interface AdminState {
     loading: boolean;
     error: string | null;
   };
+  searchDetails: {
+    searchId: string | null;
+    data: AdminSearchDetails | null;
+    loading: boolean;
+    error: string | null;
+  };
   apiUsage: {
     data: AdminApiUsageSummary | null;
     loading: boolean;
@@ -462,6 +530,12 @@ const initialState: AdminState = {
     loading: false,
     error: null,
   },
+  searchDetails: {
+    searchId: null,
+    data: null,
+    loading: false,
+    error: null,
+  },
   apiUsage: {
     data: null,
     loading: false,
@@ -495,6 +569,14 @@ const adminSlice = createSlice({
     clearAdminDeactivationFeedback(state) {
       state.deactivation.error = null;
       state.deactivation.successMessage = null;
+    },
+    clearAdminSearchDetailsState(state) {
+      state.searchDetails = {
+        searchId: null,
+        data: null,
+        loading: false,
+        error: null,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -585,6 +667,20 @@ const adminSlice = createSlice({
         state.searches.loading = false;
         state.searches.error = action.payload ?? 'Failed to fetch searches';
       })
+      .addCase(fetchAdminSearchDetails.pending, (state, action) => {
+        state.searchDetails.loading = true;
+        state.searchDetails.error = null;
+        state.searchDetails.searchId = action.meta.arg.searchId;
+      })
+      .addCase(fetchAdminSearchDetails.fulfilled, (state, action) => {
+        state.searchDetails.loading = false;
+        state.searchDetails.searchId = action.payload._id;
+        state.searchDetails.data = action.payload;
+      })
+      .addCase(fetchAdminSearchDetails.rejected, (state, action) => {
+        state.searchDetails.loading = false;
+        state.searchDetails.error = action.payload ?? 'Failed to fetch search details';
+      })
       .addCase(fetchAdminApiUsage.pending, (state) => {
         state.apiUsage.loading = true;
         state.apiUsage.error = null;
@@ -600,5 +696,5 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearAdminMemberState, clearAdminDeactivationFeedback } = adminSlice.actions;
+export const { clearAdminMemberState, clearAdminDeactivationFeedback, clearAdminSearchDetailsState } = adminSlice.actions;
 export default adminSlice.reducer;
