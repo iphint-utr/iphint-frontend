@@ -244,7 +244,7 @@ export default function AdminSearchesPage() {
         </div>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="min-w-[980px] w-full border-collapse text-left">
+          <table className="min-w-[980px] w-full border-collapse text-left ">
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t('searches.columns.file')}</th>

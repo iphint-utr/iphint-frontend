@@ -20,7 +20,7 @@ export default function AdminTopbar({ onMenuClick }: { onMenuClick: () => void }
             <Menu className="h-5 w-5" />
           </button>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">{t('topbar.eyebrow')}</p>
+            
             <h1 className="text-lg font-semibold tracking-tight text-slate-950">{t('topbar.title')}</h1>
           </div>
         </div>

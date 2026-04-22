@@ -14,10 +14,17 @@ import AdminStatusBadge from '@/components/admin/AdminStatusBadge';
 import { formatAdminDate, formatAdminNumber } from '@/lib/adminFormat';
 import { getAdminStatusToken, humanizeAdminValue } from '@/lib/adminLabels';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { truncateText } from '@/lib/utils';
+import { cn, truncateText } from '@/lib/utils';
 import { clearAdminSearchDetailsState, fetchAdminSearchDetails } from '@/lib/store/slices/adminSlice';
 
 const resultPageSizeOptions = [10, 20, 50, 100];
+
+const mobileMetricAccentStyles = {
+  teal: 'bg-slate-950 text-white ring-1 ring-slate-900',
+  emerald: 'bg-slate-100 text-slate-900 ring-1 ring-slate-200',
+  amber: 'bg-slate-200 text-slate-900 ring-1 ring-slate-300',
+  slate: 'bg-white text-slate-900 ring-1 ring-slate-200',
+} as const;
 
 const serializeDetailValue = (value: unknown) => {
   if (value === null || value === undefined || value === '') {
@@ -102,9 +109,90 @@ export default function AdminSearchDetailsPage() {
   const resultPagination = data.results.pagination;
   const reviewedCount = resultItems.filter((result) => result.reviewStatus === 'reviewed' || Boolean(result.reviewedAt)).length;
   const pendingReviewCount = Math.max(resultItems.length - reviewedCount, 0);
+  const metricItems = [
+    {
+      key: 'results',
+      title: t('searchDetails.metrics.results'),
+      value: formatAdminNumber(resultPagination.total, locale),
+      hint: t('searchDetails.metricHints.results'),
+      icon: Search,
+      accent: 'teal' as const,
+    },
+    {
+      key: 'reviewed',
+      title: t('searchDetails.metrics.reviewed'),
+      value: formatAdminNumber(reviewedCount, locale),
+      hint: t('searchDetails.metricHints.reviewed'),
+      icon: CheckCircle2,
+      accent: 'emerald' as const,
+    },
+    {
+      key: 'pendingReview',
+      title: t('searchDetails.metrics.pendingReview'),
+      value: formatAdminNumber(pendingReviewCount, locale),
+      hint: t('searchDetails.metricHints.pendingReview'),
+      icon: Clock3,
+      accent: 'amber' as const,
+    },
+    {
+      key: 'status',
+      title: t('searchDetails.metrics.status'),
+      value: getStatusLabel(data.status),
+      hint: t('searchDetails.metricHints.status'),
+      icon: ShieldCheck,
+      accent: 'slate' as const,
+    },
+  ];
+  const searchMetaItems = [
+    {
+      key: 'uploader',
+      label: t('searchDetails.fields.uploader'),
+      value: (
+        <Link
+          href={`/admin/members/${data.uploader._id}`}
+          className="block text-sm font-semibold text-slate-950 hover:underline"
+          title={data.uploader.name}
+        >
+          {truncateText(data.uploader.name, 34)}
+        </Link>
+      ),
+    },
+    {
+      key: 'uploaderEmail',
+      label: t('searchDetails.fields.uploaderEmail'),
+      value: (
+        <p className="text-sm font-medium text-slate-900" title={data.uploader.email}>
+          {truncateText(data.uploader.email, 38)}
+        </p>
+      ),
+    },
+    {
+      key: 'uploadedAt',
+      label: t('searchDetails.fields.uploadedAt'),
+      value: <p className="text-sm font-medium text-slate-900">{formatAdminDate(data.date, locale)}</p>,
+    },
+    {
+      key: 'nextRescan',
+      label: t('searchDetails.fields.nextRescan'),
+      value: (
+        <p className="text-sm font-medium text-slate-900">
+          {data.nextRescanAt ? formatAdminDate(data.nextRescanAt, locale) : t('memberDetails.unavailable')}
+        </p>
+      ),
+    },
+    {
+      key: 'lastRescan',
+      label: t('searchDetails.fields.lastRescan'),
+      value: (
+        <p className="text-sm font-medium text-slate-900">
+          {data.lastRescanAt ? formatAdminDate(data.lastRescanAt, locale) : t('memberDetails.unavailable')}
+        </p>
+      ),
+    },
+  ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <AdminPageHeader
         eyebrow={t('searchDetails.eyebrow')}
         title={t('searchDetails.title')}
@@ -120,81 +208,75 @@ export default function AdminSearchDetailsPage() {
         }
       />
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <AdminMetricCard
-          title={t('searchDetails.metrics.results')}
-          value={formatAdminNumber(resultPagination.total, locale)}
-          hint={t('searchDetails.metricHints.results')}
-          icon={<Search className="h-5 w-5" />}
-          accent="teal"
-        />
-        <AdminMetricCard
-          title={t('searchDetails.metrics.reviewed')}
-          value={formatAdminNumber(reviewedCount, locale)}
-          hint={t('searchDetails.metricHints.reviewed')}
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          accent="emerald"
-        />
-        <AdminMetricCard
-          title={t('searchDetails.metrics.pendingReview')}
-          value={formatAdminNumber(pendingReviewCount, locale)}
-          hint={t('searchDetails.metricHints.pendingReview')}
-          icon={<Clock3 className="h-5 w-5" />}
-          accent="amber"
-        />
-        <AdminMetricCard
-          title={t('searchDetails.metrics.status')}
-          value={getStatusLabel(data.status)}
-          hint={t('searchDetails.metricHints.status')}
-          icon={<ShieldCheck className="h-5 w-5" />}
-          accent="slate"
-        />
+      <div className="grid grid-cols-2 gap-3 md:hidden">
+        {metricItems.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <div key={item.key} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <p className="min-w-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.16em] text-slate-500">
+                  {item.title}
+                </p>
+                <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl', mobileMetricAccentStyles[item.accent])}>
+                  <Icon className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="mt-4 break-words text-xl font-semibold tracking-tight text-slate-950">
+                {item.value}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="hidden gap-5 md:grid md:grid-cols-2 xl:grid-cols-4">
+        {metricItems.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <AdminMetricCard
+              key={item.key}
+              title={item.title}
+              value={item.value}
+              hint={item.hint}
+              icon={<Icon className="h-5 w-5" />}
+              accent={item.accent}
+            />
+          );
+        })}
       </div>
 
       <div className="space-y-6">
         <AdminPanel title={t('searchDetails.overviewTitle')} description={t('searchDetails.overviewDescription')}>
-          <div className="grid gap-6 lg:grid-cols-[minmax(220px,280px)_minmax(0,1fr)]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
               <div className="relative aspect-square w-full">
                 <Image
                   src={data.image || '/logo.svg'}
                   alt={t('searchDetails.searchImageAlt')}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 280px"
+                  sizes="(max-width: 640px) 112px, (max-width: 1024px) 144px, 280px"
                   className="object-cover"
                 />
               </div>
             </div>
 
-            <div className="space-y-4 rounded-3xl border border-slate-100 bg-slate-50 p-5 text-sm text-slate-600">
+            <div className="space-y-3 rounded-3xltext-sm text-slate-600 sm:space-y-4 sm:p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <AdminStatusBadge value={data.status} label={getStatusLabel(data.status)} />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('searchDetails.fields.uploader')}</p>
-                  <Link href={`/admin/members/${data.uploader._id}`} className="mt-2 block text-sm font-semibold text-slate-950 hover:underline" title={data.uploader.name}>
-                    {truncateText(data.uploader.name, 34)}
-                  </Link>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('searchDetails.fields.uploaderEmail')}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900" title={data.uploader.email}>
-                    {truncateText(data.uploader.email, 38)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('searchDetails.fields.uploadedAt')}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{formatAdminDate(data.date, locale)}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('searchDetails.fields.nextRescan')}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{data.nextRescanAt ? formatAdminDate(data.nextRescanAt, locale) : t('memberDetails.unavailable')}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('searchDetails.fields.lastRescan')}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{data.lastRescanAt ? formatAdminDate(data.lastRescanAt, locale) : t('memberDetails.unavailable')}</p>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <div className="grid gap-px bg-slate-200 md:grid-cols-2">
+                  {searchMetaItems.map((item) => (
+                    <div key={item.key} className="min-w-0 bg-white px-4 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        {item.label}
+                      </p>
+                      <div className="mt-2 min-w-0">{item.value}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -234,51 +316,57 @@ export default function AdminSearchDetailsPage() {
               {resultItems.map((result, index) => {
                 const detailEntries = Object.entries(result.details ?? {});
                 const cardIndex = (resultPagination.page - 1) * resultPagination.limit + index + 1;
+                const reviewedAtValue = result.reviewedAt ? formatAdminDate(result.reviewedAt, locale) : t('memberDetails.unavailable');
 
                 return (
-                  <article key={result._id || `${index}`} className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
-                    <div className="grid gap-5 lg:grid-cols-[128px_minmax(0,1fr)]">
-                      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                  <article key={result._id || `${index}`} className="rounded-3xl border border-slate-200 bg-slate-50/70 p-3 sm:p-5">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                      <div className="w-full md:w-[270px] overflow-hidden rounded-2xl border border-slate-200 bg-white">
                         <div className="relative aspect-square w-full">
                           <Image
                             src={result.image || data.image || '/logo.svg'}
                             alt={t('searchDetails.resultImageAlt')}
                             fill
-                            sizes="128px"
-                            className="object-cover"
+                            
+                            className="object-cover object-center"
                           />
                         </div>
                       </div>
 
-                      <div className="min-w-0">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="min-w-0">
-                            <h3 className="text-base font-semibold text-slate-950">{t('searchDetails.resultTitle', { index: cardIndex })}</h3>
-                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <div className="min-w-0 space-y-3 flex-1">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
+                          <div className="flex flex-row justify-between items-center">
+
+
+                            <div className="flex flex-wrap items-center gap-2 ">
                               <AdminStatusBadge value={result.reviewStatus} label={getStatusLabel(result.reviewStatus)} />
                             </div>
-                          </div>
 
-                          <div className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{t('searchDetails.resultFields.reviewedAt')}</p>
-                            <p className="mt-2 font-medium text-slate-900">{result.reviewedAt ? formatAdminDate(result.reviewedAt, locale) : t('memberDetails.unavailable')}</p>
+                            <div className="flex flex-col md:flex-row items-center justify-center gap-1">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                {t('searchDetails.resultFields.reviewedAt')}
+                              </p>
+                              <p className="text-sm font-medium text-slate-900">{reviewedAtValue}</p>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{t('searchDetails.resultFields.details')}</p>
+                        <div className="rounded-2xl bg-white">
+                          
                           {detailEntries.length === 0 ? (
                             <p className="mt-3 text-sm text-slate-500">{t('searchDetails.resultDetailsEmpty')}</p>
                           ) : (
-                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                            <div className="mt-3 overflow-hidden rounded-2xl ">
                               {detailEntries.map(([key, value]) => {
                                 const normalizedValue = serializeDetailValue(value) || t('memberDetails.unavailable');
 
                                 return (
-                                  <div key={key} className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{humanizeAdminValue(key)}</p>
-                                    <p className="mt-2 text-sm font-medium text-slate-900" title={normalizedValue}>
-                                      {truncateText(normalizedValue, 80)}
+                                  <div key={key} className="grid gap-1.5 border-b border-slate-200 px-3 py-1 last:border-b-0 sm:grid-cols-[minmax(140px,180px)_minmax(0,1fr)] sm:items-start sm:gap-4 sm:px-4 sm:py-3">
+                                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                      {humanizeAdminValue(key)}
+                                    </p>
+                                    <p className="text-sm font-medium text-slate-900" title={normalizedValue}>
+                                      {truncateText(normalizedValue, 120)}
                                     </p>
                                   </div>
                                 );
