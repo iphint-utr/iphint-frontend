@@ -194,7 +194,7 @@ export default function AdminSearchDetailsPage() {
   return (
     <div className="space-y-6 md:space-y-8">
       <AdminPageHeader
-        eyebrow={t('searchDetails.eyebrow')}
+        
         title={t('searchDetails.title')}
         description={t('searchDetails.description')}
         actions={
@@ -249,26 +249,26 @@ export default function AdminSearchDetailsPage() {
 
       <div className="space-y-6">
         <AdminPanel title={t('searchDetails.overviewTitle')} description={t('searchDetails.overviewDescription')}>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
+          <div className="flex flex-col  gap-4 md:flex-row md:items-center">
+            <div className="overflow-hidden w-[400px] rounded-3xl border border-slate-200 bg-slate-50">
               <div className="relative aspect-square w-full">
                 <Image
                   src={data.image || '/logo.svg'}
                   alt={t('searchDetails.searchImageAlt')}
                   fill
-                  sizes="(max-width: 640px) 112px, (max-width: 1024px) 144px, 280px"
+                  
                   className="object-cover"
                 />
               </div>
             </div>
 
-            <div className="space-y-3 rounded-3xltext-sm text-slate-600 sm:space-y-4 sm:p-5">
+            <div className="space-y-3 rounded-3xl flex-1 text-sm text-slate-600 sm:space-y-4 sm:p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <AdminStatusBadge value={data.status} label={getStatusLabel(data.status)} />
               </div>
 
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="grid gap-px bg-slate-200 md:grid-cols-2">
+                <div className="flex flex-col">
                   {searchMetaItems.map((item) => (
                     <div key={item.key} className="min-w-0 bg-white px-4 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
