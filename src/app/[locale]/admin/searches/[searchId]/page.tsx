@@ -250,7 +250,7 @@ export default function AdminSearchDetailsPage() {
       <div className="space-y-6">
         <AdminPanel title={t('searchDetails.overviewTitle')} description={t('searchDetails.overviewDescription')}>
           <div className="flex flex-col  gap-4 md:flex-row md:items-center">
-            <div className="overflow-hidden w-[400px] rounded-3xl border border-slate-200 bg-slate-50">
+            <div className="overflow-hidden w-full md:w-[400px] rounded-3xl border border-slate-200 bg-slate-50">
               <div className="relative aspect-square w-full">
                 <Image
                   src={data.image || '/logo.svg'}
