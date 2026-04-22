@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Activity, Gauge, Search, TrendingUp, Users } from 'lucide-react';
+import { Gauge, Search, TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import AdminMetricCard from '@/components/admin/AdminMetricCard';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import AdminPanel from '@/components/admin/AdminPanel';
 import AdminStatusBadge from '@/components/admin/AdminStatusBadge';
-import { formatAdminDate, formatAdminNumber } from '@/lib/adminFormat';
+import { formatAdminNumber } from '@/lib/adminFormat';
 import { getAdminStatusToken, humanizeAdminValue } from '@/lib/adminLabels';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { truncateText } from '@/lib/utils';
@@ -31,7 +31,6 @@ export default function AdminApiUsagePage() {
   return (
     <div className="space-y-8">
       <AdminPageHeader
-        eyebrow={t('apiUsage.eyebrow')}
         title={t('apiUsage.title')}
         description={t('apiUsage.description')}
         actions={
@@ -145,17 +144,6 @@ export default function AdminApiUsagePage() {
                 <p className="text-sm font-medium text-slate-500">{t('apiUsage.snapshot.failed')}</p>
                 <p className="mt-3 text-2xl font-semibold text-slate-950">{formatAdminNumber(data?.failedRequests ?? 0, locale)}</p>
               </div>
-            </div>
-          </AdminPanel>
-
-          <AdminPanel title={t('apiUsage.methodologyTitle')} description={t('apiUsage.methodologyDescription')}>
-            <div className="space-y-3 rounded-3xl border border-slate-200 bg-slate-100 p-5 text-sm leading-6 text-slate-800">
-              <p>{t('apiUsage.methodologyCopy', { count: data?.sampleSize ?? 0 })}</p>
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-slate-600">
-                <Activity className="h-4 w-4 text-slate-900" />
-                <span>{t('apiUsage.generatedAt')}</span>
-              </div>
-              <p className="text-sm break-all text-slate-900">{formatAdminDate(data?.generatedAt ?? '', locale)}</p>
             </div>
           </AdminPanel>
         </div>
