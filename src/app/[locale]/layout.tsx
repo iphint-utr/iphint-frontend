@@ -9,6 +9,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import AppLayoutRouter from '@/components/layout/AppLayoutRouter';
 import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
+import Navbar from '@/components/navbar';
+import Footer from '@/components/footer';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,9 +45,12 @@ export default async function RootLayout({
         <ExtensionAttrSuppressor />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <StoreProvider>
+            <Navbar />
             <AppLayoutRouter>{children}</AppLayoutRouter>
+            <Footer />
           </StoreProvider>
         </NextIntlClientProvider>
+        
       </body>
     </html>
   );
