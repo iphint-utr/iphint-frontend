@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/lib/store/store';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   Copy,
   Check,
@@ -16,15 +14,7 @@ import {
   ChevronRight,
   AlertCircle,
 } from 'lucide-react';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import { fetchReferralStatus, generateReferralWindow } from '@/lib/store/slices/accountSlice';
 
 interface ReferralStatus {
   referralCode: string;
@@ -59,36 +49,17 @@ function CountdownTimer({ expiresAt }: { expiresAt: string }) {
 }
 
 export default function ReferralPage() {
-  const user = useSelector((state: RootState) => state.user);
-  const [status, setStatus] = useState<ReferralStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const { data: status, loading, generating, error } = useAppSelector((state) => state.account.referral);
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchStatus = useCallback(async () => {
-    try {
-      const res = await apiClient.get('/referral/status');
-      setStatus(res.data);
-    } catch {
-      setError('Failed to load referral status.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchStatus(); }, [fetchStatus]);
+  useEffect(() => {
+    dispatch(fetchReferralStatus());
+  }, [dispatch]);
 
   const handleGenerate = async () => {
-    setGenerating(true);
-    try {
-      await apiClient.post('/referral/generate');
-      await fetchStatus();
-    } catch {
-      setError('Failed to activate referral window.');
-    } finally {
-      setGenerating(false);
-    }
+    await dispatch(generateReferralWindow());
   };
 
   const handleCopy = async () => {

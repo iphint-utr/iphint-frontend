@@ -1,19 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({
-  baseURL: `${BASE_URL}/api/v1`,
-});
-
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import { apiClient } from '@/lib/api';
 
 export type ReviewStatus =
   | 'not_reviewed'

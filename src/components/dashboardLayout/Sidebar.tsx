@@ -1,23 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { LayoutDashboard, Search, Activity, CreditCard, Settings, LogOut, UserCircle2, FileText, Crown, Users, ShieldCheck } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
-import { AppDispatch, RootState } from '@/lib/store/store';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { logout } from '@/lib/store/slices/userSlice';
-import axios from 'axios';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import { fetchSubscriptionSnapshot } from '@/lib/store/slices/accountSlice';
 
 const menu = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -37,23 +27,18 @@ const closeOnMobileOnly = (onClose: () => void) => {
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useTranslations('Admin');
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const user = useSelector((state: RootState) => state.user);
-  const [planInfo, setPlanInfo] = useState<{
-    name: string;
-    tier: string;
-    subscriptionStatus: string | null;
-    isTrial: boolean;
-    trialDaysLeft: number;
-  }>({
-    name: 'Starter',
-    tier: 'starter',
-    subscriptionStatus: null,
-    isTrial: false,
-    trialDaysLeft: 0,
-  });
+  const user = useAppSelector((state) => state.user);
+  const subscriptionSnapshot = useAppSelector((state) => state.account.subscription.data);
+  const planInfo = {
+    name: subscriptionSnapshot?.plan?.name || 'Starter',
+    tier: subscriptionSnapshot?.plan?.tier || 'starter',
+    subscriptionStatus: subscriptionSnapshot?.subscription?.status || null,
+    isTrial: Boolean(subscriptionSnapshot?.subscription?.isTrial),
+    trialDaysLeft: Number(subscriptionSnapshot?.subscription?.trialDaysLeft || 0),
+  };
 
   const displayName = user.name || 'User';
   const company = user.role || 'Organization';
@@ -72,20 +57,8 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   };
 
   useEffect(() => {
-    apiClient
-      .get('/billing/subscription')
-      .then((res) => {
-        const tier = res?.data?.plan?.tier || 'starter';
-        const name = res?.data?.plan?.name || 'Starter';
-        const subscriptionStatus = res?.data?.subscription?.status || null;
-        const isTrial = !!res?.data?.subscription?.isTrial;
-        const trialDaysLeft = Number(res?.data?.subscription?.trialDaysLeft || 0);
-        setPlanInfo({ tier, name, subscriptionStatus, isTrial, trialDaysLeft });
-      })
-      .catch(() => {
-        setPlanInfo({ name: 'Starter', tier: 'starter', subscriptionStatus: null, isTrial: false, trialDaysLeft: 0 });
-      });
-  }, []);
+    dispatch(fetchSubscriptionSnapshot());
+  }, [dispatch]);
 
   return (
     <>

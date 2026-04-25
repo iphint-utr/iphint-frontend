@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { AppDispatch, RootState } from '@/lib/store/store'; 
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchDashboardData, fetchAlerts } from '@/lib/store/slices/userSlice';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { NewScanBanner } from '@/components/dashboard/NewScanBanner';
-import axios from 'axios';
+import { generateReferralWindow } from '@/lib/store/slices/accountSlice';
 import { 
   CheckCircle2, 
   ChevronRight, 
@@ -18,22 +17,13 @@ import {
   Copy 
 } from 'lucide-react';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
 export default function DashboardPage() {
   const t = useTranslations('Dashboard');
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   
   // Get user data for name and referral code
-  const  user  = useSelector((state: RootState) => state.user);
-  const { stats, latestSearches, alerts, loading } = useSelector((state: RootState) => state.user);
+  const user = useAppSelector((state) => state.user);
+  const { stats, latestSearches, alerts, loading } = useAppSelector((state) => state.user);
 
   // State for copy feedback
   const [copied, setCopied] = useState(false);
@@ -50,8 +40,8 @@ export default function DashboardPage() {
 
     try {
       // Keep the quick-copy behavior, but activate the 24-hour window first.
-      const genRes = await apiClient.post('/referral/generate');
-      code = genRes?.data?.referralCode || code;
+      const referralStatus = await dispatch(generateReferralWindow()).unwrap();
+      code = referralStatus?.referralCode || code;
 
       const referralUrl = `${baseUrl}/register?ref=${code}`;
       if (navigator.clipboard && window.isSecureContext) {

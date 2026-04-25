@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
 import { Bell, CheckCircle2, Mail, RefreshCcw, Search, Shield, Trash2, UserCircle2 } from 'lucide-react';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import {
+  deleteAllNotifications,
+  deleteNotification,
+  fetchNotifications,
+  fetchSettingsOverview,
+  markAllNotificationsRead,
+  markNotificationRead,
+  updateNotificationPreferences,
+  updatePasswordSettings,
+  updateProfileSettings,
+} from '@/lib/store/slices/accountSlice';
 
 type SummaryFrequency = 'instant' | 'daily' | 'weekly';
 
@@ -44,7 +46,19 @@ interface NotificationItem {
 }
 
 export default function SettingsPage() {
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const {
+    profile: storedProfile,
+    notificationPreferences: storedNotificationPrefs,
+    loading,
+    error: settingsError,
+    profileSaving,
+    preferencesSaving: prefsSaving,
+    passwordSaving,
+  } = useAppSelector((state) => state.account.settings);
+  const notifications = useAppSelector((state) => state.account.notifications.settings.items) as NotificationItem[];
+  const notificationsError = useAppSelector((state) => state.account.notifications.settings.error);
+  const unreadCount = useAppSelector((state) => state.account.notifications.unreadCount);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [settingsSection, setSettingsSection] = useState<'profile' | 'notifications'>('profile');
@@ -68,14 +82,8 @@ export default function SettingsPage() {
     summaryFrequency: 'instant',
   });
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread'>('all');
   const [notificationQuery, setNotificationQuery] = useState('');
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  const [profileSaving, setProfileSaving] = useState(false);
-  const [prefsSaving, setPrefsSaving] = useState(false);
-  const [passwordSaving, setPasswordSaving] = useState(false);
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -101,58 +109,51 @@ export default function SettingsPage() {
   };
 
   const loadSettings = async () => {
-    const { data } = await apiClient.get('/user-details/settings');
-    const settings = data?.settings || {};
-    setProfile(settings.profile || profile);
-    setNotificationPrefs(settings.notifications || notificationPrefs);
-    setUnreadCount(settings.unreadNotifications || 0);
+    await dispatch(fetchSettingsOverview()).unwrap();
   };
 
   const loadNotifications = async (status: 'all' | 'unread', q = '') => {
-    const { data } = await apiClient.get('/user-details/notifications', {
-      params: { status, q, page: 1, limit: 20 },
-    });
-    setNotifications(data?.notifications || []);
-    setUnreadCount(data?.unreadCount || 0);
+    await dispatch(
+      fetchNotifications({ scope: 'settings', status, q, page: 1, limit: 20 }),
+    ).unwrap();
   };
+
+  useEffect(() => {
+    setProfile(storedProfile);
+  }, [storedProfile]);
+
+  useEffect(() => {
+    setNotificationPrefs(storedNotificationPrefs);
+  }, [storedNotificationPrefs]);
 
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        setLoading(true);
         setError('');
         await Promise.all([loadSettings(), loadNotifications('all', '')]);
-      } catch (err: any) {
-        showMessage(err?.response?.data?.message || 'Failed to load settings', true);
-      } finally {
-        setLoading(false);
+      } catch (err) {
+        showMessage(typeof err === 'string' ? err : 'Failed to load settings', true);
       }
     };
 
     bootstrap();
-  }, []);
+  }, [dispatch]);
 
   const handleSaveProfile = async () => {
     try {
-      setProfileSaving(true);
-      await apiClient.patch('/user-details/settings/profile', profile);
+      await dispatch(updateProfileSettings(profile)).unwrap();
       showMessage('Profile updated successfully.');
-    } catch (err: any) {
-      showMessage(err?.response?.data?.message || 'Could not update profile.', true);
-    } finally {
-      setProfileSaving(false);
+    } catch (err) {
+      showMessage(typeof err === 'string' ? err : 'Could not update profile.', true);
     }
   };
 
   const handleSavePreferences = async () => {
     try {
-      setPrefsSaving(true);
-      await apiClient.patch('/user-details/settings/notifications', notificationPrefs);
+      await dispatch(updateNotificationPreferences(notificationPrefs)).unwrap();
       showMessage('Notification preferences saved.');
-    } catch (err: any) {
-      showMessage(err?.response?.data?.message || 'Could not update notification preferences.', true);
-    } finally {
-      setPrefsSaving(false);
+    } catch (err) {
+      showMessage(typeof err === 'string' ? err : 'Could not update notification preferences.', true);
     }
   };
 
@@ -167,17 +168,14 @@ export default function SettingsPage() {
     }
 
     try {
-      setPasswordSaving(true);
-      await apiClient.patch('/user-details/settings/password', {
+      await dispatch(updatePasswordSettings({
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
-      });
+      })).unwrap();
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       showMessage('Password updated successfully.');
-    } catch (err: any) {
-      showMessage(err?.response?.data?.message || 'Could not update password.', true);
-    } finally {
-      setPasswordSaving(false);
+    } catch (err) {
+      showMessage(typeof err === 'string' ? err : 'Could not update password.', true);
     }
   };
 
@@ -192,8 +190,8 @@ export default function SettingsPage() {
 
   const handleDeleteNotification = async (id: string) => {
     try {
-      await apiClient.delete(`/user-details/notifications/${id}`);
-      setNotifications((prev) => prev.filter((n) => n._id !== id));
+      await dispatch(deleteNotification(id)).unwrap();
+      await loadNotifications(notificationFilter, notificationQuery);
       showMessage('Notification deleted.');
     } catch {
       showMessage('Could not delete notification.', true);
@@ -202,9 +200,7 @@ export default function SettingsPage() {
 
   const handleDeleteAllNotifications = async () => {
     try {
-      await apiClient.delete('/user-details/notifications');
-      setNotifications([]);
-      setUnreadCount(0);
+      await dispatch(deleteAllNotifications()).unwrap();
       showMessage('All notifications deleted.');
     } catch {
       showMessage('Could not delete all notifications.', true);
@@ -221,12 +217,8 @@ export default function SettingsPage() {
 
   const handleMarkRead = async (id: string) => {
     try {
-      await apiClient.patch(`/user-details/notifications/${id}/read`);
-      setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, isRead: true } : n)));
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-      if (notificationFilter === 'unread') {
-        setNotifications((prev) => prev.filter((n) => n._id !== id));
-      }
+      await dispatch(markNotificationRead(id)).unwrap();
+      await loadNotifications(notificationFilter, notificationQuery);
     } catch {
       showMessage('Could not update notification.', true);
     }
@@ -234,12 +226,8 @@ export default function SettingsPage() {
 
   const handleMarkAllRead = async () => {
     try {
-      await apiClient.patch('/user-details/notifications/read-all');
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      setUnreadCount(0);
-      if (notificationFilter === 'unread') {
-        setNotifications([]);
-      }
+      await dispatch(markAllNotificationsRead()).unwrap();
+      await loadNotifications(notificationFilter, notificationQuery);
       showMessage('All notifications marked as read.');
     } catch {
       showMessage('Could not mark all notifications as read.', true);
@@ -315,7 +303,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {error && <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+      {(error || settingsError || notificationsError) && <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error || settingsError || notificationsError}</div>}
       {success && <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</div>}
 
       {settingsSection === 'profile' && (

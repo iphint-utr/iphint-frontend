@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 
 interface AuthState {
   user: any | null;
@@ -22,12 +20,10 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData: any, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/v1/auth/register`, userData);
+      const response = await apiClient.post('/auth/register', userData);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || error.response?.data?.error || 'Registration failed'
-      );
+    } catch (error: unknown) {
+      return rejectWithValue(getApiErrorMessage(error, 'Registration failed'));
     }
   }
 );
@@ -37,12 +33,10 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: any, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/v1/auth/login`, credentials);
+      const response = await apiClient.post('/auth/login', credentials);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || error.response?.data?.error || 'Login failed'
-      );
+    } catch (error: unknown) {
+      return rejectWithValue(getApiErrorMessage(error, 'Login failed'));
     }
   }
 );

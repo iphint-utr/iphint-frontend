@@ -1,1 +1,1 @@
-export { default } from '../../newScan/page';
+export { default } from '../../user/newScan/page';

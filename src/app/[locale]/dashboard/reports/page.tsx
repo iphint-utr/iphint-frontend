@@ -2,16 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Download, Eye, FileText, Image as ImageIcon, Lock } from 'lucide-react';
-import axios from 'axios';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { fetchReportsPageData, requestReportPdf } from '@/lib/store/slices/accountSlice';
 
 interface Report {
   searchId: string;
@@ -28,25 +20,19 @@ interface PlanLimits {
 }
 
 export default function ReportsPage() {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [planLimits, setPlanLimits] = useState<PlanLimits | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const dispatch = useAppDispatch();
+  const { data: reports, planLimits, loading, error, actionLoading } = useAppSelector((state) => state.account.reports) as {
+    data: Report[];
+    planLimits: PlanLimits | null;
+    loading: boolean;
+    error: string | null;
+    actionLoading: Record<string, 'download' | 'preview' | null>;
+  };
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-  const [actionLoading, setActionLoading] = useState<Record<string, 'download' | 'preview' | null>>({});
 
   useEffect(() => {
-    Promise.all([
-      apiClient.get('/user-details/reports'),
-      apiClient.get('/billing/plan-limits'),
-    ])
-      .then(([reportsRes, limitsRes]) => {
-        setReports(reportsRes.data?.reports || []);
-        setPlanLimits(limitsRes.data || null);
-      })
-      .catch(() => setError('Failed to load reports. Please try again.'))
-      .finally(() => setLoading(false));
-  }, []);
+    dispatch(fetchReportsPageData());
+  }, [dispatch]);
 
   const estimatedPages = (matchCount: number) => Math.max(1, Math.ceil(matchCount / 3));
 
@@ -56,19 +42,8 @@ export default function ReportsPage() {
       return;
     }
 
-    setActionLoading((prev) => ({ ...prev, [searchId]: action }));
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const url = `${BASE_URL}/api/v1/pdf/${action}/${searchId}`;
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to generate PDF');
-
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
+      const { objectUrl } = await dispatch(requestReportPdf({ searchId, action })).unwrap();
 
       if (action === 'download') {
         const a = document.createElement('a');
@@ -81,9 +56,7 @@ export default function ReportsPage() {
 
       URL.revokeObjectURL(objectUrl);
     } catch {
-      alert('Could not generate PDF. Please try again.');
-    } finally {
-      setActionLoading((prev) => ({ ...prev, [searchId]: null }));
+      return;
     }
   };
 

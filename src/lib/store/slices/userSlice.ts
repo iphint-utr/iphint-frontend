@@ -1,14 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 import { DashboardState } from '../../../types/dashboard';
-
-const sanitizeBaseUrl = (value?: string) =>
-  (value ?? 'http://localhost:5000/api/v1')
-    .trim()
-    .replace(/^["'\s]+|["'\s]+$/g, '')
-    .replace(/\/+$/g, '');
-
-const BASE_URL = sanitizeBaseUrl(process.env.NEXT_PUBLIC_BASE_URL);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -111,20 +103,6 @@ const initialState: UserState = {
   referralCount: user?.referralCount ?? 0,
 };
 
-// ─── Axios instance (untouched) ───────────────────────────────────────────────
-
-const apiClient = axios.create({
-  baseURL: BASE_URL,
-});
-
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 // ─── Dashboard Thunks (untouched) ─────────────────────────────────────────────
 
 export const fetchDashboardData = createAsyncThunk(
@@ -134,11 +112,7 @@ export const fetchDashboardData = createAsyncThunk(
       const response = await apiClient.get('/user-details/dashboard');
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data?.message || 'Failed to load dashboard');
-      }
-
-      return rejectWithValue('Failed to load dashboard');
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to load dashboard'));
     }
   }
 );
@@ -150,11 +124,7 @@ export const fetchAlerts = createAsyncThunk(
       const response = await apiClient.get('/user-details/alerts');
       return response.data.alerts;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data?.message || 'Failed to load alerts');
-      }
-
-      return rejectWithValue('Failed to load alerts');
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to load alerts'));
     }
   }
 );
@@ -167,13 +137,10 @@ export const loginUser = createAsyncThunk<
   { rejectValue: string }
 >('user/login', async (credentials, { rejectWithValue }) => {
   try {
-    const { data } = await axios.post<AuthResponse>(`${BASE_URL}/auth/login`, credentials);
+    const { data } = await apiClient.post<AuthResponse>('/auth/login', credentials);
     return data;
   } catch (err) {
-    if (axios.isAxiosError(err)) {
-      return rejectWithValue(err.response?.data?.message || 'Login failed');
-    }
-    return rejectWithValue('Network error');
+    return rejectWithValue(getApiErrorMessage(err, 'Login failed'));
   }
 });
 
@@ -183,13 +150,10 @@ export const registerUser = createAsyncThunk<
   { rejectValue: string }
 >('user/register', async (userData, { rejectWithValue }) => {
   try {
-    const { data } = await axios.post<AuthResponse>(`${BASE_URL}/auth/register`, userData);
+    const { data } = await apiClient.post<AuthResponse>('/auth/register', userData);
     return data;
   } catch (err) {
-    if (axios.isAxiosError(err)) {
-      return rejectWithValue(err.response?.data?.message || 'Registration failed');
-    }
-    return rejectWithValue('Network error');
+    return rejectWithValue(getApiErrorMessage(err, 'Registration failed'));
   }
 });
 

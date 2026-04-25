@@ -1,19 +1,16 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import { Menu, Bell, Check, Search, Trash2 } from 'lucide-react';
 import { usePathname, useRouter } from '@/i18n/routing';
 import LocaleSwitcher from '@/components/layout/LocaleSwitcher';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-	const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-	if (token) config.headers.Authorization = `Bearer ${token}`;
-	return config;
-});
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import {
+	fetchNotifications,
+	markAllNotificationsRead,
+	markNotificationRead,
+	deleteNotification,
+} from '@/lib/store/slices/accountSlice';
 
 interface NotificationItem {
 	_id: string;
@@ -25,12 +22,13 @@ interface NotificationItem {
 }
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
+	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const pathname = usePathname();
 	const [notificationOpen, setNotificationOpen] = useState(false);
 	const [notificationQuery, setNotificationQuery] = useState('');
-	const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-	const [unreadCount, setUnreadCount] = useState(0);
+	const notifications = useAppSelector((state) => state.account.notifications.topbar.items) as NotificationItem[];
+	const unreadCount = useAppSelector((state) => state.account.notifications.unreadCount);
 	const menuRef = useRef<HTMLDivElement | null>(null);
 
 	const pageTitle = (() => {
@@ -45,32 +43,36 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	})();
 
 	const loadNotifications = async (q = '') => {
-		const { data } = await apiClient.get('/user-details/notifications', {
-			params: { status: 'all', page: 1, limit: 8, q },
-		});
-		setNotifications(data?.notifications || []);
-		setUnreadCount(data?.unreadCount || 0);
+		await dispatch(
+			fetchNotifications({
+				scope: 'topbar',
+				status: 'all',
+				page: 1,
+				limit: 8,
+				q,
+			}),
+		).unwrap();
 	};
 
 	useEffect(() => {
 		if (!notificationOpen) return;
 
 		loadNotifications(notificationQuery).catch(() => {
-			setNotifications([]);
+			return;
 		});
-	}, [notificationOpen]);
+	}, [notificationOpen, dispatch]);
 
 	useEffect(() => {
 		if (!notificationOpen) return;
 
 		const timeout = window.setTimeout(() => {
 			loadNotifications(notificationQuery).catch(() => {
-				setNotifications([]);
+				return;
 			});
 		}, 240);
 
 		return () => window.clearTimeout(timeout);
-	}, [notificationQuery, notificationOpen]);
+	}, [notificationQuery, notificationOpen, dispatch]);
 
 	useEffect(() => {
 		const closeOnOutside = (event: MouseEvent) => {
@@ -84,20 +86,15 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	}, []);
 
 	const markRead = async (id: string) => {
-		await apiClient.patch(`/user-details/notifications/${id}/read`);
-		setNotifications((prev) => prev.map((entry) => (entry._id === id ? { ...entry, isRead: true } : entry)));
-		setUnreadCount((prev) => Math.max(0, prev - 1));
+		await dispatch(markNotificationRead(id));
 	};
 
 	const removeNotification = async (id: string) => {
-		await apiClient.delete(`/user-details/notifications/${id}`);
-		setNotifications((prev) => prev.filter((entry) => entry._id !== id));
+		await dispatch(deleteNotification(id));
 	};
 
 	const markAllRead = async () => {
-		await apiClient.patch('/user-details/notifications/read-all');
-		setNotifications((prev) => prev.map((entry) => ({ ...entry, isRead: true })));
-		setUnreadCount(0);
+		await dispatch(markAllNotificationsRead());
 	};
 
 	const goToNotification = async (item: NotificationItem) => {

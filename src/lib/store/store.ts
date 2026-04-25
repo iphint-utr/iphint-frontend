@@ -4,6 +4,7 @@ import pricingReducer from './slices/pricingSlice';
 import scanReducer from './slices/scanSlice';
 import monitoringReducer from './slices/monitoringSlice';
 import adminReducer from './slices/adminSlice';
+import accountReducer from './slices/accountSlice';
 
 export const makeStore = () => {
   return configureStore({
@@ -13,6 +14,7 @@ export const makeStore = () => {
       pricing: pricingReducer,
       monitoring: monitoringReducer,
       admin: adminReducer,
+      account: accountReducer,
     },
   });
 };

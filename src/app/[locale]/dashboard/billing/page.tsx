@@ -1,18 +1,11 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
 import { Check, Crown } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { cancelPlanSubscription, fetchBillingPageData, subscribeToPlan } from '@/lib/store/slices/accountSlice';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 const KRW_PER_USD = 1360;
-
-const apiClient = axios.create({ baseURL: `${BASE_URL}/api/v1` });
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
 
 type PlanTier = 'starter' | 'pro' | 'premium';
 type BillingCycle = 'monthly' | 'annual';
@@ -48,31 +41,12 @@ interface BillingSnapshot {
 }
 
 export default function BillingPage() {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [snapshot, setSnapshot] = useState<BillingSnapshot | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [savingPlan, setSavingPlan] = useState<PlanTier | null>(null);
+  const dispatch = useAppDispatch();
+  const { plans, loading, error, savingPlan, cancelLoading, countryCode } = useAppSelector((state) => state.account.billing);
+  const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
-  const [countryCode, setCountryCode] = useState('US');
 
   const isKorean = countryCode.toUpperCase() === 'KR';
-
-  useEffect(() => {
-    const detectCountry = async () => {
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        if (data?.country_code) {
-          setCountryCode(String(data.country_code));
-        }
-      } catch {
-        setCountryCode('US');
-      }
-    };
-
-    detectCountry();
-  }, []);
 
   const formatPrice = (usd: number) => {
     if (isKorean) {
@@ -91,21 +65,9 @@ export default function BillingPage() {
     }).format(usd);
   };
 
-  const loadData = async () => {
-    const [plansRes, snapshotRes] = await Promise.all([
-      apiClient.get('/billing/plans'),
-      apiClient.get('/billing/subscription'),
-    ]);
-
-    setPlans(plansRes.data?.plans || []);
-    setSnapshot(snapshotRes.data || null);
-  };
-
   useEffect(() => {
-    loadData()
-      .catch(() => setError('Failed to load billing data.'))
-      .finally(() => setLoading(false));
-  }, []);
+    dispatch(fetchBillingPageData());
+  }, [dispatch]);
 
   const currentTier = snapshot?.plan?.tier || 'starter';
 
@@ -118,24 +80,11 @@ export default function BillingPage() {
   }, [snapshot]);
 
   const subscribe = async (tier: PlanTier) => {
-    try {
-      setSavingPlan(tier);
-      await apiClient.post('/billing/subscribe', { tier, billingCycle: cycle });
-      await loadData();
-    } catch (e: any) {
-      setError(e?.response?.data?.message || 'Failed to update subscription.');
-    } finally {
-      setSavingPlan(null);
-    }
+    await dispatch(subscribeToPlan({ tier, billingCycle: cycle }));
   };
 
   const cancelSubscription = async () => {
-    try {
-      await apiClient.post('/billing/cancel');
-      await loadData();
-    } catch (e: any) {
-      setError(e?.response?.data?.message || 'Failed to cancel subscription.');
-    }
+    await dispatch(cancelPlanSubscription());
   };
 
   if (loading) {
@@ -205,9 +154,10 @@ export default function BillingPage() {
               <button
                 type="button"
                 onClick={cancelSubscription}
+                disabled={cancelLoading}
                 className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
               >
-                Cancel plan
+                {cancelLoading ? 'Cancelling...' : 'Cancel plan'}
               </button>
             )}
           </div>

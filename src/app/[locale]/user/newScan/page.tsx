@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -18,7 +17,7 @@ import {
   List,
   Lock,
 } from 'lucide-react';
-import { AppDispatch, RootState } from '../../../lib/store/store'; // Adjust based on your store path
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   performScan,
   clearResults,
@@ -26,13 +25,13 @@ import {
   createFolder,
   assignSearchFolder,
   setCurrentFolderId,
-} from '../../../lib/store/slices/scanSlice'; // Adjust based on your slice path
+} from '@/lib/store/slices/scanSlice';
+import { fetchSubscriptionSnapshot } from '@/lib/store/slices/accountSlice';
 
 export default function ScanPage() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { results, loading, error, searchId, folders, currentFolderId, foldersLoading } = useSelector(
-    (state: RootState) => state.scan,
-  );
+  const dispatch = useAppDispatch();
+  const { results, loading, error, searchId, folders, currentFolderId, foldersLoading } = useAppSelector((state) => state.scan);
+  const planSnapshot = useAppSelector((state) => state.account.subscription.data);
   
   const [url, setUrl] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
@@ -41,31 +40,17 @@ export default function ScanPage() {
   const [folderPanelOpen, setFolderPanelOpen] = useState(false);
   const [folderNotice, setFolderNotice] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [planSnapshot, setPlanSnapshot] = useState<any>(null);
   const [planPromptOpen, setPlanPromptOpen] = useState(false);
   const [planPromptMode, setPlanPromptMode] = useState<'upgrade' | 'renew' | 'near_limit'>('upgrade');
   const [hasShownNearLimitPrompt, setHasShownNearLimitPrompt] = useState(false);
 
   const isLimitError = typeof error === 'string' && /upload limit|plan_upload_limit_reached/i.test(error);
+  const errorMessage = typeof error === 'string' ? error : 'Search request failed.';
 
   const openPlanPrompt = (mode: 'upgrade' | 'renew' | 'near_limit') => {
     setPlanPromptMode(mode);
     setPlanPromptOpen(true);
   };
-
-  const loadPlanSnapshot = useCallback(async () => {
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000'}/api/v1/billing/subscription`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) return;
-      const data = await response.json();
-      setPlanSnapshot(data || null);
-    } catch {
-      setPlanSnapshot(null);
-    }
-  }, []);
 
   const evaluateActionAgainstPlan = () => {
     if (!planSnapshot) return true;
@@ -92,13 +77,13 @@ export default function ScanPage() {
 
   useEffect(() => {
     dispatch(fetchFolders());
-    loadPlanSnapshot();
-  }, [dispatch, loadPlanSnapshot]);
+    dispatch(fetchSubscriptionSnapshot());
+  }, [dispatch]);
 
   useEffect(() => {
     if (!searchId) return;
-    loadPlanSnapshot();
-  }, [searchId, loadPlanSnapshot]);
+    dispatch(fetchSubscriptionSnapshot());
+  }, [dispatch, searchId]);
 
   useEffect(() => {
     if (!planSnapshot || hasShownNearLimitPrompt) return;
@@ -292,7 +277,7 @@ export default function ScanPage() {
                   <p className="mt-1 text-sm text-red-700">
                     {isLimitError
                       ? `You have reached your monthly upload limit for the ${planSnapshot?.plan?.name || 'current'} plan. Upgrade to continue scanning without interruption.`
-                      : error}
+                      : errorMessage}
                   </p>
                   {isLimitError && (
                     <button

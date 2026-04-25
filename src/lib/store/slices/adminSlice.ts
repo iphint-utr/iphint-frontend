@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { apiClient } from '@/lib/api';
 import type {
   AdminApiUsageSummary,
   AdminDashboardData,
@@ -23,28 +24,6 @@ import type {
   AdminUsersQuery,
   AdminUsersResponse,
 } from '@/types/admin';
-
-const sanitizeBaseUrl = (value?: string) =>
-  (value ?? 'http://localhost:5000/api/v1')
-    .trim()
-    .replace(/^["'\s]+|["'\s]+$/g, '')
-    .replace(/\/+$/g, '');
-
-const BASE_URL = sanitizeBaseUrl(process.env.NEXT_PUBLIC_BASE_URL);
-
-const adminApiClient = axios.create({
-  baseURL: `${BASE_URL}/admin`,
-});
-
-adminApiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
 
 const defaultPagination: AdminPagination = {
   total: 0,
@@ -328,7 +307,7 @@ export const fetchAdminDashboard = createAsyncThunk<AdminDashboardData, void, { 
   'admin/fetchDashboard',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await adminApiClient.get('/dashboard');
+      const response = await apiClient.get('/admin/dashboard');
       return normalizeDashboard(response.data);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch dashboard statistics'));
@@ -347,7 +326,7 @@ export const fetchAdminUsers = createAsyncThunk<AdminUsersResponse, AdminUsersQu
         search: query?.search,
       });
 
-      const response = await adminApiClient.get(`/users?${params.toString()}`);
+      const response = await apiClient.get(`/admin/users?${params.toString()}`);
       return normalizeUsersResponse(response.data);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch users'));
@@ -359,7 +338,7 @@ export const fetchAdminUserDetails = createAsyncThunk<AdminMemberDetails, string
   'admin/fetchUserDetails',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await adminApiClient.get(`/userDetails/${userId}`);
+      const response = await apiClient.get(`/admin/userDetails/${userId}`);
       return normalizeMemberDetails(response.data);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch member details'));
@@ -372,7 +351,7 @@ export const fetchAdminUserSearches = createAsyncThunk<AdminUserSearchesResponse
   async ({ userId, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
       const params = createQueryParams({ page, limit });
-      const response = await adminApiClient.get(`/userSearches/${userId}?${params.toString()}`);
+      const response = await apiClient.get(`/admin/userSearches/${userId}?${params.toString()}`);
       return normalizeUserSearchesResponse(userId, response.data);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch member searches'));
@@ -384,7 +363,7 @@ export const deactivateAdminUser = createAsyncThunk<AdminDeactivateUserResult, A
   'admin/deactivateUser',
   async ({ userId, reason }, { rejectWithValue }) => {
     try {
-      const response = await adminApiClient.post(`/deactivate/${userId}`, reason ? { reason } : {});
+      const response = await apiClient.post(`/admin/deactivate/${userId}`, reason ? { reason } : {});
       const data = unwrapData<{ userId?: string; email?: string; isActive?: boolean }>(response.data) ?? {};
       const message = String(response.data?.message ?? 'User has been deactivated');
 
@@ -411,7 +390,7 @@ export const fetchAdminSearches = createAsyncThunk<AdminSearchesResponse, AdminS
         userName: query?.userName,
       });
 
-      const response = await adminApiClient.get(`/searches?${params.toString()}`);
+      const response = await apiClient.get(`/admin/searches?${params.toString()}`);
       return normalizeSearchesResponse(response.data);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch searches'));
@@ -424,7 +403,7 @@ export const fetchAdminSearchDetails = createAsyncThunk<AdminSearchDetails, Admi
   async ({ searchId, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
       const params = createQueryParams({ page, limit });
-      const response = await adminApiClient.get(`/searchDetails/${searchId}?${params.toString()}`);
+      const response = await apiClient.get(`/admin/searchDetails/${searchId}?${params.toString()}`);
       return normalizeSearchDetails(response.data);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch search details'));
@@ -439,8 +418,8 @@ export const fetchAdminApiUsage = createAsyncThunk<AdminApiUsageSummary, { limit
       const limit = query?.limit ?? 100;
 
       const [dashboardResponse, searchesResponse] = await Promise.all([
-        adminApiClient.get('/dashboard'),
-        adminApiClient.get(`/searches?${createQueryParams({ page: 1, limit }).toString()}`),
+        apiClient.get('/admin/dashboard'),
+        apiClient.get(`/admin/searches?${createQueryParams({ page: 1, limit }).toString()}`),
       ]);
 
       const dashboard = normalizeDashboard(dashboardResponse.data);

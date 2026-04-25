@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 import { DashboardState } from '../../../types/dashboard';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 const initialState: DashboardState = {
   stats: null,
@@ -12,30 +10,14 @@ const initialState: DashboardState = {
   error: null,
 };
 
-// Configure an axios instance to automatically attach the token if available
-const apiClient = axios.create({
-  baseURL: `${BASE_URL}/api/v1`,
-});
-
-apiClient.interceptors.request.use((config) => {
-  // Assuming token is stored in localStorage, adjust based on your auth implementation
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 export const fetchDashboardData = createAsyncThunk(
   'dashboard/fetchData',
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get('/user-details/dashboard');
-      console.log("API SCCESS")
       return response.data;
-    } catch (error: any) {
-      console.error("API ERROR:", error);
-      return rejectWithValue(error.response?.data?.message || 'Failed to load dashboard');
+    } catch (error: unknown) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to load dashboard'));
     }
   }
 );
@@ -46,8 +28,8 @@ export const fetchAlerts = createAsyncThunk(
     try {
       const response = await apiClient.get('/user-details/alerts');
       return response.data.alerts;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to load alerts');
+    } catch (error: unknown) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to load alerts'));
     }
   }
 );

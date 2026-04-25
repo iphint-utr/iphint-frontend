@@ -1,19 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-// Configure axios instance
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-const apiClient = axios.create({
-  baseURL: `${BASE_URL}/api/v1`,
-});
-
-apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 
 export interface SearchFolder {
   _id: string;
@@ -60,11 +46,7 @@ export const performScan = createAsyncThunk(
         results: Array.isArray(response.data?.results) ? response.data.results : [],
       };
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        'Failed to perform image scan.'
-      );
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to perform image scan.'));
     }
   }
 );
@@ -74,11 +56,7 @@ export const fetchFolders = createAsyncThunk('scan/fetchFolders', async (_, { re
     const response = await apiClient.get('/user-details/folders');
     return response.data?.folders || [];
   } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message ||
-        error.response?.data?.error ||
-        'Failed to fetch folders.',
-    );
+    return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch folders.'));
   }
 });
 
@@ -89,11 +67,7 @@ export const createFolder = createAsyncThunk(
       const response = await apiClient.post('/user-details/folders', { name });
       return response.data?.folder;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          'Failed to create folder.',
-      );
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to create folder.'));
     }
   },
 );
@@ -105,11 +79,7 @@ export const deleteFolder = createAsyncThunk(
       await apiClient.delete(`/user-details/folders/${folderId}`);
       return folderId;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          'Failed to delete folder.',
-      );
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to delete folder.'));
     }
   },
 );
@@ -126,11 +96,7 @@ export const assignSearchFolder = createAsyncThunk(
       });
       return payload.folderId;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          'Failed to assign folder.',
-      );
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to assign folder.'));
     }
   },
 );
@@ -171,7 +137,7 @@ const scanSlice = createSlice({
       })
       .addCase(performScan.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as any;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to perform image scan.';
       })
       .addCase(fetchFolders.pending, (state) => {
         state.foldersLoading = true;
@@ -182,7 +148,7 @@ const scanSlice = createSlice({
       })
       .addCase(fetchFolders.rejected, (state, action) => {
         state.foldersLoading = false;
-        state.error = action.payload as any;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to fetch folders.';
       })
       .addCase(createFolder.fulfilled, (state, action) => {
         if (action.payload?._id) {
@@ -191,7 +157,7 @@ const scanSlice = createSlice({
         }
       })
       .addCase(createFolder.rejected, (state, action) => {
-        state.error = action.payload as any;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to create folder.';
       })
       .addCase(deleteFolder.fulfilled, (state, action) => {
         state.folders = state.folders.filter((folder) => folder._id !== action.payload);
@@ -200,13 +166,13 @@ const scanSlice = createSlice({
         }
       })
       .addCase(deleteFolder.rejected, (state, action) => {
-        state.error = action.payload as any;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to delete folder.';
       })
       .addCase(assignSearchFolder.fulfilled, (state, action) => {
         state.currentFolderId = action.payload;
       })
       .addCase(assignSearchFolder.rejected, (state, action) => {
-        state.error = action.payload as any;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to assign folder.';
       });
   },
 });
