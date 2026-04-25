@@ -2,6 +2,8 @@ export interface DashboardStats {
   totalScans: number;
   activeMonitors: number;
   totalMatches: number;
+  monitorComplete?: number;
+  pendingReview?: number;
 }
 
 export interface SearchDetail {

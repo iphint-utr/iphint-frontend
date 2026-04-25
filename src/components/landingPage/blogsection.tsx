@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     sectionTitle: "블로그",
     posts: [
       {
@@ -57,7 +57,7 @@ type Locale = keyof typeof translations;
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function BlogSection() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   return (

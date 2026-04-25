@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     subtitle: "디지털 콘텐츠 이미지 모니터링 도구를 신뢰하는 기업",
   },
   en: {
@@ -81,7 +81,7 @@ const companies = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TrustedCompanies() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   const [visible,    setVisible]    = useState(false);

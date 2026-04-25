@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     heading: "신뢰할 수 있는 정확한 탐지",
     testimonials: [
       {
@@ -95,7 +95,7 @@ function Dots({
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TestimonialSlider() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   const [current,     setCurrent]     = useState(0);

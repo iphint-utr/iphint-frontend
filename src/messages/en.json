@@ -49,15 +49,294 @@
     "noAccountText": "Don't have an account?",
     "noAccountLink": "Sign in"
   },
-  "userSidebar": {
-    "dashboard": "Dashboard",
-    "newScan": "New Scan",
-    "history": "History",
-    "monitoring": "Monitoring",
-    "reports": "Reports",
-    "billing": "Billing",
-    "settings": "Settings",
-    "logout": "Logout"
+  "Admin": {
+    "sidebar": {
+      "brand": "Admin Console",
+      "dashboard": "Dashboard",
+      "users": "User Management",
+      "searches": "Searches",
+      "apiUsage": "API Usage",
+      "secureAccess": "Secure Admin Access",
+      "secureAccessHint": "Protected routes with admin-only access."
+    },
+    "topbar": {
+      "eyebrow": "Operations",
+      "title": "Admin Control Center",
+      "session": "Admin session"
+    },
+    "common": {
+      "refresh": "Refresh",
+      "loading": "Loading admin data...",
+      "noResults": "No data available for this view.",
+      "unknownMember": "Unknown member",
+      "previous": "Previous",
+      "next": "Next",
+      "paginationSummary": "Showing {count} of {total} records",
+      "apply": "Apply filters",
+      "reset": "Reset",
+      "viewDetails": "View details",
+      "statusLabels": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "completed": "Completed",
+        "processing": "Processing",
+        "failed": "Failed",
+        "reviewPending": "Review pending",
+        "notReviewed": "Not reviewed",
+        "reviewed": "Reviewed",
+        "underAnalysis": "Under analysis",
+        "approved": "Approved",
+        "cancelled": "Cancelled",
+        "expired": "Expired"
+      },
+      "activityTypes": {
+        "search": "Search",
+        "subscription": "Subscription",
+        "userJoined": "User joined",
+        "payment": "Payment"
+      },
+      "goToAdmin": "Open Admin Console",
+      "goToUserDashboard": "Go to User Dashboard",
+      "logout": "Logout"
+    },
+    "dashboard": {
+      "eyebrow": "Admin Overview",
+      "title": "Platform dashboard",
+      "description": "Monitor content volume, subscriptions, and recent admin activity from a single operations surface.",
+      "metrics": {
+        "totalContent": "Total content",
+        "members": "Members",
+        "activeSubscriptions": "Active subscriptions",
+        "revenue": "Revenue this month"
+      },
+      "metricHints": {
+        "totalContent": "All indexed searches and analysis jobs.",
+        "members": "All members currently registered on the platform.",
+        "activeSubscriptions": "Members with an active paid subscription.",
+        "revenue": "Gross subscription revenue reported for the current month."
+      },
+      "recentActivityTitle": "Recent activity",
+      "recentActivityDescription": "Latest member and subscription events returned by the admin dashboard API.",
+      "systemSnapshotTitle": "System snapshot",
+      "systemSnapshotDescription": "A quick read on processing throughput and search demand.",
+      "snapshot": {
+        "analysisComplete": "Analysis completion",
+        "underAnalysis": "Under analysis",
+        "searchesToday": "Searches today"
+      },
+      "quickLinksTitle": "Operational shortcuts",
+      "quickLinksDescription": "Jump directly into the admin lists that need follow-up.",
+      "quickLinks": {
+        "usersTitle": "Review users",
+        "usersDescription": "Open user management to inspect plans, activity, and account status.",
+        "searchesTitle": "Review searches",
+        "searchesDescription": "Track uploaded searches across every member account.",
+        "apiUsageTitle": "Inspect API usage",
+        "apiUsageDescription": "Open derived usage metrics based on the documented admin endpoints."
+      }
+    },
+    "users": {
+      "eyebrow": "Member Operations",
+      "title": "User management",
+      "description": "Filter and review all members, their subscription tier, and account activity.",
+      "summary": {
+        "totalMembers": "Total members",
+        "totalMembersHint": "Total records reported by the current users query.",
+        "visibleMembers": "Visible on this page",
+        "visibleMembersHint": "Members returned for the current filter set.",
+        "activeAccounts": "Active accounts",
+        "activeAccountsHint": "Active members in the current results window.",
+        "proPlans": "Pro plans",
+        "proPlansHint": "Members on the Pro tier in the current page."
+      },
+      "tableTitle": "Members list",
+      "tableDescription": "Search by name, filter by account status, and open a member record for full detail.",
+      "filters": {
+        "searchPlaceholder": "Search members by name",
+        "allStatuses": "All statuses",
+        "perPage": "{count} per page"
+      },
+      "columns": {
+        "member": "Member",
+        "status": "Status",
+        "plan": "Plan",
+        "searches": "Searches",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "loading": "Loading users...",
+      "empty": "No members matched the current filters.",
+      "planFallback": "No subscription",
+      "subscriptionUnavailable": "Subscription details unavailable"
+    },
+    "memberDetails": {
+      "eyebrow": "Member Detail",
+      "title": "Member details for {name}",
+      "description": "Review subscription state, account health, and recent searches before taking action.",
+      "backToUsers": "Back to users",
+      "loadingTitle": "Loading member",
+      "loadingDescription": "Fetching member profile and recent searches.",
+      "loading": "Loading member details...",
+      "errorTitle": "Unable to load member",
+      "errorDescription": "The requested member profile could not be fetched.",
+      "metrics": {
+        "credits": "Credits",
+        "monitors": "Monitors",
+        "searches": "Total searches",
+        "referrals": "Referrals"
+      },
+      "metricHints": {
+        "credits": "Current available credits on the account.",
+        "monitors": "Monitoring jobs currently tied to this member.",
+        "searches": "Lifetime search count returned by the admin API.",
+        "referrals": "Successful referrals linked to the member code."
+      },
+      "profileTitle": "Profile summary",
+      "profileDescription": "Identity, approval state, and primary account metadata.",
+      "fields": {
+        "contact": "Contact",
+        "joined": "Joined",
+        "referralCode": "Referral code",
+        "subscriptionId": "Subscription ID"
+      },
+      "unavailable": "Unavailable",
+      "searchesTitle": "Recent searches",
+      "searchesDescription": "Paginated search history for this member from the admin user searches endpoint.",
+      "searchColumns": {
+        "image": "Image",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "searchesLoading": "Loading member searches...",
+      "searchesEmpty": "This member has no searches in the current range.",
+      "subscriptionTitle": "Subscription",
+      "subscriptionDescription": "Billing identifiers and status for the linked subscription record.",
+      "subscriptionFields": {
+        "plan": "Plan ID",
+        "status": "Status",
+        "billingCycle": "Billing cycle"
+      },
+      "adminActionsTitle": "Admin actions",
+      "adminActionsDescription": "Deactivate the member account when moderation or policy action is required.",
+      "deactivateReasonLabel": "Deactivation reason",
+      "deactivateReasonPlaceholder": "Optional note for why the account is being deactivated.",
+      "deactivateButton": "Deactivate member",
+      "alreadyInactive": "Member already inactive"
+    },
+    "searches": {
+      "eyebrow": "Search Operations",
+      "title": "Searches",
+      "description": "Inspect uploaded search jobs across all members and filter by operator-visible status.",
+      "summary": {
+        "total": "Total searches",
+        "totalHint": "Total records reported by the current searches query.",
+        "completed": "Completed in page",
+        "completedHint": "Completed search jobs inside the current page.",
+        "averageDiscoveries": "Average discoveries",
+        "averageDiscoveriesHint": "Average discovery count for the visible searches.",
+        "uploaders": "Unique uploaders",
+        "uploadersHint": "Members represented in the current result window."
+      },
+      "tableTitle": "Search history",
+      "tableDescription": "Filter by uploader name or search status and jump into the uploader account when needed.",
+      "filters": {
+        "memberPlaceholder": "Filter by uploader name",
+        "allStatuses": "All statuses"
+      },
+      "columns": {
+        "file": "File",
+        "uploader": "Uploader",
+        "status": "Status",
+        "discoveries": "Discoveries",
+        "uploadDate": "Upload date",
+        "actions": "Actions"
+      },
+      "loading": "Loading searches...",
+      "empty": "No searches matched the current filters."
+    },
+    "searchDetails": {
+      "eyebrow": "Search Detail",
+      "title": "Search details",
+      "description": "Review the selected search record, uploader information, rescan schedule, and all associated result entries.",
+      "backToSearches": "Back to searches",
+      "loadingTitle": "Loading search",
+      "loadingDescription": "Fetching the selected search document and related results.",
+      "loading": "Loading search details...",
+      "errorTitle": "Unable to load search",
+      "errorDescription": "The requested search record could not be fetched.",
+      "metrics": {
+        "results": "Results",
+        "reviewed": "Reviewed",
+        "pendingReview": "Pending review",
+        "status": "Search status"
+      },
+      "metricHints": {
+        "results": "Total result records linked to this search.",
+        "reviewed": "Reviewed results in the current page.",
+        "pendingReview": "Results in the current page still waiting for admin review.",
+        "status": "Current lifecycle state of the selected search."
+      },
+      "overviewTitle": "Search overview",
+      "overviewDescription": "Primary metadata returned by the admin search details endpoint.",
+      "fields": {
+        "uploader": "Uploader",
+        "uploaderEmail": "Uploader email",
+        "uploadedAt": "Uploaded at",
+        "nextRescan": "Next rescan",
+        "lastRescan": "Last rescan"
+      },
+      "searchImageAlt": "Search image",
+      "resultsTitle": "Matched results",
+      "resultsDescription": "Paginated result entries associated with this search. Total records: {total}.",
+      "resultsPerPageLabel": "Results per page",
+      "resultsLoading": "Loading search results...",
+      "resultsEmpty": "No result records were returned for this search.",
+      "resultTitle": "Result {index}",
+      "resultImageAlt": "Result image",
+      "resultFields": {
+        "reviewStatus": "Review status",
+        "reviewedAt": "Reviewed at",
+        "details": "Details"
+      },
+      "resultDetailsEmpty": "No detail fields are available for this result."
+    },
+    "apiUsage": {
+      "eyebrow": "Derived Usage",
+      "title": "API usage",
+      "description": "Operational usage metrics derived from the documented admin dashboard and searches endpoints.",
+      "metrics": {
+        "totalRequests": "Total requests",
+        "successRate": "Success rate",
+        "averageDiscoveries": "Average discoveries",
+        "activeMembers": "Active members"
+      },
+      "metricHints": {
+        "totalRequests": "Total analyzed content returned by the dashboard endpoint.",
+        "successRate": "Analysis complete divided by total content.",
+        "averageDiscoveries": "Average discovery count across the recent search sample.",
+        "activeMembers": "Member count reported by the dashboard endpoint."
+      },
+      "breakdownTitle": "Status breakdown",
+      "breakdownDescription": "Distribution of recent search records by admin-visible processing state.",
+      "loading": "Loading API usage insights...",
+      "empty": "No usage insight data is available yet.",
+      "topUploadersTitle": "Top uploaders",
+      "topUploadersDescription": "Members with the highest search volume in the current recent-search sample.",
+      "topUploaderHint": "Recent uploads in sampled search history",
+      "snapshotTitle": "Request snapshot",
+      "snapshotDescription": "Key counters from the dashboard response for fast operator review.",
+      "snapshot": {
+        "searchesToday": "Searches today",
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed"
+      },
+      "methodologyTitle": "Methodology",
+      "methodologyDescription": "How this page is calculated using the available admin API surface.",
+      "methodologyCopy": "Usage metrics combine the admin dashboard response with the latest {count} search records because the documented admin API does not expose a dedicated usage analytics endpoint.",
+      "generatedAt": "Generated at"
+    }
   }
 
 }

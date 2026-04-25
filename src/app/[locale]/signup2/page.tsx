@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, clearError } from '../../../lib/store/slices/userSlice';
 import { AppDispatch, RootState } from '../../../lib/store/store';
 import { countries } from './countries';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/slices/userSlice';
 
 

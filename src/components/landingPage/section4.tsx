@@ -6,7 +6,7 @@ import { useState } from "react";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     heading:    "딥페이크 · 도용 · 불펌\n어떻게 대응하는지 확인하세요",
     subheading: "발견 된 사진의 출처가 동의없이 노출 되었다면\n셀프 혹은 소장 접수까지 연결 해드립니다",
     tabs:       ["개인", "기업", "에이전시/엔터"],
@@ -29,7 +29,7 @@ type Locale = keyof typeof translations;
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function Section4() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   const [activeTab, setActiveTab] = useState(0);

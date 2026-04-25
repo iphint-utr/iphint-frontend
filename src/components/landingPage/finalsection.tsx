@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
-  ko: {
+  kr: {
     newsLabel: "뉴스",
     newsItems: [
       { title: "뉴욕타임즈", description: "강력한 보안 기능을 갖춘" },
@@ -35,7 +35,7 @@ type Locale = keyof typeof translations;
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function FinalSection() {
   const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "ko";
+  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
   const t = translations[locale];
 
   return (

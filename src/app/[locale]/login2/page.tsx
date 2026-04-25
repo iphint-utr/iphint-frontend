@@ -3,24 +3,31 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, clearError, selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/slices/userSlice';
-import { AppDispatch, RootState } from '../../../lib/store/store';
-import { Link } from '@/i18n/routing';
-import { useRouter } from 'next/navigation';
+import {
+  loginUser,
+  clearError,
+  selectIsAuthenticated,
+  selectAuthLoading,
+  selectAuthError,
+} from '../../../lib/store/slices/userSlice';
+import { AppDispatch } from '../../../lib/store/store';
+import { Link, useRouter } from '@/i18n/routing';
 
 export default function LoginPage() {
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const authLoading = useSelector(selectAuthLoading);
+  const authError = useSelector(selectAuthError);
   
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, authLoading]);
+  }, [authLoading, isAuthenticated, router]);
   const t = useTranslations('Auth');
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.user);
+  const loading = authLoading;
+  const error = authError;
 
   const [formData, setFormData] = useState({ email: '', password: '' });
 
@@ -100,7 +107,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center text-sm sm:text-base text-black font-medium">
           {t('noAccountText')}{' '}
-          <Link href="/signup" className="font-semibold border-b border-black pb-0.5 ml-1 hover:text-gray-600 transition-colors">
+          <Link href="/register" className="font-semibold border-b border-black pb-0.5 ml-1 hover:text-gray-600 transition-colors">
             {t('noAccountLink')}
           </Link>
         </div>

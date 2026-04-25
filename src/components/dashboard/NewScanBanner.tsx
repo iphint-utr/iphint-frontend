@@ -1,25 +1,30 @@
 import React from 'react';
 import { ArrowRight, ScanLine } from 'lucide-react';
-import { useRouter } from 'next/navigation'; // Assuming you use lucide-react for icons
+import { useRouter } from '@/i18n/routing';
 
 export const NewScanBanner: React.FC<{ t: any }> = ({ t }) => {
-  const router = useRouter();
+	const router = useRouter();
 
-  const handleClick = () => {
-    router.push('user/newScan');
-  };
+	const handleClick = () => {
+		router.push('/dashboard/searches');
+	};
 
-  return (
-    <div className="bg-[#8b5cf6] rounded-xl p-8 text-white flex justify-between items-center shadow-md">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">{t('startScanTitle')}</h2>
-        <p className="text-purple-100 mb-6 text-sm">{t('startScanSub')}</p>
-        <button className="bg-white text-[#8b5cf6] px-6 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-gray-50 transition-colors" onClick={handleClick}>
-        {t('uploadBtn')} <ArrowRight size={16} />
-      </button>
-    </div>
-    <div className="hidden sm:block opacity-20">
-      <ScanLine size={100} />
-    </div>
-  </div>
-);}
+	return (
+		<div className="bg-[#8b5cf6] rounded-xl p-8 text-white flex justify-between items-center shadow-md">
+			<div>
+				<h2 className="text-2xl font-bold mb-2">{t('startScanTitle')}</h2>
+				<p className="text-purple-100 mb-6 text-sm">{t('startScanSub')}</p>
+				<button
+					className="cursor-pointer bg-white text-[#8b5cf6] px-6 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-gray-50 transition-colors"
+					onClick={handleClick}
+				>
+					{t('uploadBtn')} <ArrowRight size={16} />
+				</button>
+			</div>
+
+			<div className="hidden sm:block opacity-20">
+				<ScanLine size={100} />
+			</div>
+		</div>
+	);
+};
