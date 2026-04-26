@@ -42,12 +42,6 @@ export default function MonitoringPage() {
   }, [dispatch, nameFilter, dateFilter, folderFilter, activePage]);
 
   useEffect(() => {
-    if (activePage !== page) {
-      setActivePage(page);
-    }
-  }, [page, activePage]);
-
-  useEffect(() => {
     if (!folderMenuOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,12 +54,14 @@ export default function MonitoringPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [folderMenuOpen]);
 
+  const currentPage = page || activePage;
+
   const pageLabel = useMemo(() => {
     if (!total) return 'No items';
-    const start = (page - 1) * 12 + 1;
-    const end = Math.min(page * 12, total);
+    const start = (currentPage - 1) * 12 + 1;
+    const end = Math.min(currentPage * 12, total);
     return `${start}-${end} of ${total}`;
-  }, [page, total]);
+  }, [currentPage, total]);
 
   const statusPill = (analysisStatus: string) => {
     if (analysisStatus === 'analysis_complete') {
@@ -111,9 +107,10 @@ export default function MonitoringPage() {
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex min-w-0 basis-[30%] items-center gap-2">
-            <div ref={folderMenuRef} className="relative w-44 shrink-0">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+          <div className="flex w-full flex-col gap-3 sm:flex-row xl:flex-1">
+            <div className="flex min-w-0 items-center gap-2 sm:w-[18rem] sm:flex-none">
+              <div ref={folderMenuRef} className="relative min-w-0 flex-1">
               <button
                 type="button"
                 onClick={() => setFolderMenuOpen((prev) => !prev)}
@@ -152,16 +149,17 @@ export default function MonitoringPage() {
               )}
             </div>
 
-            {folderFilter && (
-              <button
-                type="button"
-                onClick={handleDeleteSelectedFolder}
-                className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50"
-                aria-label="Delete selected folder"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            )}
+              {folderFilter && (
+                <button
+                  type="button"
+                  onClick={handleDeleteSelectedFolder}
+                  className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50"
+                  aria-label="Delete selected folder"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
 
             <div className="relative min-w-0 flex-1">
               <Calendar className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -177,7 +175,7 @@ export default function MonitoringPage() {
             </div>
           </div>
 
-          <div className="relative min-w-0 basis-[40%]">
+          <div className="relative min-w-0 w-full xl:max-w-md xl:flex-1">
             <SearchIcon className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="text"
@@ -191,7 +189,7 @@ export default function MonitoringPage() {
             />
           </div>
 
-          <div className="flex min-w-0 basis-[30%] items-center justify-end gap-2">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between xl:w-auto xl:flex-none xl:justify-end">
             <button
               onClick={() => {
                 setNameFilter('');
@@ -200,7 +198,7 @@ export default function MonitoringPage() {
                 setActivePage(1);
                 setFolderMenuOpen(false);
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
             >
               <Filter className="h-4 w-4" />
               Reset Filters
@@ -237,14 +235,14 @@ export default function MonitoringPage() {
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         {viewMode === 'list' ? (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+          <table className="min-w-[760px] w-full table-fixed border-collapse text-left">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">File Name</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Date</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Progress</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+                <th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
+                <th className="w-[40%] px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">File Name</th>
+                <th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Date</th>
+                <th className="w-36 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Progress</th>
+                <th className="w-40 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -281,7 +279,11 @@ export default function MonitoringPage() {
                         />
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.fileName}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                      <div className="min-w-0 truncate" title={item.fileName}>
+                        {item.fileName}
+                      </div>
+                    </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {new Date(item.time).toLocaleDateString()}
                     </td>
@@ -346,19 +348,19 @@ export default function MonitoringPage() {
         </div>
         )}
 
-        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+        <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-gray-500">{pageLabel}</p>
           <div className="flex items-center gap-2">
             <button
-              disabled={page <= 1}
-              onClick={() => setActivePage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage <= 1}
+              onClick={() => setActivePage(Math.max(1, currentPage - 1))}
               className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
             <button
-              disabled={page >= pages}
-              onClick={() => setActivePage((prev) => Math.min(pages, prev + 1))}
+              disabled={currentPage >= pages}
+              onClick={() => setActivePage(Math.min(pages, currentPage + 1))}
               className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next

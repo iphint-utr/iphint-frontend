@@ -71,7 +71,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen  p-6 lg:p-10 font-sans text-gray-900">
+    <div className="min-h-screen p-4 font-sans text-gray-900 sm:p-6 lg:p-10">
       
       {/* --- HEADER WITH POPPING BUTTON --- */}
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -84,7 +84,7 @@ export default function DashboardPage() {
             <button
               onClick={handleCopyReferral}
               className={`
-                group relative flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300
+                group relative flex w-full items-center justify-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 sm:w-auto
                 ${copied 
                   ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' 
                   : 'bg-linear-to-r from-[#6366f1] via-[#a855f7] to-[#ec4899] text-white shadow-xl hover:shadow-[#a855f7]/40 hover:-translate-y-0.5 active:scale-95'
@@ -130,7 +130,7 @@ export default function DashboardPage() {
           <NewScanBanner t={t} />
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
-            <div className="flex justify-between items-center mb-8">
+            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="text-xl font-bold text-black">{t('recentScans')}</h3>
               <button className="text-sm text-[#8b5cf6] font-bold hover:underline">
                 {t('viewAll')}
@@ -139,13 +139,14 @@ export default function DashboardPage() {
             
             <div className="space-y-4">
               {latestSearches.map((search) => (
-                <div key={search.searchId} className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 cursor-pointer group">
+                <div key={search.searchId} className="group cursor-pointer rounded-xl border border-transparent bg-gray-50/50 p-4 transition-all hover:border-gray-100 hover:bg-gray-50">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-gray-200 rounded-lg overflow-hidden shrink-0 shadow-sm">
                       <img src={search.image} alt="scan" className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <p className="font-bold text-red-900 group-hover:text-[#6366f1] transition-colors truncate max-w-[200px]">
+                      <p className="max-w-full truncate font-bold text-red-900 transition-colors group-hover:text-[#6366f1] sm:max-w-[200px]">
   {search.fileName}
 </p>
                       <p className="text-xs text-gray-400 mt-0.5 font-medium">
@@ -153,14 +154,15 @@ export default function DashboardPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
+                  <div className="flex items-center justify-between gap-6 sm:justify-end">
+                    <div className="text-left sm:text-right">
                       <p className="font-bold text-gray-900">{search.resultCount} {t('matches')}</p>
-                      <p className="text-[10px] text-emerald-600 flex items-center justify-end gap-1 font-black uppercase tracking-wider">
+                      <p className="text-[10px] text-emerald-600 flex items-center gap-1 font-black uppercase tracking-wider sm:justify-end">
                         <CheckCircle2 size={12} /> {t(search.status)}
                       </p>
                     </div>
                     <ChevronRight size={20} className="text-gray-300 group-hover:text-black transition-colors" />
+                  </div>
                   </div>
                 </div>
               ))}

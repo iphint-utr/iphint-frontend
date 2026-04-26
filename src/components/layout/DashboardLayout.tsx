@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className={`transition-all duration-200 ${sidebarOpen ? 'lg:ml-60' : 'lg:ml-0'}`}>
         <Topbar onMenuClick={() => setSidebarOpen((prev) => !prev)} />
-        <main className="min-h-[calc(100vh-64px)] px-6 py-6">
+        <main className="min-h-[calc(100vh-64px)] px-4 py-5 sm:px-6 sm:py-6">
           <div className="mx-auto w-full space-y-6">{children}</div>
         </main>
       </div>

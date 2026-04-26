@@ -6,9 +6,10 @@ export interface SearchFolder {
   name: string;
 }
 
-interface ScanResult {
+export interface ScanResult {
   _id?: string;
   image?: string;
+  isLocked?: boolean;
   details?: {
     title?: string;
     link?: string;
@@ -45,7 +46,7 @@ export const performScan = createAsyncThunk(
         searchId: response.data?.searchId || null,
         results: Array.isArray(response.data?.results) ? response.data.results : [],
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to perform image scan.'));
     }
   }
@@ -55,7 +56,7 @@ export const fetchFolders = createAsyncThunk('scan/fetchFolders', async (_, { re
   try {
     const response = await apiClient.get('/user-details/folders');
     return response.data?.folders || [];
-  } catch (error: any) {
+  } catch (error: unknown) {
     return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch folders.'));
   }
 });
@@ -66,7 +67,7 @@ export const createFolder = createAsyncThunk(
     try {
       const response = await apiClient.post('/user-details/folders', { name });
       return response.data?.folder;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to create folder.'));
     }
   },
@@ -78,7 +79,7 @@ export const deleteFolder = createAsyncThunk(
     try {
       await apiClient.delete(`/user-details/folders/${folderId}`);
       return folderId;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to delete folder.'));
     }
   },
@@ -95,7 +96,7 @@ export const assignSearchFolder = createAsyncThunk(
         folderId: payload.folderId,
       });
       return payload.folderId;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to assign folder.'));
     }
   },

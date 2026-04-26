@@ -109,7 +109,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
 	return (
 		<header className="sticky top-0 z-20 h-16 border-b border-gray-200 bg-white shadow-sm">
-			<div className="h-full px-6 flex items-center justify-between">
+			<div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
 				<div className="flex items-center gap-3">
 					<button
 						aria-label="Open sidebar"
@@ -118,10 +118,10 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 					>
 						<Menu size={18} />
 					</button>
-					<h1 className="text-lg leading-6 font-semibold text-gray-900">{pageTitle}</h1>
+					<h1 className="max-w-[9rem] truncate text-base font-semibold leading-6 text-gray-900 sm:max-w-none sm:text-lg">{pageTitle}</h1>
 				</div>
 
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-1.5 sm:gap-2">
 					<div ref={menuRef} className="relative">
 						<button
 							type="button"
@@ -138,7 +138,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 						</button>
 
 						{notificationOpen && (
-							<div className="absolute right-0 top-11 z-30 w-96 rounded-xl border border-gray-200 bg-white p-3 shadow-lg">
+							<div className="absolute right-0 top-11 z-30 w-[22rem] max-w-[calc(100vw-1rem)] rounded-xl border border-gray-200 bg-white p-3 shadow-lg sm:w-96">
 								<div className="mb-2 flex items-center justify-between">
 									<p className="text-sm font-semibold text-gray-900">Notifications</p>
 									<button

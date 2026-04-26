@@ -11,22 +11,9 @@ import {
   Clock,
   Trophy,
   Link2,
-  ChevronRight,
   AlertCircle,
 } from 'lucide-react';
 import { fetchReferralStatus, generateReferralWindow } from '@/lib/store/slices/accountSlice';
-
-interface ReferralStatus {
-  referralCode: string;
-  generatedAt: string | null;
-  expiresAt: string | null;
-  windowOpen: boolean;
-  completedInWindow: number;
-  milestoneTarget: number;
-  milestoneReached: boolean;
-  permanentPdfAccess: boolean;
-  totalReferrals: number;
-}
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
   const [remaining, setRemaining] = useState('');
@@ -119,7 +106,7 @@ export default function ReferralPage() {
 
       {/* Reward milestone card */}
       <div className={`rounded-2xl border p-6 ${status?.milestoneReached ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
             <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.milestoneReached ? 'bg-emerald-500' : 'bg-indigo-100'}`}>
               <Trophy size={20} className={status?.milestoneReached ? 'text-white' : 'text-indigo-600'} />
@@ -151,7 +138,7 @@ export default function ReferralPage() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
           <Users size={20} className="mx-auto mb-1 text-indigo-500" />
           <p className="text-2xl font-bold text-gray-900">{status?.totalReferrals ?? 0}</p>
@@ -177,11 +164,11 @@ export default function ReferralPage() {
         </div>
 
         {/* URL display */}
-        <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5">
+        <div className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 sm:flex-row sm:items-center">
           <span className="flex-1 truncate text-sm text-gray-700 font-mono">{referralUrl}</span>
           <button
             onClick={handleCopy}
-            className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
+            className={`flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors sm:w-auto ${
               copied ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
             }`}
           >
@@ -224,7 +211,7 @@ export default function ReferralPage() {
         <button
           onClick={handleGenerate}
           disabled={generating || (status?.windowOpen ?? false)}
-          className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           <RefreshCw size={15} className={generating ? 'animate-spin' : ''} />
           {status?.windowOpen ? 'Window Active' : generating ? 'Activating…' : 'Start New Window'}

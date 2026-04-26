@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -25,6 +25,7 @@ import {
   createFolder,
   assignSearchFolder,
   setCurrentFolderId,
+  type ScanResult,
 } from '@/lib/store/slices/scanSlice';
 import { fetchSubscriptionSnapshot } from '@/lib/store/slices/accountSlice';
 
@@ -42,7 +43,7 @@ export default function ScanPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [planPromptOpen, setPlanPromptOpen] = useState(false);
   const [planPromptMode, setPlanPromptMode] = useState<'upgrade' | 'renew' | 'near_limit'>('upgrade');
-  const [hasShownNearLimitPrompt, setHasShownNearLimitPrompt] = useState(false);
+  const hasShownNearLimitPromptRef = useRef(false);
 
   const isLimitError = typeof error === 'string' && /upload limit|plan_upload_limit_reached/i.test(error);
   const errorMessage = typeof error === 'string' ? error : 'Search request failed.';
@@ -86,23 +87,28 @@ export default function ScanPage() {
   }, [dispatch, searchId]);
 
   useEffect(() => {
-    if (!planSnapshot || hasShownNearLimitPrompt) return;
+    if (!planSnapshot || hasShownNearLimitPromptRef.current) return;
 
     const status = planSnapshot?.subscription?.status;
     const used = Number(planSnapshot?.usage?.imagesUsedThisMonth || 0);
     const limit = Number(planSnapshot?.usage?.imageUploadLimit || 0);
 
     if (status === 'cancelled' || status === 'expired') {
-      openPlanPrompt('renew');
-      setHasShownNearLimitPrompt(true);
-      return;
+      hasShownNearLimitPromptRef.current = true;
+      const timer = window.setTimeout(() => {
+        openPlanPrompt('renew');
+      }, 0);
+      return () => window.clearTimeout(timer);
     }
 
     if (limit > 0 && used / limit >= 0.8 && used < limit) {
-      openPlanPrompt('near_limit');
-      setHasShownNearLimitPrompt(true);
+      hasShownNearLimitPromptRef.current = true;
+      const timer = window.setTimeout(() => {
+        openPlanPrompt('near_limit');
+      }, 0);
+      return () => window.clearTimeout(timer);
     }
-  }, [planSnapshot, hasShownNearLimitPrompt]);
+  }, [planSnapshot]);
 
   useEffect(() => {
     if (!folderNotice) return;
@@ -115,7 +121,7 @@ export default function ScanPage() {
   }, [folderNotice]);
 
   // Handle file drop
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       if (!evaluateActionAgainstPlan()) return;
@@ -123,7 +129,7 @@ export default function ScanPage() {
       setUrl(''); // Clear URL if a file is uploaded
       dispatch(performScan(file));
     }
-  }, [dispatch, planSnapshot]);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -181,9 +187,9 @@ export default function ScanPage() {
   };
 
   const selectedFolderName = folders.find((folder) => folder._id === currentFolderId)?.name;
-  const lockedResultsCount = (results as any[]).filter((item: any) => item?.isLocked).length;
+  const lockedResultsCount = results.filter((item) => item?.isLocked).length;
 
-  const previewResult = previewResultIndex !== null ? (results as any[])[previewResultIndex] : null;
+  const previewResult = previewResultIndex !== null ? results[previewResultIndex] ?? null : null;
 
   const closePreviewModal = () => setPreviewResultIndex(null);
 
@@ -294,14 +300,14 @@ export default function ScanPage() {
           )}
 
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <h2 className="font-semibold text-gray-900 text-lg">Search Results</h2>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                 {results.length} Found
               </span>
             </div>
 
-            <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/80">
+            <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/80 sm:px-6">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="relative flex flex-1 flex-wrap items-center gap-2">
                   <button
@@ -357,19 +363,19 @@ export default function ScanPage() {
                             <p className="mt-2 text-xs text-gray-500">No folders yet. Create one below.</p>
                           )}
 
-                          <div className="mt-3 flex items-center gap-2">
+                          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
                             <input
                               value={newFolderName}
                               onChange={(event) => setNewFolderName(event.target.value)}
                               placeholder="Create new folder"
-                              className="h-8 min-w-48 flex-1 rounded-md border border-gray-300 bg-white px-2.5 text-xs text-gray-700 outline-none placeholder:text-gray-400 focus:border-gray-400"
+                              className="h-8 min-w-0 w-full flex-1 rounded-md border border-gray-300 bg-white px-2.5 text-xs text-gray-700 outline-none placeholder:text-gray-400 focus:border-gray-400 sm:min-w-48"
                             />
 
                             <button
                               type="button"
                               onClick={handleCreateFolder}
                               disabled={!newFolderName.trim()}
-                              className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-gray-300 bg-white px-2.5 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="inline-flex h-8 w-full cursor-pointer items-center justify-center gap-1 rounded-md border border-gray-300 bg-white px-2.5 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                             >
                               <FolderPlus className="h-3.5 w-3.5" />
                               Create
@@ -410,13 +416,13 @@ export default function ScanPage() {
 
             {viewMode === 'list' ? (
               <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="min-w-[760px] w-full table-fixed border-collapse text-left">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Image</th>
-                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Details</th>
-                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Engine</th>
-                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Action</th>
+                    <th className="w-24 px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Image</th>
+                    <th className="w-[45%] px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Details</th>
+                    <th className="w-32 px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Engine</th>
+                    <th className="w-32 px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -435,7 +441,7 @@ export default function ScanPage() {
                       </td>
                     </tr>
                   ) : results.length > 0 ? (
-                    results.map((result: any, index: number) => (
+                    results.map((result: ScanResult, index: number) => (
                       <tr key={result._id || index} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-6 py-4">
                           {result.image ? (
@@ -461,13 +467,13 @@ export default function ScanPage() {
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 min-w-70">
-                          <div className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+                        <td className="px-6 py-4">
+                          <div className="mb-1 line-clamp-2 text-sm font-medium text-gray-900" title={result.details?.title || 'No title'}>
                             {result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'No title')}
                           </div>
                           <div className="text-xs text-gray-500 flex items-center gap-1">
                             <span className="bg-gray-100 px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold text-[10px]">Source</span>
-                            {result.details?.source || 'Website'}
+                            <span className="truncate" title={result.details?.source || 'Website'}>{result.details?.source || 'Website'}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -514,7 +520,7 @@ export default function ScanPage() {
                   </div>
                 ) : results.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {results.map((result: any, index: number) => (
+                    {results.map((result: ScanResult, index: number) => (
                       <div key={result._id || index} className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
                         <button
                           type="button"

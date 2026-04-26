@@ -148,8 +148,8 @@ export default function Footer() {
     <footer className="w-full bg-white border-t border-gray-100">
 
       {/* ── Top section ─────────────────────────────────────────────────────── */}
-      <div className="max-w-[1200px] mx-auto px-6 sm:px-10 pt-12 pb-16">
-        <div className="flex items-start">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-10 pt-10 sm:pt-12 pb-12 sm:pb-16">
+        <div className="flex flex-col gap-10 md:flex-row md:items-start">
 
           {/* Logo — top-left, does not grow */}
           <div className="flex-shrink-0">
@@ -158,11 +158,8 @@ export default function Footer() {
             </Link>
           </div>
 
-          {/* Spacer — eats all available space, pushes columns to far right */}
-          <div className="flex-1" />
-
           {/* Columns — hugging the right edge, gap between them */}
-          <div className="flex items-start gap-20 lg:gap-28">
+          <div className="grid gap-8 sm:grid-cols-2 md:ml-auto md:flex md:items-start md:gap-20 lg:gap-28">
 
             {/* Column 1 */}
             <div className="flex flex-col gap-5">
@@ -208,14 +205,16 @@ export default function Footer() {
 
       {/* ── Bottom bar ──────────────────────────────────────────────────────── */}
       <div className="border-t border-gray-200">
-        <div className="max-w-[1200px] mx-auto px-6 sm:px-10 h-[56px] flex items-center justify-between">
-          <span className="text-[13px] text-gray-500">
+        <div className="max-w-[1200px] mx-auto flex min-h-[56px] flex-col gap-3 px-4 py-4 sm:h-[56px] sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-0">
+          <span className="text-center text-[13px] text-gray-500 sm:text-left">
             {t.copyright}
           </span>
-          <FooterLangSwitcher
-            selected={selectedLang}
-            onSelect={changeLanguage}
-          />
+          <div className="self-center sm:self-auto">
+            <FooterLangSwitcher
+              selected={selectedLang}
+              onSelect={changeLanguage}
+            />
+          </div>
         </div>
       </div>
 

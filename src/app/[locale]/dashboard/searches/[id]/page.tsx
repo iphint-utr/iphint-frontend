@@ -177,7 +177,7 @@ export default function SearchDetailsPage() {
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-semibold text-gray-900">Search Results Review</h1>
 					<p className="mt-1 text-sm text-gray-500">
@@ -186,7 +186,7 @@ export default function SearchDetailsPage() {
 				</div>
 				<button
 					onClick={() => router.push('/dashboard/monitoring')}
-					className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+					className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:self-start"
 				>
 					Back to Monitoring
 				</button>
@@ -242,7 +242,7 @@ export default function SearchDetailsPage() {
 									: 'Select all'}
 							</p>
 						</div>
-						<div className="flex items-center gap-2">
+						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
 							<div className="relative inline-block">
 									<select
 										value={bulkAction}
@@ -274,15 +274,15 @@ export default function SearchDetailsPage() {
 				</div>
 
 				<div className="overflow-x-auto">
-					<table className="w-full border-collapse text-left">
+					<table className="min-w-[960px] w-full table-fixed border-collapse text-left">
 						<thead className="bg-gray-50">
 							<tr>
 								<th className="px-4 py-3 w-12" />
-								<th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
-								<th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
-								<th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
-								<th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
-								<th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 text-right">Action</th>
+								<th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
+								<th className="w-[36%] px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
+								<th className="w-44 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+								<th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
+								<th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 text-right">Action</th>
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-100">
@@ -329,11 +329,11 @@ export default function SearchDetailsPage() {
 												/>
 											</button>
 										</td>
-										<td className="px-4 py-3 min-w-65">
-											<p className="text-sm font-medium text-gray-900 line-clamp-2">
+										<td className="px-4 py-3">
+											<p className="line-clamp-2 text-sm font-medium text-gray-900" title={result.details?.title || 'Untitled result'}>
 												{result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'Untitled result')}
 											</p>
-											<p className="mt-1 text-xs text-gray-500">{result.details?.source || 'Unknown source'}</p>
+											<p className="mt-1 truncate text-xs text-gray-500" title={result.details?.source || 'Unknown source'}>{result.details?.source || 'Unknown source'}</p>
 										</td>
 										<td className="px-4 py-3">
 											<div className="relative inline-block">

@@ -16,20 +16,6 @@ import {
 } from '../../../lib/store/slices/pricingSlice'
 import type { Translations, PlanId, Plan } from './pricing'
 import { ChevronRight } from 'lucide-react'
-
-// ─── Gradient constant ─────────────────────────────────────────────────────
-const GRADIENT =
-  'linear-gradient(135deg,#ddc0fc 0%,#ffc0e3 30%,#fdf1bf 60%,#f8b6dc 90%,#ddc0fc 100%)'
-
-// ─── Check / Dash icons ────────────────────────────────────────────────────
-function CheckIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="8" style={{ fill: '#000000' }} />
-      <path d="M4.5 8.5l2.5 2.5 4.5-5" stroke="#636363" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
 function CheckIconLg() {
   return (
     <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 20 20" fill="none">
@@ -277,7 +263,7 @@ export default function PricingClient({
           <p className="text-gray-500 text-base max-w-xl mx-auto mb-10">{t.subheading}</p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-3 bg-white rounded-2xl px-2 py-2 shadow-md border border-gray-100">
+          <div className="inline-flex flex-wrap items-center justify-center gap-3 bg-white rounded-2xl px-2 py-2 shadow-md border border-gray-100">
             <button
               onClick={() => dispatch(setBillingCycle('monthly'))}
               className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
@@ -339,49 +325,51 @@ export default function PricingClient({
             style={{ background:  '#000' }}
           />
         </div>
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden pb-6">
-          {/* Header row */}
-          <div className="grid grid-cols-4 bg-gray-50 border-b border-gray-100">
-            <div className="fc text-sm font-bold text-gray-500 tracking-wider">
-              Feature
+        <div className="overflow-x-auto">
+          <div className="min-w-[720px] bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden pb-6">
+            {/* Header row */}
+            <div className="grid grid-cols-4 bg-gray-50 border-b border-gray-100">
+              <div className="fc text-sm font-bold text-gray-500 tracking-wider">
+                Feature
+              </div>
+              {t.comparison.plans.map((plan, i) => (
+                <div
+                  key={i}
+                  className="fc py-4 text-center text-sm font-bold text-gray-700"
+                >
+                  {plan}
+                </div>
+              ))}
             </div>
-            {t.comparison.plans.map((plan, i) => (
-              <div
-                key={i}
-                className="fc py-4 text-center text-sm font-bold text-gray-700"
-              >
-                {plan}
-              </div>
-            ))}
-          </div>
 
-          {/* Data rows */}
-          {t.comparison.features.map((row, i) => {
-            const isHl = highlightedFeat === row.label
-            return (
-              <div
-                key={i}
-                className={`grid grid-cols-4 border-b border-gray-50 last:border-none transition-colors duration-150 cursor-default ${
-                  isHl ? 'bg-gray-50/60' : 'hover:bg-gray-50/70'
-                }`}
-                onMouseEnter={() => dispatch(setHighlightedFeature(row.label))}
-                onMouseLeave={() => dispatch(setHighlightedFeature(null))}
-              >
-                <div className="p-4 text-sm text-gray-600 font-medium">{row.label}</div>
-                {(['starter', 'professional', 'agency'] as const).map((key) => (
-                  <div key={key} className="fc p-4 text-center text-sm text-gray-600">
-                    {row[key] === 'check' ? (
-                      <CheckIconTable />
-                    ) : row[key] === 'none' ? (
-                      <span className="text-gray-300 text-lg">—</span>
-                    ) : (
-                      row[key]
-                    )}
-                  </div>
-                ))}
-              </div>
-            )
-          })}
+            {/* Data rows */}
+            {t.comparison.features.map((row, i) => {
+              const isHl = highlightedFeat === row.label
+              return (
+                <div
+                  key={i}
+                  className={`grid grid-cols-4 border-b border-gray-50 last:border-none transition-colors duration-150 cursor-default ${
+                    isHl ? 'bg-gray-50/60' : 'hover:bg-gray-50/70'
+                  }`}
+                  onMouseEnter={() => dispatch(setHighlightedFeature(row.label))}
+                  onMouseLeave={() => dispatch(setHighlightedFeature(null))}
+                >
+                  <div className="p-4 text-sm text-gray-600 font-medium">{row.label}</div>
+                  {(['starter', 'professional', 'agency'] as const).map((key) => (
+                    <div key={key} className="fc p-4 text-center text-sm text-gray-600">
+                      {row[key] === 'check' ? (
+                        <CheckIconTable />
+                      ) : row[key] === 'none' ? (
+                        <span className="text-gray-300 text-lg">—</span>
+                      ) : (
+                        row[key]
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </section>
 
