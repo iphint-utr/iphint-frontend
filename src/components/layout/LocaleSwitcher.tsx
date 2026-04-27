@@ -8,7 +8,6 @@ import { routing, usePathname, useRouter } from '@/i18n/routing';
 const localeLabels: Record<(typeof routing.locales)[number], string> = {
   en: 'EN',
   kr: 'KR',
-  ko: 'KO',
 };
 
 export default function LocaleSwitcher() {

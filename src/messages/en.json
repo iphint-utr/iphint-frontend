@@ -20,7 +20,24 @@
     "quickActions": "Quick Actions",
     "newScanAction": "New Scan",
     "viewMonitoringAction": "View Monitoring",
-    "generateReportAction": "Generate Report"
+    "generateReportAction": "Generate Report",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "searches": "Searches",
+      "monitoring": "Monitoring",
+      "reports": "Reports",
+      "referral": "Referral",
+      "billing": "Billing",
+      "settings": "Settings",
+      "currentPlan": "Current plan",
+      "premiumTrial": "Premium trial: {count} {unit} left",
+      "day": "day",
+      "days": "days",
+      "upgradeBeforeTrialEnds": "Upgrade before trial ends",
+      "renewPlan": "Renew plan",
+      "upgradePlan": "Upgrade plan",
+      "logout": "Logout"
+    }
   },
   "Auth": {
     "signupTitle": "Sign up",

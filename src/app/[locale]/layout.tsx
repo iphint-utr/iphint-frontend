@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { isLocale } from "@/lib/i18n";
-import { notFound } from "next/navigation";
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -11,6 +10,7 @@ import AppLayoutRouter from '@/components/layout/AppLayoutRouter';
 import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
 import Header from '@/components/navbar';
 import Footer from '@/components/footer';
+import { notFound } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],

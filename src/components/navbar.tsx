@@ -1,39 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { Globe, ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const locales = [
-  { code: "en", label: "ENGLISH" },
-  { code: "ko", label: "KOREAN" },
-];
+  { code: "en", label: "English" },
+  { code: "kr", label: "Korean" },
+] as const;
 
 export default function Header() {
   const t = useTranslations("header");
   const locale = useLocale();
+  const activeLocale = locale === "kr" ? "kr" : "en";
   const pathname = usePathname();
   const router = useRouter();
 
-  const [isLangOpen, setIsLangOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const currentLocaleLabel =
-    locales.find((l) => l.code === locale)?.label ?? "ENGLISH";
+  const switchLocale = (nextLocale: (typeof locales)[number]["code"]) => {
+    if (nextLocale === activeLocale) {
+      return;
+    }
 
-  const switchLocale = (nextLocale: string) => {
-    // Replace the locale segment in the pathname
-    const segments = pathname.split("/");
-    segments[1] = nextLocale;
-    router.push(segments.join("/"));
-    setIsLangOpen(false);
+    router.replace(pathname, { locale: nextLocale });
+    setIsMobileMenuOpen(false);
   };
 
   const navLinks = [
-    { href: `/${locale}/pricing`, label: t("pricing") },
-    { href: `/${locale}/service`, label: t("service") },
+    { href: "/pricing", label: t("pricing") },
+    { href: "/service", label: t("service") },
   ];
 
   return (
@@ -41,7 +38,7 @@ export default function Header() {
       <div className="mx-auto flex h-[64px] max-w-[1440px] items-center justify-between px-6 lg:px-10">
         {/* ── Logo ── */}
         <Link
-          href={`/${locale}`}
+          href="/"
           className="flex items-center gap-1.5 shrink-0"
           aria-label="IpHint home"
         >
@@ -90,7 +87,7 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-3 ml-auto">
           {/* Contact Us */}
           <Link
-            href={`/${locale}/contact`}
+            href="/contact"
             className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
           >
             {t("contactUs")}
@@ -98,62 +95,29 @@ export default function Header() {
 
           {/* Get Started Now */}
           <Link
-            href={`/${locale}/get-started`}
+            href="/get-started"
             className="inline-flex h-10 items-center rounded-full bg-gray-950 px-5 text-[14px] font-semibold text-white hover:bg-black transition-colors duration-150"
           >
             {t("getStarted")}
           </Link>
 
-          {/* Divider */}
-          <div className="h-6 w-px bg-gray-200 mx-1" aria-hidden="true" />
-
-          {/* Language Switcher */}
-          <div className="relative">
-            <button
-              onClick={() => setIsLangOpen((prev) => !prev)}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gray-200 px-3.5 text-[13px] font-medium text-gray-700 hover:border-gray-400 transition-colors duration-150"
-              aria-haspopup="listbox"
-              aria-expanded={isLangOpen}
-            >
-              <Globe size={14} strokeWidth={1.8} />
-              {currentLocaleLabel}
-              <ChevronDown
-                size={13}
-                strokeWidth={2}
-                className={`transition-transform duration-200 ${isLangOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-
-            {isLangOpen && (
-              <>
-                {/* Overlay to close */}
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsLangOpen(false)}
-                />
-                <ul
-                  role="listbox"
-                  className="absolute right-0 top-11 z-50 w-36 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg"
-                >
-                  {locales.map((loc) => (
-                    <li key={loc.code}>
-                      <button
-                        role="option"
-                        aria-selected={locale === loc.code}
-                        onClick={() => switchLocale(loc.code)}
-                        className={`flex w-full items-center px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-gray-50 ${
-                          locale === loc.code
-                            ? "text-gray-950 font-semibold"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {loc.label}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
+          <div className="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 p-1">
+            {locales.map((loc) => (
+              <button
+                key={loc.code}
+                type="button"
+                onClick={() => switchLocale(loc.code)}
+                aria-pressed={activeLocale === loc.code}
+                className={[
+                  "rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-150",
+                  activeLocale === loc.code
+                    ? "bg-white text-gray-950 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900",
+                ].join(" ")}
+              >
+                {loc.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -188,14 +152,14 @@ export default function Header() {
 
           <div className="pt-4 flex flex-col gap-3">
             <Link
-              href={`/${locale}/contact`}
+              href="/contact"
               onClick={() => setIsMobileMenuOpen(false)}
               className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
             >
               {t("contactUs")}
             </Link>
             <Link
-              href={`/${locale}/get-started`}
+              href="/get-started"
               onClick={() => setIsMobileMenuOpen(false)}
               className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
             >
@@ -210,10 +174,9 @@ export default function Header() {
                 key={loc.code}
                 onClick={() => {
                   switchLocale(loc.code);
-                  setIsMobileMenuOpen(false);
                 }}
                 className={`flex-1 h-9 rounded-full border text-[12px] font-semibold transition-colors ${
-                  locale === loc.code
+                  activeLocale === loc.code
                     ? "border-gray-950 bg-gray-950 text-white"
                     : "border-gray-200 text-gray-600 hover:border-gray-400"
                 }`}

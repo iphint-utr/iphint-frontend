@@ -25,7 +25,24 @@
     "quickActions": "빠른 작업",
     "newScanAction": "새 스캔",
     "viewMonitoringAction": "모니터링 보기",
-    "generateReportAction": "보고서 생성"
+    "generateReportAction": "보고서 생성",
+    "sidebar": {
+      "dashboard": "대시보드",
+      "searches": "검색",
+      "monitoring": "모니터링",
+      "reports": "보고서",
+      "referral": "추천",
+      "billing": "결제",
+      "settings": "설정",
+      "currentPlan": "현재 요금제",
+      "premiumTrial": "프리미엄 체험판: {count}{unit} 남음",
+      "day": "일",
+      "days": "일",
+      "upgradeBeforeTrialEnds": "체험판이 끝나기 전에 업그레이드",
+      "renewPlan": "요금제 갱신",
+      "upgradePlan": "요금제 업그레이드",
+      "logout": "로그아웃"
+    }
   },
   "Auth": {
     "signupTitle": "회원가입",
