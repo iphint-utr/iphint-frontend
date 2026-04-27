@@ -337,6 +337,14 @@
       "methodologyCopy": "Usage metrics combine the admin dashboard response with the latest {count} search records because the documented admin API does not expose a dedicated usage analytics endpoint.",
       "generatedAt": "Generated at"
     }
+  },
+  
+  "header": {
+    "pricing": "Pricing",
+    "service": "Service",
+    "contactUs": "Contact Us",
+    "getStarted": "Get Started Now"
   }
+
 
 }

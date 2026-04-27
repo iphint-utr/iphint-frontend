@@ -1,4 +1,9 @@
-{
+{  "header": {
+    "pricing": "요금제",
+    "service": "서비스",
+    "contactUs": "문의하기",
+    "getStarted": "시작하기"
+  },
   "Dashboard": {
     "welcome": "환영합니다, {name}님",
     "referralLink": "추천 링크 복사",

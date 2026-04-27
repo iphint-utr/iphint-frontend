@@ -263,7 +263,7 @@ export default function MonitoringPage() {
                   <tr
                     key={item.searchId}
                     onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
-                    className="cursor-pointer hover:bg-gray-50"
+                    className="flex-cursor-pointer hover:bg-gray-50"
                   >
                     <td className="px-4 py-3">
                       <button
