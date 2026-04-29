@@ -32,7 +32,7 @@ function CountdownTimer({ expiresAt }: { expiresAt: string }) {
     return () => clearInterval(id);
   }, [expiresAt]);
 
-  return <span className="font-mono font-semibold text-amber-600">{remaining}</span>;
+  return <span className="font-mono font-semibold text-gray-900">{remaining}</span>;
 }
 
 export default function ReferralPage() {
@@ -82,7 +82,7 @@ export default function ReferralPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-900 border-t-transparent" />
       </div>
     );
   }
@@ -98,18 +98,18 @@ export default function ReferralPage() {
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <AlertCircle size={16} />
+        <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+          <AlertCircle size={16} className="text-gray-600" />
           {error}
         </div>
       )}
 
       {/* Reward milestone card */}
-      <div className={`rounded-2xl border p-6 ${status?.milestoneReached ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
+      <div className={`rounded-2xl border p-6 ${status?.milestoneReached ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white'}`}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.milestoneReached ? 'bg-emerald-500' : 'bg-indigo-100'}`}>
-              <Trophy size={20} className={status?.milestoneReached ? 'text-white' : 'text-indigo-600'} />
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${status?.milestoneReached ? 'bg-gray-900' : 'bg-gray-100'}`}>
+              <Trophy size={20} className={status?.milestoneReached ? 'text-white' : 'text-gray-700'} />
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900">Milestone Reward</p>
@@ -117,7 +117,7 @@ export default function ReferralPage() {
             </div>
           </div>
           {status?.milestoneReached && (
-            <span className="shrink-0 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white">Unlocked ✓</span>
+            <span className="shrink-0 rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">Unlocked ✓</span>
           )}
         </div>
 
@@ -129,7 +129,7 @@ export default function ReferralPage() {
             </div>
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
               <div
-                className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+                className="h-full rounded-full bg-gray-900 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -140,17 +140,17 @@ export default function ReferralPage() {
       {/* Stats row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
-          <Users size={20} className="mx-auto mb-1 text-indigo-500" />
+          <Users size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.totalReferrals ?? 0}</p>
           <p className="text-xs text-gray-500 mt-0.5">Total signups</p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
-          <Check size={20} className="mx-auto mb-1 text-emerald-500" />
+          <Check size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.completedInWindow ?? 0}</p>
           <p className="text-xs text-gray-500 mt-0.5">Completed this window</p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
-          <Gift size={20} className="mx-auto mb-1 text-purple-500" />
+          <Gift size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.milestoneReached ? '1' : '0'}</p>
           <p className="text-xs text-gray-500 mt-0.5">Rewards earned</p>
         </div>
@@ -169,7 +169,7 @@ export default function ReferralPage() {
           <button
             onClick={handleCopy}
             className={`flex w-full shrink-0 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors sm:w-auto ${
-              copied ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              copied ? 'bg-gray-700 text-white' : 'bg-gray-900 text-white hover:bg-black'
             }`}
           >
             {copied ? <Check size={13} strokeWidth={3} /> : <Copy size={13} />}
@@ -191,12 +191,12 @@ export default function ReferralPage() {
         </div>
 
         {status?.windowOpen && status.expiresAt ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
-            <p className="text-amber-700">Window is <span className="font-semibold">active</span>. Expires in:</p>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm">
+            <p className="text-gray-700">Window is <span className="font-semibold">active</span>. Expires in:</p>
             <p className="mt-1 text-lg">
               <CountdownTimer expiresAt={status.expiresAt} />
             </p>
-            <p className="mt-2 text-xs text-amber-600">
+            <p className="mt-2 text-xs text-gray-500">
               Only users who sign up <em>and</em> log in before the window closes count towards your milestone.
             </p>
           </div>
@@ -211,7 +211,7 @@ export default function ReferralPage() {
         <button
           onClick={handleGenerate}
           disabled={generating || (status?.windowOpen ?? false)}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           <RefreshCw size={15} className={generating ? 'animate-spin' : ''} />
           {status?.windowOpen ? 'Window Active' : generating ? 'Activating…' : 'Start New Window'}
@@ -233,7 +233,7 @@ export default function ReferralPage() {
             { step: '4', text: 'Get 5 completed referrals within the 24-hour window to permanently unlock PDF & Reports access.' },
           ].map(({ step, text }) => (
             <li key={step} className="flex items-start gap-3 text-sm text-gray-600">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-600">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
                 {step}
               </span>
               <span>{text}</span>

@@ -10,19 +10,24 @@ export const NewScanBanner: React.FC<{ t: any }> = ({ t }) => {
 	};
 
 	return (
-		<div className="bg-[#8b5cf6] rounded-xl p-8 text-white flex justify-between items-center shadow-md">
-			<div>
-				<h2 className="text-2xl font-bold mb-2">{t('startScanTitle')}</h2>
-				<p className="text-purple-100 mb-6 text-sm">{t('startScanSub')}</p>
+		<div className="flex flex-col gap-5 rounded-xl bg-gray-950 p-5 text-white shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-6 lg:p-8">
+			<div className="min-w-0 flex-1">
+				<h2 className="mb-2 max-w-full truncate text-xl font-bold sm:text-2xl" title={t('startScanTitle')}>
+					{t('startScanTitle')}
+				</h2>
+				<p className="mb-5 max-w-full truncate text-sm text-gray-300 sm:mb-6" title={t('startScanSub')}>
+					{t('startScanSub')}
+				</p>
 				<button
-					className="cursor-pointer bg-white text-[#8b5cf6] px-6 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-gray-50 transition-colors"
+					className="flex w-full max-w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 font-semibold text-gray-900 transition-colors hover:bg-gray-100 sm:w-auto sm:px-6"
 					onClick={handleClick}
 				>
-					{t('uploadBtn')} <ArrowRight size={16} />
+					<span className="min-w-0 truncate">{t('uploadBtn')}</span>
+					<ArrowRight size={16} className="shrink-0" />
 				</button>
 			</div>
 
-			<div className="hidden sm:block opacity-20">
+			<div className="hidden shrink-0 opacity-20 sm:block">
 				<ScanLine size={100} />
 			</div>
 		</div>

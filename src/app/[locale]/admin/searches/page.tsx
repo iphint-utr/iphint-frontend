@@ -203,38 +203,37 @@ export default function AdminSearchesPage() {
             </div>
           ) : (
             data.map((item) => (
-              <article key={item._id} className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
+              <article key={item._id} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
                 <div className="flex items-start gap-3">
-                  <img src={item.image} alt={item.fileName} className="h-14 w-14 shrink-0 rounded-2xl border border-slate-200 object-cover" />
+                  <img src={item.image} alt={item.fileName} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900" title={item.fileName}>{truncateText(item.fileName, 40)}</p>
+                    <p className="truncate text-sm font-semibold text-slate-900" title={item.fileName}>{item.fileName}</p>
+                    <div className="mt-2">
+                      <AdminStatusBadge value={item.status} label={getStatusLabel(item.status)} />
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <AdminStatusBadge value={item.status} label={getStatusLabel(item.status)} />
-                </div>
-
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('searches.columns.uploader')}</p>
-                    <Link href={`/admin/members/${item.uploaderId}`} className="mt-2 block text-sm font-medium text-slate-900 hover:underline" title={item.uploaderName}>
+                    <Link href={`/admin/members/${item.uploaderId}`} className="mt-1.5 block truncate text-sm font-medium text-slate-900 hover:underline" title={item.uploaderName}>
                       {truncateText(item.uploaderName, 30)}
                     </Link>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
+                  <div className="rounded-xl border border-slate-200 bg-white px-3 py-2.5">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('searches.columns.discoveries')}</p>
-                    <p className="mt-2 text-sm font-medium text-slate-900">{formatAdminNumber(item.discoveryCount, locale)}</p>
+                    <p className="mt-1.5 text-sm font-medium text-slate-900">{formatAdminNumber(item.discoveryCount, locale)}</p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:col-span-2">
+                  <div className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 sm:col-span-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('searches.columns.uploadDate')}</p>
-                    <p className="mt-2 text-sm font-medium text-slate-900">{formatAdminDate(item.uploadDate, locale)}</p>
+                    <p className="mt-1.5 text-sm font-medium text-slate-900">{formatAdminDate(item.uploadDate, locale)}</p>
                   </div>
                 </div>
 
                 <Link
                   href={`/admin/searches/${item._id}`}
-                  className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
                   {t('common.viewDetails')}
                 </Link>

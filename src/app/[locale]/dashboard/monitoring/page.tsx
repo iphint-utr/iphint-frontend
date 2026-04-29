@@ -234,78 +234,130 @@ export default function MonitoringPage() {
 
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         {viewMode === 'list' ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-[760px] w-full table-fixed border-collapse text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
-                <th className="w-[40%] px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">File Name</th>
-                <th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Date</th>
-                <th className="w-36 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Progress</th>
-                <th className="w-40 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-gray-500">
-                    Loading monitoring data...
-                  </td>
-                </tr>
-              ) : searches.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-gray-500">
-                    No searched images found for current filters.
-                  </td>
-                </tr>
-              ) : (
-                searches.map((item) => (
-                  <tr
-                    key={item.searchId}
-                    onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
-                    className="flex-cursor-pointer hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3">
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); setPreviewImage({ src: item.image, name: item.fileName }); }}
-                        className="cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
-                        aria-label="Preview image"
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.fileName}
-                          className="h-14 w-14 rounded-lg border border-gray-200 object-cover hover:opacity-80 transition-opacity"
-                        />
-                      </button>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                      <div className="min-w-0 truncate" title={item.fileName}>
-                        {item.fileName}
+          <>
+            {loading ? (
+              <div className="px-4 py-10 text-center text-sm text-gray-500">
+                Loading monitoring data...
+              </div>
+            ) : searches.length === 0 ? (
+              <div className="px-4 py-10 text-center text-sm text-gray-500">
+                No searched images found for current filters.
+              </div>
+            ) : (
+              <>
+                <div className="md:hidden divide-y divide-gray-100">
+                  {searches.map((item) => (
+                    <div key={item.searchId} className="p-4">
+                      <div className="flex items-start gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewImage({ src: item.image, name: item.fileName })}
+                          className="shrink-0 cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                          aria-label="Preview image"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.fileName}
+                            className="h-28 w-28 rounded-lg border border-gray-200 object-cover transition-opacity hover:opacity-80"
+                          />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
+                          className="min-w-0 flex-1 cursor-pointer text-left"
+                        >
+                          <p className="truncate text-sm font-semibold text-gray-900" title={item.fileName}>
+                            {item.fileName}
+                          </p>
+                          <div className="mt-2 space-y-1.5 text-xs text-gray-600">
+                            <p>
+                              <span className="font-medium text-gray-700">Date:</span>{' '}
+                              {new Date(item.time).toLocaleDateString()}
+                            </p>
+                            <p>
+                              <span className="font-medium text-gray-700">Progress:</span>{' '}
+                              {item.reviewedResults}/{item.totalResults} reviewed
+                            </p>
+                          </div>
+                          <span
+                            className={[
+                              'mt-3 inline-flex rounded-full border px-2.5 py-1 text-xs font-medium',
+                              statusPill(item.analysisStatus),
+                            ].join(' ')}
+                          >
+                            {statusLabel(item.analysisStatus)}
+                          </span>
+                        </button>
                       </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {new Date(item.time).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {item.reviewedResults}/{item.totalResults} reviewed
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={[
-                          'inline-flex rounded-full border px-2.5 py-1 text-xs font-medium',
-                          statusPill(item.analysisStatus),
-                        ].join(' ')}
-                      >
-                        {statusLabel(item.analysisStatus)}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-[760px] w-full table-fixed border-collapse text-left">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="w-28 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
+                        <th className="w-[40%] px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">File Name</th>
+                        <th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Date</th>
+                        <th className="w-36 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Progress</th>
+                        <th className="w-40 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {searches.map((item) => (
+                        <tr
+                          key={item.searchId}
+                          onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
+                          className="cursor-pointer hover:bg-gray-50"
+                        >
+                          <td className="px-4 py-3">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewImage({ src: item.image, name: item.fileName });
+                              }}
+                              className="cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                              aria-label="Preview image"
+                            >
+                              <img
+                                src={item.image}
+                                alt={item.fileName}
+                                className="h-16 w-16 rounded-lg border border-gray-200 object-cover transition-opacity hover:opacity-80"
+                              />
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                            <div className="min-w-0 truncate" title={item.fileName}>
+                              {item.fileName}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600">
+                            {new Date(item.time).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-700">
+                            {item.reviewedResults}/{item.totalResults} reviewed
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={[
+                                'inline-flex rounded-full border px-2.5 py-1 text-xs font-medium',
+                                statusPill(item.analysisStatus),
+                              ].join(' ')}
+                            >
+                              {statusLabel(item.analysisStatus)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </>
         ) : (
         <div className="p-4 md:p-5">
           {loading ? (
