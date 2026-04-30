@@ -17,10 +17,10 @@ const translations = {
     col2: {
       heading: "이용약관 및 정책",
       links: [
-        { label: "개인정보 보호 정책", href: "/privacy"   },
-        { label: "서비스 이용약관",   href: "/terms"     },
+        { label: "개인정보 보호 정책", href: "/privacy_policy"   },
+        { label: "서비스 이용약관",   href: "/terms_of_service" },
         { label: "이용 정책",        href: "/policies"  },
-        { label: "환불 정책",        href: "/refund"    },
+        { label: "환불 정책",        href: "/refund_policy"    },
       ],
     },
     copyright: "©2026 Toostar. All Rights Reserved.",
@@ -38,10 +38,10 @@ const translations = {
     col2: {
       heading: "Terms & Policies",
       links: [
-        { label: "Privacy Policy",   href: "/privacy"  },
-        { label: "Terms of Service", href: "/terms"    },
+        { label: "Privacy Policy",   href: "/privacy_policy"  },
+        { label: "Terms of Service", href: "/terms_of_service" },
         { label: "Usage Policy",     href: "/policies" },
-        { label: "Refund Policy",    href: "/refund"   },
+        { label: "Refund Policy",    href: "/refund_policy"   },
       ],
     },
     copyright: "©2026 Toostar. All Rights Reserved.",

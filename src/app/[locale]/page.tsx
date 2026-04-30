@@ -6,10 +6,13 @@ import Link from "next/link";
   import TrustedCompanies from "@/components/landingPage/section2";
 import Section3 from "@/components/landingPage/section3";
 import Section4 from "@/components/landingPage/section4";
-import TestimonialSlider from "@/components/landingPage/testimonialSlider";
-import BlogSection from "@/components/landingPage/blogsection";
-import FinalSection from "@/components/landingPage/finalsection";
+import TestimonialSlider from "@/components/landingPage/section5";
+import BlogSection from "@/components/landingPage/section6";
+import FinalSection from "@/components/landingPage/section8";
 import Section1 from "@/components/landingPage/section1";
+import Section6 from "@/components/landingPage/section6";
+import Section8 from "@/components/landingPage/section8";
+import Section7 from "@/components/landingPage/section7"; 
 
 
 
@@ -44,7 +47,10 @@ export default function Home() {
         <BlogSection/>
 
 
-        <FinalSection/>
+        <Section7/>
+
+
+        <Section8/>
 
 
       </div>
