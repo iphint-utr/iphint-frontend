@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
   //import { useEffect, useRef, useState } from "react";
-  import TrustedCompanies from "@/components/landingPage/trustedCompanies";
+  import TrustedCompanies from "@/components/landingPage/section2";
 import Section3 from "@/components/landingPage/section3";
 import Section4 from "@/components/landingPage/section4";
 import TestimonialSlider from "@/components/landingPage/testimonialSlider";
@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <div className="w-full fc ">
-      <div className="w-full fc flex-col max-w-7xl md:px-10">
+      <div className="w-full fc flex-col max-w-full">
 
 
         {/*   section 1   */}

@@ -1,88 +1,159 @@
 "use client";
 
-import Image from "next/image";
-import { useParams } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 
-// ─── Translations ─────────────────────────────────────────────────────────────
-const translations = {
-  kr: {
-    heading:    "딥페이크 · 도용 · 불펌\n어떻게 대응하는지 확인하세요",
-    subheading: "발견 된 사진의 출처가 동의없이 노출 되었다면\n셀프 혹은 소장 접수까지 연결 해드립니다",
-    tabs:       ["개인", "기업", "에이전시/엔터"],
-    cardLabel:  "발견 후 내용증명 진행",
-    cardTitle:  "짤로 떠돌아 다니는 내 사진",
-    cardBody:   "일반적인 검색으로는 찾기 어렵지만 투스타에서 제공되는 내용증명 서비스를 신청했고 로펌 계약이 없는 상태였지만 1/10 비용으로 빠르게 신청",
+// Ensure these filenames exactly match the files in your /public directory
+const carouselData = [
+  {
+    id: "artist",
+    title: "Artist",
+    file: "/sec4_main.svg",
+    heading: "Drawing, Illustration, Webtoon, Character, Digital Art",
+    description: "We continuously monitor thousands of platforms daily on your behalf and provide reports on how your works are being used.",
   },
-  en: {
-    heading:    "Deepfake · Theft · Illegal Repost\nSee how we respond",
-    subheading: "If photos of you have been shared without consent,\nwe connect you to self-help or formal legal complaint filing.",
-    tabs:       ["Individual", "Business", "Agency / Entertainment"],
-    cardLabel:  "Proof of Content After Discovery",
-    cardTitle:  "My photos spreading as memes",
-    cardBody:   "Hard to find through regular searches, but applied for the content verification service provided by Twostar — even without a law firm contract, filed quickly at 1/10 the cost.",
+  {
+    id: "model",
+    title: "Model",
+    file: "/sec4_model.svg",
+    heading: "Fashion, Photography, Runway, Commercial",
+    description: "Protect your likeness and modeling portfolio across global campaigns and digital platforms.",
   },
-} as const;
+  {
+    id: "creator",
+    title: "Creator",
+    file: "/sec4_creator.svg",
+    heading: "Video, Music, Podcasting, Streaming",
+    description: "Ensure your content remains yours. Track your creative output across all major media platforms.",
+  },
+  {
+    id: "ecommerce",
+    title: "E-commerce",
+    file: "/sec4_ecommerce.svg",
+    heading: "Brands, Retail, Online Stores",
+    description: "Safeguard your product imagery and brand assets from unauthorized use in the digital marketplace.",
+  },
+];
 
-type Locale = keyof typeof translations;
-
-// ─── Component ─────────────────────────────────────────────────────────────────
 export default function Section4() {
-  const params = useParams();
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
-  const t = translations[locale];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeItem = carouselData[activeIndex];
 
-  const [activeTab, setActiveTab] = useState(0);
+  // Filters out the active item so the right side acts as a queue
+  const queueItems = carouselData.filter((_, idx) => idx !== activeIndex);
 
   return (
-    <section className="bg-white py-20 px-4 w-full">
-      {/* Heading */}
-      <div className="text-center mb-10">
-        <h2 className="text-2xl md:text-4xl font-black text-gray-900 leading-tight whitespace-pre-line tracking-tight">
-          {t.heading}
-        </h2>
-        <p className="mt-5 text-gray-400 text-sm md:text-base leading-relaxed whitespace-pre-line">
-          {t.subheading}
-        </p>
-      </div>
+    <section className="min-h-[500px] bg-[#fafafa] py-20 px-6 lg:px-12 font-sans text-slate-900">
+      <div className="max-w-full mx-auto flex flex-col gap-16">
+        
+        {/* Header Section */}
+        <div className="text-center flex flex-col gap-4">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+            Creators and Brands
+          </h2>
+          <p className="text-sm md:text-base font-medium text-slate-700 max-w-3xl mx-auto leading-relaxed">
+            We grow together with influencers, artists, and creators from all over the world. 
+            Check out the results achieved by teams using ImgMov.
+          </p>
+        </div>
 
-      {/* Tabs */}
-      <div className="flex justify-center mb-8">
-        <div className="flex rounded-full p-1 gap-1">
-          {t.tabs.map((tab, i) => (
+        {/* Main Content Carousel */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center justify-center ">
+          
+          {/* 1. Left: Active Featured Card */}
+          <div className="col-span-1 lg:col-span-5 flex justify-center ">
+            <div className="relative w-full max-w-md aspect-square rounded-2xl flex items-center justify-center transition-all duration-500">
+              {/* Dotted Background Pattern */}
+              <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_2px,transparent_2px)] [background-size:24px_24px] opacity-70 rounded-2xl"></div>
+              
+              <div className="relative z-10 w-full h-full flex items-center justify-center animate-fade-in">
+                <Image
+                  src={activeItem.file}
+                  alt={`${activeItem.title} illustration`}
+                  fill
+                  className="object-contain drop-shadow-sm"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Middle: Active Text Info & Progress */}
+          <div className="col-span-1 lg:col-span-4 flex flex-col justify-center gap-5">
+            <div>
+              <span className="inline-block bg-slate-900 text-white px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide">
+                {activeItem.title}
+              </span>
+            </div>
+            <h3 className="text-2xl font-semibold leading-snug">
+              {activeItem.heading}
+            </h3>
+            <p className="text-slate-600 text-sm leading-relaxed">
+              {activeItem.description}
+            </p>
+
+            {/* Progress Bar attached to text block */}
+            <div className="mt-8 h-[3px] w-full bg-gray-200 overflow-hidden relative rounded-full">
+              <div
+                className="absolute top-0 left-0 h-full bg-slate-900 transition-all duration-500 ease-out rounded-full"
+                style={{ width: `${((activeIndex + 1) / carouselData.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* 3. Right: Scrollable Thumbnails Queue */}
+          <div className="col-span-1 lg:col-span-3 flex overflow-x-auto pb-4 lg:pb-0 gap-6 snap-x snap-mandatory hide-scrollbar">
+            {queueItems.map((item) => {
+              const originalIndex = carouselData.findIndex((i) => i.id === item.id);
+              
+              return (
+                <button 
+                  key={item.id} 
+                  className="flex flex-col items-center gap-4 shrink-0 snap-start group outline-none"
+                  onClick={() => setActiveIndex(originalIndex)}
+                  aria-label={`View ${item.title}`}
+                >
+                  <div className="relative w-28 md:w-32 aspect-square bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm group-hover:border-gray-300 group-hover:shadow-md transition-all">
+                    {/* Smaller Dotted Background */}
+                    <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] [background-size:16px_16px] opacity-60"></div>
+                    
+                    <div className="relative w-full h-full p-5">
+                      <Image
+                        src={item.file}
+                        alt={item.title}
+                        fill
+                        className="object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Bottom Pill Badge */}
+                  <span className="bg-slate-100/80 text-slate-700 px-4 py-1 rounded-full text-xs font-semibold group-hover:bg-slate-200 transition-colors">
+                    {item.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+        </div>
+
+        {/* Global Pagination Dots */}
+        <div className="flex justify-center gap-2.5 mt-8">
+          {carouselData.map((_, idx) => (
             <button
-              key={i}
-              onClick={() => setActiveTab(i)}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                activeTab === i
-                  ? "bg-white text-gray-900 border border-gray-300 shadow-sm"
-                  : "text-gray-400 hover:text-gray-600"
+              key={idx}
+              onClick={() => setActiveIndex(idx)}
+              className={`h-2.5 rounded-full transition-all duration-300 border ${
+                idx === activeIndex 
+                  ? "bg-slate-900 w-2.5 border-slate-900" 
+                  : "bg-white w-2.5 border-gray-300 hover:border-gray-500"
               }`}
-            >
-              {tab}
-            </button>
+              aria-label={`Go to slide ${idx + 1}`}
+            />
           ))}
         </div>
-      </div>
 
-      {/* Card */}
-      <div className="w-full mx-auto overflow-hidden">
-        <div className="flex flex-col w-full md:flex-row items-stretch min-h-[420px]">
-          <div className=" relative fc ">
-            <Image src="/i2.png" alt="sample2" height={520} width={520} />
-          </div>
-
-          {/* Right — text */}
-          <div className="md:w-72 flex flex-col justify-center px-8 py-10 md:py-0 flex-1">
-            <p className="text-md font-semibold text-gray-700 uppercase mb-3">
-              {t.cardLabel}
-            </p>
-            <h3 className=" text-2xl md:text-4xl font-black text-gray-900 leading-snug mb-4">
-              {t.cardTitle}
-            </h3>
-            <p className="text-lg text-gray-600 font-semibold leading-relaxed">{t.cardBody}</p>
-          </div>
-        </div>
       </div>
     </section>
   );

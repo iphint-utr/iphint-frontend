@@ -1,0 +1,86 @@
+// components/landing/Section2.tsx
+import Image from "next/image";
+
+const features = [
+  {
+    title: "Search Engines",
+    desc: "Data-driven image detection across major search engines",
+    icon: "/sec2_searchEngines.svg",
+  },
+  {
+    title: "Social Media",
+    desc: "AI-powered image matching and theft detection on SNS",
+    icon: "/sec2_socialMedia.svg",
+  },
+  {
+    title: "Harmful Sites",
+    desc: "Real-time tracking of 50,000+ illegal channels",
+    icon: "/sec2_harmfulSites.svg",
+  },
+  {
+    title: "Streaming Sites",
+    desc: "Proactive monitoring of video and streaming platforms",
+    icon: "/sec2_streamingSites.svg",
+  },
+  {
+    title: "Deep Web",
+    desc: "Tracing leaked assets in closed web communities",
+    icon: "/sec2_deepWeb.svg",
+  },
+];
+
+export default function Section2() {
+  return (
+    <section className="w-full py-16 md:py-24">
+      <div className="max-w-full mx-auto px-4 sm:px-6">
+        
+        {/* Rounded Container */}
+        <div className="bg-[#f3f3f3] rounded-[32px] px-6 md:px-12 py-12 md:py-16">
+          
+          {/* Heading */}
+          <h2 className="text-center text-xl md:text-2xl lg:text-3xl font-semibold text-black mb-12">
+            Accessible security service for everyone, regardless of scale
+          </h2>
+
+          {/* Features Grid */}
+          <div className="
+            grid 
+            grid-cols-2 
+            sm:grid-cols-2 
+            md:grid-cols-3 
+            lg:grid-cols-5 
+            gap-y-10 
+            gap-x-6 
+            text-center
+          ">
+            {features.map((item, i) => (
+              <div key={i} className="flex flex-col items-center space-y-4">
+                
+                {/* Icon */}
+                <Image
+                  src={item.icon}
+                  alt={item.title}
+                  width={64}
+                  height={64}
+                  className="w-14 h-14 md:w-16 md:h-16"
+                />
+
+                {/* Title */}
+                <h3 className="font-semibold text-base md:text-lg">
+                  {item.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-sm text-gray-600 max-w-[180px]">
+                  {item.desc}
+                </p>
+
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
