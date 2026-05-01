@@ -154,7 +154,7 @@ export default function Footer() {
           {/* Logo — top-left, does not grow */}
           <div className="flex-shrink-0">
             <Link href="/" aria-label="Toostar home" className="block text-gray-950">
-              <img src="/logo2.svg" alt="Toostar" />
+              <img src="/logo_footer.svg" alt="Toostar" />
             </Link>
           </div>
 
