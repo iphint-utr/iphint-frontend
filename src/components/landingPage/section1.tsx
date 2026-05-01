@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Section1() {
   return (
     <section className="w-full py-16 md:py-24">
-      <div className=" mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className=" max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* LEFT CONTENT */}
         <div className="space-y-6">

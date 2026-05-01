@@ -1,8 +1,25 @@
+import { Link } from "@/i18n/routing";
+
 const pressArticles = [
-  { id: 1, source: "The New York Times", title: "Global war against counterfeit goods: Use IpHint (iphint.com) to ..." },
-  { id: 2, source: "The New York Times", title: "Global war against counterfeit goods: Use ImgMov (iphint.com) to ..." },
-  { id: 3, source: "The New York Times", title: "Global war against counterfeit goods: Use IpHint (iphint.com) to ..." },
-];
+  {
+    id: 1,
+    source: "The New York Times",
+    title: "Global war against counterfeit goods: Use IpHint (iphint.com) to ...",
+    href: "#",
+  },
+  {
+    id: 2,
+    source: "The New York Times",
+    title: "Global war against counterfeit goods: Use ImgMov (iphint.com) to ...",
+    href: "#",
+  },
+  {
+    id: 3,
+    source: "The New York Times",
+    title: "Global war against counterfeit goods: Use IpHint (iphint.com) to ...",
+    href: "#",
+  },
+] as const;
 
 export default function PressSection() {
   return (
@@ -10,20 +27,33 @@ export default function PressSection() {
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-16">Press</h2>
         <div className="flex flex-col md:flex-row gap-6 overflow-x-auto pb-4 hide-scrollbar">
-          {pressArticles.map((article, idx) => (
-            <div 
+          {pressArticles.map((article) => (
+            <Link
               key={article.id}
-              className={`min-w-[300px] flex-1 p-8 rounded-3xl border-2 transition-all ${
-                idx === 0 ? "border-black" : "border-gray-100 bg-white"
-              }`}
+              href={article.href}
+              className="group min-w-[300px] flex-1 rounded-3xl border border-gray-200 bg-white p-8 transition-all hover:border-gray-300 hover:bg-slate-50"
             >
-              <h3 className="text-xl font-bold mb-6 leading-tight">
+              <h3 className="text-xl font-bold mb-6 leading-tight text-slate-950">
                 {article.title}
               </h3>
-              <p className="text-sm font-medium text-slate-600">
-                {article.source}
-              </p>
-            </div>
+              <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-600">
+                <span>{article.source}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="h-5 w-5 transition-transform group-hover:translate-x-1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

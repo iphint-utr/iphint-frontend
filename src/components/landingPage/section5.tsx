@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import Image from "next/image";
+import { useRef, type WheelEvent } from "react";
 
 const testimonials = [
   {
@@ -38,47 +37,68 @@ export default function Section5() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === "left" 
-        ? scrollLeft - clientWidth / 2 
-        : scrollLeft + clientWidth / 2;
-      
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    if (!scrollRef.current) {
+      return;
     }
+
+    const { clientWidth } = scrollRef.current;
+    const offset = Math.max(clientWidth * 0.75, 280);
+
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -offset : offset,
+      behavior: "smooth",
+    });
+  };
+
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    const container = event.currentTarget;
+
+    if (container.scrollWidth <= container.clientWidth) {
+      return;
+    }
+
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+      return;
+    }
+
+    event.preventDefault();
+    container.scrollBy({ left: event.deltaY, behavior: "auto" });
   };
 
   return (
-    <section className="bg-slate-50 py-20 overflow-hidden">
-      <div className="max-w-full mx-auto px-6">
+    <section className="w-full overflow-hidden bg-slate-50 py-14 sm:py-16 lg:py-20">
+      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-12">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why they trust us</h2>
-          <p className="text-sm font-semibold text-slate-600">5.5 hours saved in imposter tracking.</p>
+        <div className="mb-10 text-center sm:mb-14 lg:mb-16">
+          <h2 className="mb-3 text-3xl font-bold md:text-4xl">Why they trust us</h2>
+          <p className="mx-auto max-w-xl text-sm font-semibold leading-relaxed text-slate-600 sm:text-base">
+            5.5 hours saved in imposter tracking.
+          </p>
         </div>
 
         {/* Slider Container */}
         <div className="relative">
-          <div 
+          <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-8 scroll-smooth"
+            onWheel={handleWheel}
+            className="grid grid-flow-col auto-cols-[88%] gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scroll-px-4 scroll-smooth hide-scrollbar sm:auto-cols-[72%] sm:gap-5 md:auto-cols-[48%] md:gap-6 lg:auto-cols-[38%] xl:auto-cols-[31%] 2xl:auto-cols-[24%]"
           >
             {testimonials.map((item, idx) => (
-              <div 
+              <article
                 key={idx}
-                className="min-w-[300px] md:min-w-[380px] snap-center bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-sm flex flex-col justify-between"
+                className="flex min-w-0 snap-start flex-col justify-between rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-8 xl:p-10"
               >
                 <div>
-                  <div className="mb-6">
+                  <div className="mb-4 md:mb-6">
                     <svg width="24" height="20" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M5.5 0C2.46243 0 0 2.46243 0 5.5V11H7V5.5C7 4.67157 6.32843 4 5.5 4H4V0H5.5ZM19.5 0C16.4624 0 14 2.46243 14 5.5V11H21V5.5C21 4.67157 20.3284 4 19.5 4H18V0H19.5Z" fill="black"/>
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold mb-4 leading-tight">{item.quote}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-10">{item.content}</p>
+                  <h3 className="mb-3 text-lg font-bold leading-tight sm:text-xl">{item.quote}</h3>
+                  <p className="mb-6 text-sm leading-relaxed text-slate-600 sm:text-base md:mb-10">{item.content}</p>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
                     {/* Fallback to initials or icon if image doesn't exist */}
                     <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-400">
@@ -86,38 +106,36 @@ export default function Section5() {
                     </div>
                     {/* Replace with <Image /> when you have the local files */}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-bold">{item.author}</p>
                     <p className="text-xs text-slate-500">{item.subtext}</p>
                   </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
 
-          {/* Navigation Controls (Visible on Tablet/Desktop) */}
-          <div className="hidden md:flex justify-center items-center gap-4 mt-8">
-            <button 
+          <p className="mt-4 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:hidden">
+            Swipe to explore more stories
+          </p>
+
+          <div className="mt-6 hidden items-center justify-center gap-4 md:flex">
+            <button
+              type="button"
               onClick={() => scroll("left")}
-              className="p-3 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-              aria-label="Scroll left"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-slate-700 transition-colors hover:bg-gray-50"
+              aria-label="Scroll testimonials left"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
-            <button 
+            <button
+              type="button"
               onClick={() => scroll("right")}
-              className="p-3 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors shadow-sm"
-              aria-label="Scroll right"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-slate-700 transition-colors hover:bg-gray-50"
+              aria-label="Scroll testimonials right"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
-          </div>
-
-          {/* Mobile Dots */}
-          <div className="flex md:hidden justify-center gap-2 mt-4">
-            {testimonials.map((_, i) => (
-              <div key={i} className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-            ))}
           </div>
         </div>
       </div>
