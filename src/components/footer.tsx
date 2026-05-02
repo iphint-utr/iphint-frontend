@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +20,7 @@ const translations = {
       links: [
         { label: "개인정보 보호 정책", href: "/privacy_policy"   },
         { label: "서비스 이용약관",   href: "/terms_of_service" },
-        { label: "이용 정책",        href: "/policies"  },
+        { label: "이용 정책",        href: "/usage_policy"  },
         { label: "환불 정책",        href: "/refund_policy"    },
       ],
     },
@@ -40,7 +41,7 @@ const translations = {
       links: [
         { label: "Privacy Policy",   href: "/privacy_policy"  },
         { label: "Terms of Service", href: "/terms_of_service" },
-        { label: "Usage Policy",     href: "/policies" },
+        { label: "Usage Policy",     href: "/usage_policy" },
         { label: "Refund Policy",    href: "/refund_policy"   },
       ],
     },
@@ -154,7 +155,9 @@ export default function Footer() {
           {/* Logo — top-left, does not grow */}
           <div className="flex-shrink-0">
             <Link href="/" aria-label="Toostar home" className="block text-gray-950">
-              <img src="/logo_footer.svg" alt="Toostar" />
+              <div className="relative h-8 w-32">
+                <Image src="/logo_footer.svg" alt="Toostar" fill className="object-contain object-left" />
+              </div>
             </Link>
           </div>
 

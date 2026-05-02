@@ -19,7 +19,9 @@ const publicChromePaths = new Set([
   '/signup',
   '/service',
   '/privacy_policy',
+  '/refund_policy',
   '/terms_of_service',
+  '/usage_policy',
 ]);
 
 export default function AppLayoutRouter({ children }: { children: React.ReactNode }) {
