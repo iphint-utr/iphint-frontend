@@ -11,7 +11,7 @@ const localizedTopLevelRoutes = new Set([
   'pricing',
   'register',
   'signin',
-  'signup2',
+  'signup',
   'user',
 ]);
 
@@ -24,8 +24,17 @@ const intlMiddleware = createMiddleware({
 export default function proxy(request: NextRequest) {
   const segments = request.nextUrl.pathname.split('/').filter(Boolean);
   const firstSegment = segments[0];
-
   const isSupportedLocale = Boolean(firstSegment && (locales as readonly string[]).includes(firstSegment));
+  const legacySignupIndex = isSupportedLocale ? 1 : 0;
+
+  if (segments[legacySignupIndex] === 'signup2') {
+    const redirectUrl = request.nextUrl.clone();
+    const redirectedSegments = [...segments];
+    redirectedSegments[legacySignupIndex] = 'signup';
+    redirectUrl.pathname = `/${redirectedSegments.join('/')}`;
+    return NextResponse.redirect(redirectUrl);
+  }
+
   const isKnownRouteWithoutLocale = Boolean(firstSegment && localizedTopLevelRoutes.has(firstSegment));
   const looksLikeLocalePrefix = Boolean(firstSegment && /^[A-Za-z-]{2,5}$/.test(firstSegment));
 

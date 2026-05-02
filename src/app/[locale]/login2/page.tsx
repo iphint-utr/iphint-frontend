@@ -107,7 +107,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center text-sm sm:text-base text-black font-medium">
           {t('noAccountText')}{' '}
-          <Link href="/register" className="font-semibold border-b border-black pb-0.5 ml-1 hover:text-gray-600 transition-colors">
+          <Link href="/signup" className="font-semibold border-b border-black pb-0.5 ml-1 hover:text-gray-600 transition-colors">
             {t('noAccountLink')}
           </Link>
         </div>

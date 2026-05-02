@@ -52,7 +52,7 @@ export default function ReferralPage() {
   const handleCopy = async () => {
     const code = status?.referralCode || user?.referralCode || '';
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const url = `${baseUrl}/register?ref=${code}`;
+    const url = `${baseUrl}/signup?ref=${code}`;
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
@@ -74,8 +74,8 @@ export default function ReferralPage() {
 
   const referralCode = status?.referralCode || user?.referralCode || '';
   const referralUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/register?ref=${referralCode}`
-    : `/register?ref=${referralCode}`;
+    ? `${window.location.origin}/signup?ref=${referralCode}`
+    : `/signup?ref=${referralCode}`;
 
   const progress = status ? Math.min((status.completedInWindow / status.milestoneTarget) * 100, 100) : 0;
 

@@ -1,1 +1,1 @@
-export { default } from '../signup2/page';
+export { default } from '../signup/page';

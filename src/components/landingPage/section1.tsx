@@ -1,5 +1,6 @@
 // components/landing/Hero.tsx
 import Image from "next/image";
+import { Link } from "@/i18n/routing";
 
 export default function Section1() {
   return (
@@ -25,9 +26,12 @@ export default function Section1() {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="bg-black text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition">
+            <Link
+              href="/signup"
+              className="bg-black text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition"
+            >
               Get Started Now
-            </button>
+            </Link>
 
             <button className="border border-gray-300 px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition">
               Start Now

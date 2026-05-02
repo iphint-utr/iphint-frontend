@@ -43,7 +43,7 @@ export default function DashboardPage() {
       const referralStatus = await dispatch(generateReferralWindow()).unwrap();
       code = referralStatus?.referralCode || code;
 
-      const referralUrl = `${baseUrl}/register?ref=${code}`;
+      const referralUrl = `${baseUrl}/signup?ref=${code}`;
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(referralUrl);
       } else {

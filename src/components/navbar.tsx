@@ -95,7 +95,7 @@ export default function Header() {
 
           {/* Get Started Now */}
           <Link
-            href="/get-started"
+            href="/signup"
             className="inline-flex h-10 items-center rounded-full bg-gray-950 px-5 text-[14px] font-semibold text-white hover:bg-black transition-colors duration-150"
           >
             {t("getStarted")}
@@ -159,7 +159,7 @@ export default function Header() {
               {t("contactUs")}
             </Link>
             <Link
-              href="/get-started"
+              href="/signup"
               onClick={() => setIsMobileMenuOpen(false)}
               className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
             >
