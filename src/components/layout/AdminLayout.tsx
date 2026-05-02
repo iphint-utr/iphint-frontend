@@ -2,7 +2,7 @@
 
 import React, { useState, useSyncExternalStore } from 'react';
 import AdminSidebar from '@/components/adminLayout/Sidebar';
-import SidebarToggleButton from '@/components/layout/SidebarToggleButton';
+import AdminTopbar from '@/components/adminLayout/Topbar';
 
 const desktopSidebarMediaQuery = '(min-width: 1024px)';
 
@@ -46,9 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <AdminSidebar open={sidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
       <div className={`transition-all duration-200 ${isDesktopSidebar ? 'lg:ml-72' : 'lg:ml-0'}`}>
-        <div className="sticky top-16 z-20 px-3 pt-4 sm:px-6 lg:px-8">
-          <SidebarToggleButton isOpen={sidebarOpen} onClick={handleSidebarToggle} />
-        </div>
+        <AdminTopbar onMenuClick={handleSidebarToggle} />
 
         <main className="min-h-screen px-3 py-5 sm:px-6 sm:py-6 lg:px-8">
           <div className="mx-auto w-full max-w-7xl">{children}</div>

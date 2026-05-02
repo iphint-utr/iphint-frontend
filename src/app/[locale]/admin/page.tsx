@@ -10,7 +10,6 @@ import AdminStatusBadge from '@/components/admin/AdminStatusBadge';
 import { formatAdminCurrency, formatAdminDate, formatAdminNumber } from '@/lib/adminFormat';
 import { getAdminActivityToken, humanizeAdminValue } from '@/lib/adminLabels';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { truncateText } from '@/lib/utils';
 import { fetchAdminDashboard } from '@/lib/store/slices/adminSlice';
 
 export default function AdminDashboardPage() {
@@ -37,7 +36,7 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             onClick={() => dispatch(fetchAdminDashboard())}
-            className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+            className="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
             {t('common.refresh')}
           </button>
@@ -98,17 +97,15 @@ export default function AdminDashboardPage() {
                     className="rounded-3xl border border-slate-100 bg-slate-50/70 p-4"
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0 flex-1">
+                      <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <AdminStatusBadge value={activity.type} label={activityLabel} />
-                          <p className="text-sm font-semibold text-slate-900" title={activity.userName || t('common.unknownMember')}>
-                            {truncateText(activity.userName || t('common.unknownMember'), 28)}
-                          </p>
+                          <p className="text-sm font-semibold text-slate-900">{activity.userName || t('common.unknownMember')}</p>
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-slate-600" title={activity.description}>{truncateText(activity.description, 120)}</p>
-                        <p className="mt-2 text-xs text-slate-500" title={activity.userEmail}>{truncateText(activity.userEmail, 38)}</p>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">{activity.description}</p>
+                        <p className="mt-2 text-xs text-slate-500">{activity.userEmail}</p>
                       </div>
-                      <p className="text-xs font-medium break-all text-slate-500 sm:text-right">{formatAdminDate(activity.timestamp, locale)}</p>
+                      <p className="text-xs font-medium text-slate-500">{formatAdminDate(activity.timestamp, locale)}</p>
                     </div>
                   </div>
                 );

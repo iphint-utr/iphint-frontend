@@ -2,7 +2,7 @@
 
 import React, { useState, useSyncExternalStore } from 'react';
 import Sidebar from '@/components/dashboardLayout/Sidebar';
-import SidebarToggleButton from '@/components/layout/SidebarToggleButton';
+import Topbar from '@/components/dashboardLayout/Topbar';
 
 const desktopSidebarMediaQuery = '(min-width: 1024px)';
 
@@ -46,9 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar open={sidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
 
       <div className={`transition-all duration-200 ${isDesktopSidebar && sidebarOpen ? 'lg:ml-60' : 'lg:ml-0'}`}>
-        <div className="sticky top-16 z-20 px-4 pt-4 sm:px-6">
-          <SidebarToggleButton isOpen={sidebarOpen} onClick={handleSidebarToggle} />
-        </div>
+        <Topbar onMenuClick={handleSidebarToggle} />
 
         <main className="min-h-screen px-4 py-5 sm:px-6 sm:py-6">
           <div className="mx-auto w-full space-y-6">{children}</div>
