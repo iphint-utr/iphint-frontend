@@ -1,35 +1,33 @@
 // components/landing/Section2.tsx
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const features = [
   {
-    title: "Search Engines",
-    desc: "Data-driven image detection across major search engines",
+    key: "searchEngines",
     icon: "/sec2_searchEngines.svg",
   },
   {
-    title: "Social Media",
-    desc: "AI-powered image matching and theft detection on SNS",
+    key: "socialMedia",
     icon: "/sec2_socialMedia.svg",
   },
   {
-    title: "Harmful Sites",
-    desc: "Real-time tracking of 50,000+ illegal channels",
+    key: "harmfulSites",
     icon: "/sec2_harmfulSites.svg",
   },
   {
-    title: "Streaming Sites",
-    desc: "Proactive monitoring of video and streaming platforms",
+    key: "streamingSites",
     icon: "/sec2_streamingSites.svg",
   },
   {
-    title: "Deep Web",
-    desc: "Tracing leaked assets in closed web communities",
+    key: "deepWeb",
     icon: "/sec2_deepWeb.svg",
   },
 ];
 
 export default function Section2() {
+  const t = useTranslations("Landing.section2");
+
   return (
     <section className="w-full py-16 md:py-24">
       <div className="max-w-full mx-auto px-4 sm:px-6">
@@ -39,7 +37,7 @@ export default function Section2() {
           
           {/* Heading */}
           <h2 className="text-center text-xl md:text-2xl lg:text-3xl font-semibold text-black mb-12">
-            Accessible security service for everyone, regardless of scale
+            {t("title")}
           </h2>
 
           {/* Features Grid */}
@@ -59,7 +57,7 @@ export default function Section2() {
                 {/* Icon */}
                 <Image
                   src={item.icon}
-                  alt={item.title}
+                  alt={t(`features.${item.key}.title`)}
                   width={64}
                   height={64}
                   className="w-14 h-14 md:w-16 md:h-16"
@@ -67,12 +65,12 @@ export default function Section2() {
 
                 {/* Title */}
                 <h3 className="font-semibold text-base md:text-lg">
-                  {item.title}
+                  {t(`features.${item.key}.title`)}
                 </h3>
 
                 {/* Description */}
                 <p className="text-sm text-gray-600 max-w-[180px]">
-                  {item.desc}
+                  {t(`features.${item.key}.description`)}
                 </p>
 
               </div>

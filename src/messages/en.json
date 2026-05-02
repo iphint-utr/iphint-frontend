@@ -355,7 +355,162 @@
       "generatedAt": "Generated at"
     }
   },
-  
+  "Landing": {
+    "section1": {
+      "title": "Protect your ideas and\nbrand growth with IpHint.",
+      "subtitle": "Never lose sight of your visual assets with our non-stop tracking system",
+      "description": "Raw data alone is meaningless. We prioritize precision detection on high-risk global sites, reporting only the essential information that directly impacts your rights.",
+      "primaryCta": "Get Started Now",
+      "secondaryCta": "Start Now",
+      "imageAlt": "Hero illustration"
+    },
+    "section2": {
+      "title": "Accessible security service for everyone, regardless of scale",
+      "features": {
+        "searchEngines": {
+          "title": "Search Engines",
+          "description": "Data-driven image detection across major search engines"
+        },
+        "socialMedia": {
+          "title": "Social Media",
+          "description": "AI-powered image matching and theft detection on SNS"
+        },
+        "harmfulSites": {
+          "title": "Harmful Sites",
+          "description": "Real-time tracking of 50,000+ illegal channels"
+        },
+        "streamingSites": {
+          "title": "Streaming Sites",
+          "description": "Proactive monitoring of video and streaming platforms"
+        },
+        "deepWeb": {
+          "title": "Deep Web",
+          "description": "Tracing leaked assets in closed web communities"
+        }
+      }
+    },
+    "section3": {
+      "title": "Try Monitoring",
+      "description": "Check for leaks across the web and take appropriate action based on the results!",
+      "features": {
+        "deepWebDetection": {
+          "title": "Deep Web Detection",
+          "description": "Scans everything from adult sites and harmful sites to streaming sites that general search engines cannot find."
+        },
+        "highAccuracy": {
+          "title": "High Accuracy",
+          "description": "Our AI-based image matching technology accurately identifies modified images and prevents the display of similar content."
+        },
+        "alertService": {
+          "title": "Alert Service",
+          "description": "No more hassle of searching manually. Get notified when new matches are found so you can respond quickly."
+        },
+        "secureStorage": {
+          "title": "Secure Storage",
+          "description": "Uploaded images are encrypted and stored securely, with personal information protection as our top priority."
+        }
+      },
+      "footerQuestion": "Do you need enterprise-grade data residency?",
+      "footerCta": "Contact Sales"
+    },
+    "section4": {
+      "title": "Creators and Brands",
+      "description": "We grow together with influencers, artists, and creators from all over the world. Check out the results achieved by teams using ImgMov.",
+      "items": {
+        "artist": {
+          "title": "Artist",
+          "heading": "Drawing, Illustration, Webtoon, Character, Digital Art",
+          "description": "We continuously monitor thousands of platforms daily on your behalf and provide reports on how your works are being used."
+        },
+        "model": {
+          "title": "Model",
+          "heading": "Fashion, Photography, Runway, Commercial",
+          "description": "Protect your likeness and modeling portfolio across global campaigns and digital platforms."
+        },
+        "creator": {
+          "title": "Creator",
+          "heading": "Video, Music, Podcasting, Streaming",
+          "description": "Ensure your content remains yours. Track your creative output across all major media platforms."
+        },
+        "ecommerce": {
+          "title": "E-commerce",
+          "heading": "Brands, Retail, Online Stores",
+          "description": "Safeguard your product imagery and brand assets from unauthorized use in the digital marketplace."
+        }
+      },
+      "viewSlide": "View {title}",
+      "goToSlide": "Go to slide {index}"
+    },
+    "section5": {
+      "title": "Why they trust us",
+      "subtitle": "5.5 hours saved in imposter tracking.",
+      "testimonials": {
+        "artist": {
+          "quote": "Reduced monitoring from 12 hours to 30 mins.",
+          "content": "It was nearly impossible to manually find all the accounts that stole my drawings and posted them as their own. This service gives me true peace of mind.",
+          "author": "Artist (Webtoon)",
+          "subtext": "Over 30 serialized works"
+        },
+        "ceo": {
+          "quote": "4 hours of daily monitoring, now automated.",
+          "content": "I found shops selling my products just by changing the packaging. I was also worried about the increasing number of scam sites stealing my model photos and detail pages.",
+          "author": "CEO, Apparel Online Store",
+          "subtext": "Annual Sales: $11M"
+        },
+        "influencer": {
+          "quote": "No more 30-hour monthly search struggles.",
+          "content": "I used to drain so much energy tracking my photos being used in illegal ads or ghost accounts. I'm so grateful to have solved this with such an affordable subscription.",
+          "author": "Influencer & Model",
+          "subtext": "300K Followers"
+        }
+      },
+      "swipeHint": "Swipe to explore more stories",
+      "scrollLeft": "Scroll testimonials left",
+      "scrollRight": "Scroll testimonials right"
+    },
+    "section6": {
+      "title": "Blog",
+      "posts": {
+        "1": {
+          "title": "IpHint: A company providing AI-based Intellectual Property (IP) image protection solutions."
+        },
+        "2": {
+          "title": "Startup 'IpHint' expands beyond copyright to 'counterfeit detection'... Simultaneous launch of a global ..."
+        },
+        "3": {
+          "title": "The global war against counterfeit goods: Use IpHint (iphint.com) to stay protected from copyright ... hunters."
+        },
+        "4": {
+          "title": "The global war against counterfeit goods: Use IpHint (iphint.com) to stay protected from copyright ..."
+        }
+      }
+    },
+    "section7": {
+      "title": "Press",
+      "articles": {
+        "1": {
+          "source": "The New York Times",
+          "title": "Global war against counterfeit goods: Use IpHint (iphint.com) to ..."
+        },
+        "2": {
+          "source": "The New York Times",
+          "title": "Global war against counterfeit goods: Use ImgMov (iphint.com) to ..."
+        },
+        "3": {
+          "source": "The New York Times",
+          "title": "Global war against counterfeit goods: Use IpHint (iphint.com) to ..."
+        }
+      }
+    },
+    "section8": {
+      "titleBeforeBrand": "Start monitoring with ",
+      "brand": "IpHint",
+      "titleAfterBrand": "",
+      "primaryCta": "Start Now",
+      "secondaryCta": "Contact Sales"
+    }
+  },
+
   "header": {
     "pricing": "Pricing",
     "service": "Service",

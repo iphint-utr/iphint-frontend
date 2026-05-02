@@ -1,15 +1,19 @@
+import { useTranslations } from "next-intl";
+
 const blogPosts = [
-  { id: 1, title: "IpHint: A company providing AI-based Intellectual Property (IP) image protection solutions." },
-  { id: 2, title: "Startup 'IpHint' expands beyond copyright to 'counterfeit detection'... Simultaneous launch of a global ..." },
-  { id: 3, title: "The global war against counterfeit goods: Use IpHint (iphint.com) to stay protected from copyright ... hunters." },
-  { id: 4, title: "The global war against counterfeit goods: Use IpHint (iphint.com) to stay protected from copyright ..." },
+  { id: 1 },
+  { id: 2 },
+  { id: 3 },
+  { id: 4 },
 ];
 
 export default function Section6() {
+  const t = useTranslations("Landing.section6");
+
   return (
     <section className="py-20 bg-white px-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-12">Blog</h2>
+        <h2 className="text-4xl font-bold text-center mb-12">{t("title")}</h2>
         <div className="border-t border-gray-100">
           {blogPosts.map((post) => (
             <a
@@ -18,7 +22,7 @@ export default function Section6() {
               className="group flex items-center justify-between py-8 border-b border-gray-100 hover:bg-slate-50 transition-colors px-4"
             >
               <h3 className="text-lg font-semibold text-slate-900 pr-8 leading-snug">
-                {post.title}
+                {t(`posts.${post.id}.title`)}
               </h3>
 
               <svg

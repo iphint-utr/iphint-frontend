@@ -1,27 +1,27 @@
 // components/landing/Hero.tsx
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 
 export default function Section1() {
+  const t = useTranslations("Landing.section1");
+
   return (
     <section className="w-full py-16 md:py-24">
       <div className=" max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* LEFT CONTENT */}
         <div className="space-y-6">
-          <h1 className="text-2xl md:text-3xl lg:text-3xl font-semibold text-black leading-tight">
-            Protect your ideas and <br />
-            brand growth with IpHint.
+          <h1 className="whitespace-pre-line text-2xl md:text-3xl lg:text-3xl font-semibold text-black leading-tight">
+            {t("title")}
           </h1>
 
           <h2 className="text-lg md:text-xl font-semibold text-black">
-            Never lose sight of your visual assets with our non-stop tracking system
+            {t("subtitle")}
           </h2>
 
           <p className="text-gray-600 max-w-xl">
-            Raw data alone is meaningless. We prioritize precision detection on
-            high-risk global sites, reporting only the essential information that
-            directly impacts your rights.
+            {t("description")}
           </p>
 
           {/* CTA Buttons */}
@@ -30,11 +30,11 @@ export default function Section1() {
               href="/signup"
               className="bg-black text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition"
             >
-              Get Started Now
+              {t("primaryCta")}
             </Link>
 
             <button className="border border-gray-300 px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition">
-              Start Now
+              {t("secondaryCta")}
             </button>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function Section1() {
         <div className="flex justify-center lg:justify-end">
           <Image
             src="/sec1_svg.svg"
-            alt="Hero Illustration"
+            alt={t("imageAlt")}
             width={500}
             height={500}
             priority

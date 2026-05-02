@@ -1,30 +1,29 @@
 // components/landing/Section3.tsx
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const features = [
   {
-    title: "Deep Web Detection",
-    desc: "Scans everything from adult sites and harmful sites to streaming sites that general search engines cannot find.",
+    key: "deepWebDetection",
     icon: "/sec3_deepWebDetection.svg",
   },
   {
-    title: "High Accuracy",
-    desc: "Our AI-based image matching technology accurately identifies modified images and prevents the display of similar content.",
+    key: "highAccuracy",
     icon: "/sec3_highAccuracy.svg",
   },
   {
-    title: "Alert Service",
-    desc: "No more hassle of searching manually. Get notified when new matches are found so you can respond quickly.",
+    key: "alertService",
     icon: "/sec3_alertService.svg",
   },
   {
-    title: "Secure Storage",
-    desc: "Uploaded images are encrypted and stored securely, with personal information protection as our top priority.",
+    key: "secureStorage",
     icon: "/sec3_secureStorage.svg",
   },
 ];
 
 export default function Section3() {
+  const t = useTranslations("Landing.section3");
+
   return (
     <section className="w-full py-16 md:py-24">
       
@@ -34,10 +33,10 @@ export default function Section3() {
         {/* Heading */}
         <div className="text-center mb-14">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-black">
-            Try Monitoring
+            {t("title")}
           </h2>
           <p className="mt-4 text-gray-700 text-sm md:text-base">
-            Check for leaks across the web and take appropriate action based on the results!
+            {t("description")}
           </p>
         </div>
 
@@ -65,7 +64,7 @@ export default function Section3() {
               {/* Icon */}
               <Image
                 src={item.icon}
-                alt={item.title}
+                alt={t(`features.${item.key}.title`)}
                 width={40}
                 height={40}
                 className="w-8 h-8 md:w-10 md:h-10"
@@ -73,12 +72,12 @@ export default function Section3() {
 
               {/* Title */}
               <h3 className="text-lg md:text-xl font-semibold text-black">
-                {item.title}
+                {t(`features.${item.key}.title`)}
               </h3>
 
               {/* Description */}
               <p className="text-sm text-gray-700 leading-relaxed">
-                {item.desc}
+                {t(`features.${item.key}.description`)}
               </p>
 
             </div>
@@ -88,8 +87,8 @@ export default function Section3() {
 
       {/* Bottom Bar */}
       <div className="mt-16 bg-black text-white text-center py-4 text-sm">
-        Do you need enterprise-grade data residency?{" "}
-        <span className="underline cursor-pointer">Contact Sales</span>
+        {t("footerQuestion")} {" "}
+        <span className="underline cursor-pointer">{t("footerCta")}</span>
       </div>
 
     </section>
