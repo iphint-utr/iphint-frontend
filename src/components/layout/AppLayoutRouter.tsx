@@ -8,12 +8,29 @@ import AdminLayout from '@/components/layout/AdminLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import AdminRoute from '@/components/AdminRoute';
 import { routing } from '@/i18n/routing';
+import Header from '@/components/navbar';
+import Footer from '@/components/footer';
+
+const publicChromePaths = new Set([
+  '/',
+  '/login',
+  '/login2',
+  '/register',
+  '/signup2',
+  '/privacy_policy',
+  '/terms_of_service',
+]);
 
 export default function AppLayoutRouter({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || '';
   const localePattern = routing.locales.join('|');
-  const isDashboardRoute = new RegExp(`^\\/(?:${localePattern})\\/dashboard(\\/|$)`).test(pathname);
-  const isAdminRoute = new RegExp(`^\\/(?:${localePattern})\\/admin(\\/|$)`).test(pathname);
+  const localelessPath = pathname.replace(new RegExp(`^\/(?:${localePattern})(?=\/|$)`), '') || '/';
+  const normalizedPath = localelessPath !== '/' && localelessPath.endsWith('/')
+    ? localelessPath.slice(0, -1)
+    : localelessPath;
+  const isDashboardRoute = normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/');
+  const isAdminRoute = normalizedPath === '/admin' || normalizedPath.startsWith('/admin/');
+  const shouldShowPublicChrome = publicChromePaths.has(normalizedPath);
 
   if (isDashboardRoute) {
     return (
@@ -31,5 +48,17 @@ export default function AppLayoutRouter({ children }: { children: React.ReactNod
     );
   }
 
-  return <PublicLayout>{children}</PublicLayout>;
+  const content = <PublicLayout>{children}</PublicLayout>;
+
+  if (!shouldShowPublicChrome) {
+    return content;
+  }
+
+  return (
+    <>
+      <Header />
+      {content}
+      <Footer />
+    </>
+  );
 }

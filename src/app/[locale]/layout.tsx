@@ -8,8 +8,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import AppLayoutRouter from '@/components/layout/AppLayoutRouter';
 import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
-import Header from '@/components/navbar';
-import Footer from '@/components/footer';
 import { notFound } from "next/navigation";
 
 const inter = Inter({
@@ -45,9 +43,7 @@ export default async function RootLayout({
         <ExtensionAttrSuppressor />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <StoreProvider>
-            <Header />
             <AppLayoutRouter>{children}</AppLayoutRouter>
-            <Footer />
           </StoreProvider>
         </NextIntlClientProvider>
         
