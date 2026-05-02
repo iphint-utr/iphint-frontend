@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
 import { PageParamsSchema, TranslationsSchema } from './pricing'
 import type { Locale } from './pricing'
 import PricingClient from './PricingClient'

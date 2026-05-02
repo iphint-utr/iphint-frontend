@@ -7,13 +7,13 @@ export default function AboutSection() {
   const t = useTranslations("services.about");
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#f5f5f5] py-16 sm:py-20 lg:py-24">
+    <section className="relative w-full overflow-hidden bg-white py-16 sm:py-20 lg:py-32 xl:py-36">
       {/* Dotted background pattern */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(circle, #c0c0c0 1px, transparent 1px)",
+            "radial-gradient(circle, #e6e6e6 1.6px, transparent 1.6px)",
           backgroundSize: "24px 24px",
         }}
         aria-hidden="true"

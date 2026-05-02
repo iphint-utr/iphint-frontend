@@ -103,7 +103,7 @@
         "ceo": {
           "quote": "하루 4시간의 모니터링, 이제는 자동화되었습니다.",
           "content": "포장만 바꿔 제 상품을 파는 쇼핑몰을 발견했고, 제 모델 사진과 상세 페이지를 훔쳐가는 사기 사이트가 늘어나 걱정이 컸습니다.",
-          "author": "의류 온라인 스토어 CEO",
+          "author": "의류 온라인 스토어 대표",
           "subtext": "연 매출 1,100만 달러"
         },
         "influencer": {
@@ -138,15 +138,15 @@
       "title": "언론 보도",
       "articles": {
         "1": {
-          "source": "The New York Times",
+          "source": "뉴욕타임스",
           "title": "위조 상품과의 글로벌 전쟁: IpHint(iphint.com) 활용 사례"
         },
         "2": {
-          "source": "The New York Times",
+          "source": "뉴욕타임스",
           "title": "글로벌 위조 상품 대응: ImgMov(iphint.com) 활용 사례"
         },
         "3": {
-          "source": "The New York Times",
+          "source": "뉴욕타임스",
           "title": "브랜드 보호를 위한 IpHint(iphint.com) 활용 이야기"
         }
       }
@@ -206,7 +206,7 @@
     "businessLabel": "비즈니스 환경은 무엇인가요?",
     "businessPlaceholder": "회사 또는 프로젝트 이름",
     "roleLabel": "구체적인 역할은 무엇인가요?",
-    "rolePlaceholder": "예: 디자이너, CEO, 프리랜서",
+    "rolePlaceholder": "예: 디자이너, 대표, 프리랜서",
     "contactLabel": "알림 연락처",
     "countryLabel": "주요 국가/지역",
     "emailLabel": "보고서 수신 이메일",
