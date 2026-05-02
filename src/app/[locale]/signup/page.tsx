@@ -16,6 +16,7 @@ import { selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/sli
 function SignupForm() {
   const t = useTranslations('Auth');
   const searchParams = useSearchParams();
+  const referralCode = searchParams.get('ref') || searchParams.get('referralCode') || '';
   const dispatch = useDispatch<AppDispatch>();
   const { authError } = useSelector((state: RootState) => state.user);
 const router = useRouter();
@@ -26,7 +27,7 @@ useEffect(() => {
   if (!authLoading && isAuthenticated) {
     router.push('/dashboard');
   }
-}, [isAuthenticated, authLoading]);
+}, [isAuthenticated, authLoading, router]);
   const [formData, setFormData] = useState({
     name: '',
     companyName: '',
@@ -36,16 +37,7 @@ useEffect(() => {
     phoneNumber: '',
     email: '',
     password: '',
-    referralCode: '' 
   });
-
-  // 1. Capture referral code from the URL parameters (e.g., ?ref=123456 or ?referralCode=123456)
-  useEffect(() => {
-    const codeFromUrl = searchParams.get('ref') || searchParams.get('referralCode');
-    if (codeFromUrl) {
-      setFormData((prev) => ({ ...prev, referralCode: codeFromUrl }));
-    }
-  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     dispatch(clearError());
@@ -65,7 +57,7 @@ useEffect(() => {
       phoneNumber: fullPhone,
       email: formData.email,
       password: formData.password,
-      referralCode: formData.referralCode // Passed directly to backend
+      referralCode // Passed directly to backend
     };
     
     dispatch(registerUser(submitData));
@@ -179,7 +171,7 @@ useEffect(() => {
         </div>
 
         {/* Hidden Referral Code input (Optional: for visual confirmation in DOM) */}
-        <input type="hidden" name="referralCode" value={formData.referralCode} />
+        <input type="hidden" name="referralCode" value={referralCode} />
 
         {authError && (
           <div className="text-red-600 bg-red-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
@@ -208,10 +200,20 @@ useEffect(() => {
 // 3. Export Default Component wrapped in Suspense
 export default function SignupPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white font-sans text-gray-900">
-      <Suspense fallback={<div className="w-full text-center">Loading...</div>}>
-        <SignupForm />
-      </Suspense>
+    <div className="min-h-screen bg-white font-sans text-gray-900">
+      <div className="grid min-h-screen lg:grid-cols-2">
+        <div
+          aria-hidden="true"
+          className="min-h-[280px] bg-slate-100 bg-cover bg-center bg-no-repeat lg:min-h-screen"
+          style={{ backgroundImage: "url('/signup2.svg')" }}
+        />
+
+        <div className="flex items-center justify-center">
+          <Suspense fallback={<div className="w-full text-center">Loading...</div>}>
+            <SignupForm />
+          </Suspense>
+        </div>
+      </div>
     </div>
   );
 }
