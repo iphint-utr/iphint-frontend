@@ -520,8 +520,8 @@ export default function SearchDetailsPage() {
 								<th className="w-10 px-3 py-3" />
 								<th className="w-20 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
 								<th className="w-[40%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
-								<th className="w-[25%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
-								<th className="w-[25%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
+								<th className="w-[23%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+								<th className="w-[10%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
 								<th className="w-[10%] pr-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500"></th>
 							</tr>
 						</thead>
