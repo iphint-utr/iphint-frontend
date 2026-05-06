@@ -381,12 +381,12 @@ export default function SearchDetailsPage() {
 							</p>
 						</div>
 						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-							<div className="relative inline-block">
+							<div className="relative w-full sm:w-auto">
 								<select
 									value={bulkAction}
 									onChange={(event) => setBulkAction(event.target.value as BulkAction)}
 									disabled={isBulkUpdating || resultsLoading || selectedResultIds.length === 0}
-									className="w-40 sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+									className="w-full sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
 								>
 									{BULK_ACTION_OPTIONS.map((option) => (
 										<option key={option.value} value={option.value} className="bg-white text-gray-900">
@@ -403,7 +403,7 @@ export default function SearchDetailsPage() {
 							<button
 								onClick={applyBulkAction}
 								disabled={isBulkUpdating || resultsLoading || bulkDeleting || selectedResultIds.length === 0 || bulkAction === '__none'}
-								className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+								className="w-full cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 sm:w-auto"
 							>
 								{isBulkUpdating || bulkDeleting ? 'Working...' : 'Apply'}
 							</button>
@@ -411,16 +411,118 @@ export default function SearchDetailsPage() {
 					</div>
 				</div>
 
-				<div className="overflow-x-auto">
-					<table className="min-w-[960px] w-full table-fixed border-collapse text-left">
+				{/* ── Mobile cards (below md) ── */}
+				<div className="divide-y divide-gray-100 md:hidden">
+					{resultsLoading ? (
+						<p className="px-4 py-10 text-center text-sm text-gray-500">Loading results...</p>
+					) : results.length === 0 ? (
+						<p className="px-4 py-10 text-center text-sm text-gray-500">No result images found for this search.</p>
+					) : (
+						results.map((result) => (
+							<div key={result._id} className="p-4">
+								{/* Top row: checkbox + thumbnail + title */}
+								<div className="flex items-start gap-3">
+									<input
+										type="checkbox"
+										checked={selectedResultIds.includes(result._id)}
+										onChange={() => toggleOne(result._id)}
+										disabled={isBulkUpdating}
+										aria-label="Select result image"
+										className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 text-gray-900 focus:ring-gray-400 disabled:cursor-not-allowed"
+									/>
+									<button
+										type="button"
+										onClick={() => setPreviewResultId(result._id)}
+										disabled={result.isLocked}
+										className="shrink-0 cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+										aria-label="Open image preview"
+									>
+										<img
+											src={result.image}
+											alt={result.details?.title || 'result image'}
+											className={[
+												'h-16 w-16 rounded-lg border border-gray-200 object-cover',
+												result.isLocked ? 'blur-sm opacity-70' : '',
+											].join(' ')}
+										/>
+									</button>
+									<div className="min-w-0 flex-1">
+										<p className="line-clamp-2 text-sm font-medium text-gray-900">
+											{result.isLocked
+												? 'Upgrade plan to view this result'
+												: (result.details?.title || 'Untitled result')}
+										</p>
+										<p className="mt-0.5 truncate text-xs text-gray-500">
+											{result.details?.source || 'Unknown source'}
+										</p>
+									</div>
+									<button
+										onClick={() => requestDeleteResult(result._id)}
+										disabled={deletingResultId === result._id || isBulkUpdating || bulkDeleting}
+										className="ml-2 inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-red-200 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+										aria-label="Delete result"
+									>
+										<Trash2
+											size={15}
+											strokeWidth={2}
+											className={deletingResultId === result._id ? 'animate-pulse' : ''}
+										/>
+									</button>
+								</div>
+								{/* Status + source row */}
+								<div className="mt-3 flex items-center gap-2 pl-7">
+									<div className="relative min-w-0 flex-1">
+										<select
+											value={result.reviewStatus || 'not_reviewed'}
+											disabled={updatingResultId === result._id || isBulkUpdating}
+											onChange={(event) =>
+												handleStatusChange(result._id, event.target.value as ReviewStatus)
+											}
+											className="w-full cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-3 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+										>
+											{REVIEW_STATUS_OPTIONS.map((option) => (
+												<option key={option.value} value={option.value} className="bg-white text-gray-900">
+													{option.label}
+												</option>
+											))}
+										</select>
+										<ChevronDown
+											size={14}
+											className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+										/>
+									</div>
+
+									<div className="flex items-center justify-center flex-1">
+									{result.details?.link && !result.isLocked ? (
+										<a
+											href={result.details.link}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-medium text-gray-700 hover:text-gray-900"
+										>
+											Visit <ExternalLink className="h-3.5 w-3.5" />
+										</a>
+									) : result.isLocked ? (
+										<span className="shrink-0 whitespace-nowrap text-sm text-amber-700">Upgrade</span>
+									) : null}
+									</div>
+								</div>
+							</div>
+						))
+					)}
+				</div>
+
+				{/* ── Desktop table (md+) ── */}
+				<div className="hidden overflow-x-auto md:block">
+					<table className="w-full min-w-[780px] table-fixed border-collapse text-left">
 						<thead className="bg-gray-50">
 							<tr>
-								<th className="px-4 py-3 w-12" />
-								<th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
-								<th className="w-[36%] px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
-								<th className="w-44 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
-								<th className="w-32 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
-								<th className="w-24 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 text-right">Action</th>
+								<th className="w-10 px-3 py-3" />
+								<th className="w-20 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
+								<th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
+								<th className="w-44 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+								<th className="w-24 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
+								<th className="w-12 px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500"></th>
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-100">
@@ -439,7 +541,7 @@ export default function SearchDetailsPage() {
 							) : (
 								results.map((result) => (
 									<tr key={result._id}>
-										<td className="px-4 py-3">
+										<td className="px-3 py-3">
 											<input
 												type="checkbox"
 												checked={selectedResultIds.includes(result._id)}
@@ -449,7 +551,7 @@ export default function SearchDetailsPage() {
 												className="h-4 w-4 cursor-pointer rounded border-gray-300 text-gray-900 focus:ring-gray-400 disabled:cursor-not-allowed"
 											/>
 										</td>
-										<td className="px-4 py-3">
+										<td className="px-3 py-3">
 											<button
 												type="button"
 												onClick={() => setPreviewResultId(result._id)}
@@ -461,27 +563,27 @@ export default function SearchDetailsPage() {
 													src={result.image}
 													alt={result.details?.title || 'result image'}
 													className={[
-														'h-16 w-16 rounded-lg border border-gray-200 object-cover',
+														'h-14 w-14 rounded-lg border border-gray-200 object-cover',
 														result.isLocked ? 'blur-sm opacity-70' : '',
 													].join(' ')}
 												/>
 											</button>
 										</td>
-										<td className="px-4 py-3">
+										<td className="px-3 py-3">
 											<p className="line-clamp-2 text-sm font-medium text-gray-900" title={result.details?.title || 'Untitled result'}>
 												{result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'Untitled result')}
 											</p>
 											<p className="mt-1 truncate text-xs text-gray-500" title={result.details?.source || 'Unknown source'}>{result.details?.source || 'Unknown source'}</p>
 										</td>
-										<td className="px-4 py-3">
-											<div className="relative inline-block">
+										<td className="px-3 py-3">
+											<div className="relative w-full">
 												<select
 													value={result.reviewStatus || 'not_reviewed'}
 													disabled={updatingResultId === result._id || isBulkUpdating}
 													onChange={(event) =>
 														handleStatusChange(result._id, event.target.value as ReviewStatus)
 													}
-													className="w-40 sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+													className="w-full cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
 												>
 													{REVIEW_STATUS_OPTIONS.map((option) => (
 														<option key={option.value} value={option.value} className="bg-white text-gray-900">
@@ -490,12 +592,12 @@ export default function SearchDetailsPage() {
 													))}
 												</select>
 												<ChevronDown
-													size={14}
-													className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+													size={13}
+													className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
 												/>
 											</div>
 										</td>
-										<td className="px-4 py-3">
+										<td className="px-3 py-3">
 											{result.details?.link && !result.isLocked ? (
 												<a
 													href={result.details.link}
@@ -506,16 +608,16 @@ export default function SearchDetailsPage() {
 													Visit <ExternalLink className="h-3.5 w-3.5" />
 												</a>
 											) : result.isLocked ? (
-												<span className="text-sm text-amber-700">Upgrade required</span>
+												<span className="text-sm text-amber-700">Upgrade</span>
 											) : (
-												<span className="text-sm text-gray-400">No link</span>
+												<span className="text-sm text-gray-400">—</span>
 											)}
 										</td>
-										<td className="px-4 py-3 text-right">
+										<td className="px-3 py-3 text-right">
 											<button
 												onClick={() => requestDeleteResult(result._id)}
 												disabled={deletingResultId === result._id || isBulkUpdating || bulkDeleting}
-												className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-red-200 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+												className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-red-200 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
 												aria-label="Delete result"
 												title="Delete result"
 											>
