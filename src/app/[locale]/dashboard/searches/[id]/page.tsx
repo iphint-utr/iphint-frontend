@@ -519,10 +519,10 @@ export default function SearchDetailsPage() {
 							<tr>
 								<th className="w-10 px-3 py-3" />
 								<th className="w-20 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
-								<th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
-								<th className="w-44 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
-								<th className="w-24 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
-								<th className="w-12 px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500"></th>
+								<th className="w-[40%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
+								<th className="w-[25%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+								<th className="w-[25%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
+								<th className="w-[10%] pr-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500"></th>
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-100">
@@ -576,7 +576,7 @@ export default function SearchDetailsPage() {
 											<p className="mt-1 truncate text-xs text-gray-500" title={result.details?.source || 'Unknown source'}>{result.details?.source || 'Unknown source'}</p>
 										</td>
 										<td className="px-3 py-3">
-											<div className="relative w-full">
+											<div className="relative max-w-36">
 												<select
 													value={result.reviewStatus || 'not_reviewed'}
 													disabled={updatingResultId === result._id || isBulkUpdating}
@@ -597,7 +597,7 @@ export default function SearchDetailsPage() {
 												/>
 											</div>
 										</td>
-										<td className="px-3 py-3">
+										<td className="px-5 py-3">
 											{result.details?.link && !result.isLocked ? (
 												<a
 													href={result.details.link}
@@ -613,7 +613,7 @@ export default function SearchDetailsPage() {
 												<span className="text-sm text-gray-400">—</span>
 											)}
 										</td>
-										<td className="px-3 py-3 text-right">
+										<td className="px-5 py-3 text-right">
 											<button
 												onClick={() => requestDeleteResult(result._id)}
 												disabled={deletingResultId === result._id || isBulkUpdating || bulkDeleting}
