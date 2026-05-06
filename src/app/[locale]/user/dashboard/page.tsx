@@ -146,7 +146,7 @@ export default function DashboardPage() {
             
             <div className="divide-y divide-gray-300">
               {latestSearches.map((search) => (
-                <div key={search.searchId} className=" first:pt-0 last:pb-0">
+                <Link key={search.searchId} href={`/dashboard/searches/${search.searchId}`} className="block first:pt-0 last:pb-0">
                   <div className="group cursor-pointer border border-transparent bg-gray-50/50 p-3 transition-all hover:border-gray-100 hover:bg-gray-200 sm:p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -182,7 +182,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
               {latestSearches.length === 0 && (
                 <p className="py-8 text-center text-sm italic text-gray-400 sm:py-10">No recent scans found.</p>

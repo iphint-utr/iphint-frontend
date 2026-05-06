@@ -2,18 +2,48 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChevronDown, ExternalLink, Trash2, X } from 'lucide-react';
+import {
+	ArrowLeft,
+	CheckCircle2,
+	ChevronDown,
+	Clock3,
+	ExternalLink,
+	Search,
+	ShieldCheck,
+	Trash2,
+	X,
+} from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { AppDispatch, RootState } from '@/lib/store/store';
 import { fetchDashboardData } from '@/lib/store/slices/userSlice';
 import {
 	bulkDeleteMonitoringResults,
+	clearMonitoringState,
 	deleteMonitoringResult,
 	fetchMonitoringSearchResults,
 	ReviewStatus,
 	updateMonitoringResultStatus,
 } from '@/lib/store/slices/monitoringSlice';
+
+const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
+	monitoring: { bg: 'bg-blue-50', text: 'text-blue-700' },
+	analysis_complete: { bg: 'bg-green-50', text: 'text-green-700' },
+	pending_review: { bg: 'bg-amber-50', text: 'text-amber-700' },
+	completed: { bg: 'bg-green-50', text: 'text-green-700' },
+	pending: { bg: 'bg-amber-50', text: 'text-amber-700' },
+};
+
+function StatusBadge({ status }: { status: string }) {
+	const style = STATUS_STYLES[status] ?? { bg: 'bg-gray-100', text: 'text-gray-600' };
+	return (
+		<span
+			className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold capitalize ${style.bg} ${style.text}`}
+		>
+			{status.replace(/_/g, ' ')}
+		</span>
+	);
+}
 
 type BulkAction = ReviewStatus | 'delete' | '__none';
 
@@ -66,6 +96,12 @@ export default function SearchDetailsPage() {
 	useEffect(() => {
 		setSelectedResultIds([]);
 	}, [id]);
+
+	useEffect(() => {
+		return () => {
+			dispatch(clearMonitoringState());
+		};
+	}, [dispatch]);
 
 	const reviewedCount = useMemo(
 		() =>
@@ -175,43 +211,145 @@ export default function SearchDetailsPage() {
 		return () => window.removeEventListener('keydown', handleEscape);
 	}, [deleteConfirmState]);
 
+	if (resultsLoading && !selectedSearch) {
+		return (
+			<div className="space-y-6">
+				<p className="py-10 text-center text-sm text-gray-500">Loading search details...</p>
+			</div>
+		);
+	}
+
+	if (error && !selectedSearch) {
+		return (
+			<div className="space-y-6">
+				<div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
+			</div>
+		);
+	}
+
+	const pendingCount = Math.max(results.length - reviewedCount, 0);
+
+	const metricCards = [
+		{ title: 'Total Results', value: String(results.length), icon: Search, accent: 'bg-gray-900 text-white' },
+		{ title: 'Reviewed', value: String(reviewedCount), icon: CheckCircle2, accent: 'bg-gray-100 text-gray-900' },
+		{ title: 'Pending Review', value: String(pendingCount), icon: Clock3, accent: 'bg-gray-200 text-gray-900' },
+		{
+			title: 'Status',
+			value: (selectedSearch?.status ?? '-').replace(/_/g, ' '),
+			icon: ShieldCheck,
+			accent: 'bg-white text-gray-900 ring-1 ring-gray-200',
+		},
+	];
+
+	const overviewFields = [
+		{ label: 'Search ID', value: id },
+		{ label: 'File Name', value: selectedSearch?.fileName ?? '-' },
+		{
+			label: 'Date',
+			value: selectedSearch?.time ? new Date(selectedSearch.time).toLocaleString() : '-',
+		},
+		{ label: 'Progress', value: `${reviewedCount} / ${results.length} reviewed` },
+	];
+
 	return (
-		<div className="space-y-6">
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+		<div className="space-y-6 md:space-y-8">
+			{/* ── Page Header ────────────────────────────────────────── */}
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
-					<h1 className="text-2xl font-semibold text-gray-900">Search Results Review</h1>
-					<p className="mt-1 text-sm text-gray-500">
-						Update status per found image to move this search from monitoring to analysis complete.
-					</p>
+					<h1 className="text-2xl font-bold text-gray-900">Search Details</h1>
+					<p className="mt-1 text-sm text-gray-500">Review and manage image search results.</p>
 				</div>
-				<button
-					onClick={() => router.push('/dashboard/monitoring')}
-					className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:self-start"
+				<Link
+					href="/dashboard/monitoring"
+					className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
 				>
+					<ArrowLeft className="mr-2 h-4 w-4" />
 					Back to Monitoring
-				</button>
+				</Link>
 			</div>
 
-			<div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-					<div>
-						<p className="text-xs uppercase tracking-wide text-gray-500">Search ID</p>
-						<p className="mt-1 text-sm font-medium text-gray-900 break-all">{id}</p>
-					</div>
-					<div>
-						<p className="text-xs uppercase tracking-wide text-gray-500">File</p>
-						<p className="mt-1 text-sm font-medium text-gray-900">{selectedSearch?.fileName || '-'}</p>
-					</div>
-					<div>
-						<p className="text-xs uppercase tracking-wide text-gray-500">Progress</p>
-						<p className="mt-1 text-sm font-medium text-gray-900">
-							{reviewedCount}/{results.length} reviewed
-						</p>
+			{/* ── Metric Cards (mobile 2-col) ─────────────────────────── */}
+			<div className="grid grid-cols-2 gap-3 md:hidden">
+				{metricCards.map((card) => {
+					const Icon = card.icon;
+					return (
+						<div key={card.title} className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm">
+							<div className="flex items-start justify-between gap-3">
+								<p className="min-w-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.16em] text-gray-500">
+									{card.title}
+								</p>
+								<div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${card.accent}`}>
+									<Icon className="h-4 w-4" />
+								</div>
+							</div>
+							<p className="mt-4 break-words text-xl font-semibold capitalize tracking-tight text-gray-950">
+								{card.value}
+							</p>
+						</div>
+					);
+				})}
+			</div>
+
+			{/* ── Metric Cards (desktop 4-col) ─────────────────────────── */}
+			<div className="hidden gap-5 md:grid md:grid-cols-4">
+				{metricCards.map((card) => {
+					const Icon = card.icon;
+					return (
+						<div key={card.title} className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+							<div className="flex items-center justify-between gap-3">
+								<p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">
+									{card.title}
+								</p>
+								<div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${card.accent}`}>
+									<Icon className="h-5 w-5" />
+								</div>
+							</div>
+							<p className="mt-4 text-2xl font-bold capitalize tracking-tight text-gray-950">
+								{card.value}
+							</p>
+						</div>
+					);
+				})}
+			</div>
+
+			{/* ── Overview Panel ─────────────────────────────────────── */}
+			<div className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
+				<h2 className="mb-5 text-base font-bold text-gray-900">Search Overview</h2>
+				<div className="flex flex-col gap-5 md:flex-row md:items-start">
+					{selectedSearch?.image && (
+						<div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 md:w-48 lg:w-64">
+							<div className="relative aspect-square w-full">
+								<img src={selectedSearch.image} alt="Search image" className="h-full w-full object-cover" />
+							</div>
+						</div>
+					)}
+					<div className="flex-1">
+						<div className="mb-3 flex flex-wrap items-center gap-2">
+							{selectedSearch?.status && <StatusBadge status={selectedSearch.status} />}
+						</div>
+						<div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+							{overviewFields.map((item) => (
+								<div key={item.label} className="min-w-0 border-b border-gray-100 bg-white px-4 py-3 last:border-0">
+									<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+										{item.label}
+									</p>
+									<p className="mt-1 break-all text-sm font-medium text-gray-900">{item.value}</p>
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+			{/* ── Results Panel ──────────────────────────────────────── */}
+			<div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
+				<div className="border-b border-gray-100 px-5 py-4">
+					<h2 className="text-base font-bold text-gray-900">
+						Results{' '}
+						<span className="ml-1 text-sm font-normal text-gray-500">({results.length} total)</span>
+					</h2>
+				</div>
+
 				{(planLimits?.lockedCount || 0) > 0 && (
 					<div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800">
 						{planLimits?.lockedCount} result{planLimits?.lockedCount === 1 ? '' : 's'} hidden by plan limit. Upgrade to unlock full thumbnails and source links.
@@ -225,7 +363,7 @@ export default function SearchDetailsPage() {
 					</div>
 				)}
 
-				<div className="border-b border-gray-200 bg-white p-4">
+				<div className="border-b border-gray-100 bg-white p-4">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div className="flex items-center gap-2">
 							<input
@@ -244,22 +382,22 @@ export default function SearchDetailsPage() {
 						</div>
 						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
 							<div className="relative inline-block">
-									<select
-										value={bulkAction}
-										onChange={(event) => setBulkAction(event.target.value as BulkAction)}
-										disabled={isBulkUpdating || resultsLoading || selectedResultIds.length === 0}
-										className="w-40 sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
-									>
-										{BULK_ACTION_OPTIONS.map((option) => (
-											<option key={option.value} value={option.value} className="bg-white text-gray-900">
-												{option.label}
-											</option>
-										))}
-									</select>
-									<ChevronDown
-										size={14}
-										className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
-									/>
+								<select
+									value={bulkAction}
+									onChange={(event) => setBulkAction(event.target.value as BulkAction)}
+									disabled={isBulkUpdating || resultsLoading || selectedResultIds.length === 0}
+									className="w-40 sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+								>
+									{BULK_ACTION_OPTIONS.map((option) => (
+										<option key={option.value} value={option.value} className="bg-white text-gray-900">
+											{option.label}
+										</option>
+									))}
+								</select>
+								<ChevronDown
+									size={14}
+									className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+								/>
 							</div>
 
 							<button
