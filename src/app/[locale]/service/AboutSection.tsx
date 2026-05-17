@@ -20,7 +20,7 @@ export default function AboutSection() {
       />
 
       {/* Content row */}
-      <div className="relative mx-auto flex max-w-5xl items-center justify-between px-6 sm:px-10 lg:px-16">
+      <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 lg:px-16">
         {/* Left decorative icon */}
         <div className="hidden w-32 flex-shrink-0 sm:block lg:w-40">
           <Image

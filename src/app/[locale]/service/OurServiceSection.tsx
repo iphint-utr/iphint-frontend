@@ -27,7 +27,7 @@ const FEATURES: FeatureItem[] = [
     alt: "Dashboard Review icon",
   },
   {
-    icon: "/services/sec4_instant_alert.svg",
+    icon: "/services/sec4_alert.svg",
     labelKey: "features.instantAlert",
     alt: "Instant Alert icon",
   },
@@ -44,7 +44,7 @@ export default function OurServiceSection() {
 
   return (
     <section className="w-full bg-white py-16 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-5xl px-6 sm:px-10 lg:px-16">
+      <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
         {/* Header */}
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
