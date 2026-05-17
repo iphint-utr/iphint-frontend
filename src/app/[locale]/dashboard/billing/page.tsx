@@ -57,7 +57,7 @@ interface PaddleCheckoutResponse extends PaddleCheckoutPayload {
 }
 
 const paddleEnvironment = process.env.NEXT_PUBLIC_PADDLE_ENV === 'sandbox' ? 'sandbox' : 'production';
-const paddleClientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
+const paddleClientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN?.trim().replace(/^['"]|['"]$/g, '') || undefined;
 
 const normalizePaddleCheckoutPayload = (payload: PaddleCheckoutResponse) => payload.checkout ?? payload;
 
