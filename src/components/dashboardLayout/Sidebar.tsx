@@ -27,8 +27,6 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     name: subscriptionSnapshot?.plan?.name || 'Starter',
     tier: subscriptionSnapshot?.plan?.tier || 'starter',
     subscriptionStatus: subscriptionSnapshot?.subscription?.status || null,
-    isTrial: Boolean(subscriptionSnapshot?.subscription?.isTrial),
-    trialDaysLeft: Number(subscriptionSnapshot?.subscription?.trialDaysLeft || 0),
   };
   const menu = [
     { label: dashboardT('sidebar.dashboard'), href: '/dashboard', icon: LayoutDashboard },
@@ -43,8 +41,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const displayName = user.name || 'User';
   const company = user.role || 'Organization';
   const isAdmin = user.role === 'admin';
-  const needsUpgrade = planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired';
-  const showUpgradeAction = needsUpgrade || planInfo.isTrial;
+  const showUpgradeAction = planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired';
 
   const isItemActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -112,17 +109,6 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 </span>
               </div>
 
-              {planInfo.isTrial && (
-                <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5">
-                  <p className="text-[11px] font-semibold text-amber-800">
-                    {dashboardT('sidebar.premiumTrial', {
-                      count: planInfo.trialDaysLeft,
-                      unit: planInfo.trialDaysLeft === 1 ? dashboardT('sidebar.day') : dashboardT('sidebar.days'),
-                    })}
-                  </p>
-                </div>
-              )}
-
               {showUpgradeAction && (
                 <button
                   type="button"
@@ -132,11 +118,9 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                   }}
                   className="mt-2 w-full rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
                 >
-                  {planInfo.isTrial
-                    ? dashboardT('sidebar.upgradeBeforeTrialEnds')
-                    : (planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired'
-                        ? dashboardT('sidebar.renewPlan')
-                        : dashboardT('sidebar.upgradePlan'))}
+                  {planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired'
+                    ? dashboardT('sidebar.renewPlan')
+                    : dashboardT('sidebar.upgradePlan')}
                 </button>
               )}
             </div>

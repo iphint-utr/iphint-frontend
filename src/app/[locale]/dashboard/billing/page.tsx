@@ -5,7 +5,7 @@ import React, { startTransition, useCallback, useEffect, useMemo, useRef, useSta
 import { Check, Crown } from 'lucide-react';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { cancelPlanSubscription, fetchBillingPageData, subscribeToPlan } from '@/lib/store/slices/accountSlice';
+import { cancelPlanSubscription, fetchBillingPageData } from '@/lib/store/slices/accountSlice';
 
 const KRW_PER_USD = 1360;
 
@@ -179,12 +179,6 @@ export default function BillingPage() {
 
   const subscribe = async (tier: PlanTier) => {
     setCheckoutError(null);
-
-    if (tier === 'starter') {
-      await dispatch(subscribeToPlan({ tier, billingCycle: cycle }));
-      return;
-    }
-
     setCheckoutPlan(tier);
 
     try {
@@ -312,7 +306,7 @@ export default function BillingPage() {
               </button>
             </div>
 
-            {snapshot?.subscription?.status === 'active' && currentTier !== 'starter' && (
+            {snapshot?.subscription?.status === 'active' && (
               <button
                 type="button"
                 onClick={cancelSubscription}
@@ -331,8 +325,7 @@ export default function BillingPage() {
           const price = cycle === 'annual' ? plan.pricing.annual : plan.pricing.monthly;
           const isCurrent = plan.tier === currentTier;
           const isWorking = savingPlan === plan.tier || checkoutPlan === plan.tier;
-          const needsPaddleCheckout = plan.tier !== 'starter';
-          const isPaddleUnavailable = needsPaddleCheckout && !paddleClientToken;
+          const isPaddleUnavailable = !paddleClientToken;
 
           return (
             <div
@@ -353,11 +346,9 @@ export default function BillingPage() {
               <p className="mt-2 text-2xl font-bold text-gray-900">{formatPrice(price)}</p>
               <p className="text-xs text-gray-500">per month ({cycle === 'annual' ? 'billed annually' : 'billed monthly'})</p>
 
-              {needsPaddleCheckout && (
-                <p className="mt-2 text-xs text-gray-500">
-                  Auto-pay starts after checkout and renews {cycle === 'annual' ? 'yearly' : 'monthly'} until you cancel.
-                </p>
-              )}
+              <p className="mt-2 text-xs text-gray-500">
+                Auto-pay starts after checkout and renews {cycle === 'annual' ? 'yearly' : 'monthly'} until you cancel.
+              </p>
 
               <div className="mt-4 space-y-2 text-sm text-gray-700">
                 {plan.features.map((feature) => (
@@ -377,12 +368,8 @@ export default function BillingPage() {
                 {isCurrent
                   ? 'Current plan'
                   : isWorking
-                    ? needsPaddleCheckout
-                      ? 'Opening Paddle...'
-                      : 'Updating...'
-                    : needsPaddleCheckout
-                      ? `Subscribe to ${plan.name}`
-                      : `Choose ${plan.name}`}
+                    ? 'Opening Paddle...'
+                    : `Subscribe to ${plan.name}`}
               </button>
             </div>
           );
