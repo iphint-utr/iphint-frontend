@@ -6,6 +6,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── Brand palette ── */
+  --color-brand: var(--brand);
+  --color-brand-light: var(--brand-light);
+
+  /* ── Semantic status ── */
+  --color-danger: var(--danger);
+
   /* ── App text palette ── */
   --color-tx-1: var(--tx-1);
   --color-tx-2: var(--tx-2);
@@ -57,6 +64,13 @@
 }
 
 :root {
+  /* ── Brand ── */
+  --brand: #000000;
+  --brand-light: #eff1f5;
+
+  /* ── Semantic status ── */
+  --danger: #D61111;
+
   /* ── Text palette ── */
   --tx-1: #000000;
   --tx-2: #333333;
@@ -68,21 +82,21 @@
   --app-font-family: var(--font-inter);
   --app-font-size-base: 16px;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: #eff1f5;
   --foreground: #000000;
-  --card: oklch(1 0 0);
+  --card: #ffffff;
   --card-foreground: #000000;
-  --popover: oklch(1 0 0);
+  --popover: #ffffff;
   --popover-foreground: #000000;
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --primary: #000000;
+  --primary-foreground: #eff1f5;
+  --secondary: #eff1f5;
   --secondary-foreground: #333333;
   --muted: oklch(0.97 0 0);
   --muted-foreground: #888888;
   --accent: oklch(0.97 0 0);
   --accent-foreground: #333333;
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: #D61111;
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
