@@ -91,7 +91,7 @@ export default function AdminSidebar({
 							type="button"
 							onClick={() => {
 								closeOnMobileOnly(onClose);
-								router.push('/dashboard');
+								router.push('/user');
 							}}
 							className="mb-2 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm leading-5 font-medium text-white hover:bg-gray-800"
 						>

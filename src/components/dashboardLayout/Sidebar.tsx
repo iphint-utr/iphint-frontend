@@ -29,13 +29,13 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     subscriptionStatus: subscriptionSnapshot?.subscription?.status || null,
   };
   const menu = [
-    { label: dashboardT('sidebar.dashboard'), href: '/dashboard', icon: LayoutDashboard },
-    { label: dashboardT('sidebar.searches'), href: '/dashboard/searches', icon: Search },
-    { label: dashboardT('sidebar.monitoring'), href: '/dashboard/monitoring', icon: Activity },
-    { label: dashboardT('sidebar.reports'), href: '/dashboard/reports', icon: FileText },
-    { label: dashboardT('sidebar.referral'), href: '/dashboard/referral', icon: Users },
-    { label: dashboardT('sidebar.billing'), href: '/dashboard/billing', icon: CreditCard },
-    { label: dashboardT('sidebar.settings'), href: '/dashboard/settings', icon: Settings },
+    { label: dashboardT('sidebar.dashboard'), href: '/user', icon: LayoutDashboard },
+    { label: dashboardT('sidebar.searches'), href: '/user/searches', icon: Search },
+    { label: dashboardT('sidebar.monitoring'), href: '/user/monitoring', icon: Activity },
+    { label: dashboardT('sidebar.reports'), href: '/user/reports', icon: FileText },
+    { label: dashboardT('sidebar.referral'), href: '/user/referral', icon: Users },
+    { label: dashboardT('sidebar.billing'), href: '/user/billing', icon: CreditCard },
+    { label: dashboardT('sidebar.settings'), href: '/user/settings', icon: Settings },
   ];
 
   const displayName = user.name || 'User';
@@ -44,7 +44,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const showUpgradeAction = planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired';
 
   const isItemActive = (href: string) => {
-    if (href === '/dashboard') return pathname === '/dashboard';
+    if (href === '/user') return pathname === '/user';
     return pathname === href || pathname.startsWith(href + '/');
   };
 
@@ -114,7 +114,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                   type="button"
                   onClick={() => {
                     closeOnMobileOnly(onClose);
-                    router.push('/dashboard/billing');
+                    router.push('/user/billing');
                   }}
                   className="mt-2 w-full rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
                 >

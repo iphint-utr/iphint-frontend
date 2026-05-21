@@ -33,12 +33,12 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
 	const pageTitle = (() => {
 		if (!pathname) return 'Dashboard';
-		if (pathname === '/dashboard') return 'Dashboard';
-		if (pathname.startsWith('/dashboard/monitoring')) return 'Monitoring';
-		if (pathname.startsWith('/dashboard/billing')) return 'Billing';
-		if (pathname.startsWith('/dashboard/settings')) return 'Settings';
-		if (pathname.startsWith('/dashboard/searches/')) return 'Details';
-		if (pathname.startsWith('/dashboard/searches')) return 'Searches';
+		if (pathname === '/user') return 'Dashboard';
+		if (pathname.startsWith('/user/monitoring')) return 'Monitoring';
+		if (pathname.startsWith('/user/billing')) return 'Billing';
+		if (pathname.startsWith('/user/settings')) return 'Settings';
+		if (pathname.startsWith('/user/searches/')) return 'Details';
+		if (pathname.startsWith('/user/searches')) return 'Searches';
 		return 'Dashboard';
 	})();
 

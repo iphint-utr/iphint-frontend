@@ -264,7 +264,7 @@ export default function MonitoringPage() {
 
                         <button
                           type="button"
-                          onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
+                          onClick={() => router.push(`/user/searches/${item.searchId}`)}
                           className="min-w-0 flex-1 cursor-pointer text-left"
                         >
                           <p className="truncate text-sm font-semibold text-gray-900" title={item.fileName}>
@@ -309,7 +309,7 @@ export default function MonitoringPage() {
                       {searches.map((item) => (
                         <tr
                           key={item.searchId}
-                          onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
+                          onClick={() => router.push(`/user/searches/${item.searchId}`)}
                           className="cursor-pointer hover:bg-gray-50"
                         >
                           <td className="px-4 py-3">
@@ -372,7 +372,7 @@ export default function MonitoringPage() {
                 <button
                   type="button"
                   key={item.searchId}
-                  onClick={() => router.push(`/dashboard/searches/${item.searchId}`)}
+                  onClick={() => router.push(`/user/searches/${item.searchId}`)}
                   className="cursor-pointer rounded-xl border border-gray-200 bg-white p-3 text-left shadow-sm transition-colors hover:bg-gray-50"
                 >
                   <img

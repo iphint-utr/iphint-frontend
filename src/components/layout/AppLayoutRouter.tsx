@@ -32,7 +32,7 @@ export default function AppLayoutRouter({ children }: { children: React.ReactNod
   const normalizedPath = localelessPath !== '/' && localelessPath.endsWith('/')
     ? localelessPath.slice(0, -1)
     : localelessPath;
-  const isDashboardRoute = normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/');
+  const isDashboardRoute = normalizedPath === '/user' || normalizedPath.startsWith('/user/');
   const isAdminRoute = normalizedPath === '/admin' || normalizedPath.startsWith('/admin/');
   const shouldShowPublicChrome = publicChromePaths.has(normalizedPath);
 

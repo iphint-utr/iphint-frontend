@@ -288,7 +288,7 @@ export default function ScanPage() {
                   {isLimitError && (
                     <button
                       type="button"
-                      onClick={() => (window.location.href = '/dashboard/billing')}
+                      onClick={() => (window.location.href = '/user/billing')}
                       className="mt-3 rounded-md bg-red-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-800"
                     >
                       Upgrade plan
@@ -646,7 +646,7 @@ export default function ScanPage() {
               </button>
               <button
                 type="button"
-                onClick={() => (window.location.href = '/dashboard/billing')}
+                onClick={() => (window.location.href = '/user/billing')}
                 className="flex-1 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
                 {planPromptMode === 'renew' ? 'Renew plan' : 'Upgrade plan'}

@@ -31,7 +31,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
     }
 
     if (!isAdmin) {
-      router.replace('/dashboard');
+      router.replace('/user');
     }
   }, [isAdmin, isAuthenticated, ready, router]);
 

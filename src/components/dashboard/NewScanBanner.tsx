@@ -6,7 +6,7 @@ export const NewScanBanner: React.FC<{ t: any }> = ({ t }) => {
 	const router = useRouter();
 
 	const handleClick = () => {
-		router.push('/dashboard/searches');
+		router.push('/user/searches');
 	};
 
 	return (

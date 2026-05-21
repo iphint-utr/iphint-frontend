@@ -21,7 +21,7 @@ export default function LoginPage() {
   
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push('/dashboard');
+      router.push('/user');
     }
   }, [authLoading, isAuthenticated, router]);
   const t = useTranslations('Auth');

@@ -100,7 +100,7 @@ export default function ReportsPage() {
           </p>
           <button
             type="button"
-            onClick={() => (window.location.href = '/dashboard/billing')}
+            onClick={() => (window.location.href = '/user/billing')}
             className="mt-5 inline-flex items-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
           >
             Upgrade plan to unlock this feature
@@ -202,7 +202,7 @@ export default function ReportsPage() {
               </button>
               <button
                 type="button"
-                onClick={() => (window.location.href = '/dashboard/billing')}
+                onClick={() => (window.location.href = '/user/billing')}
                 className="flex-1 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
                 Upgrade plan

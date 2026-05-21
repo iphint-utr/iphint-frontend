@@ -25,7 +25,7 @@ const authLoading = useSelector(selectAuthLoading);
 
 useEffect(() => {
   if (!authLoading && isAuthenticated) {
-    router.push('/dashboard');
+    router.push('/user');
   }
 }, [isAuthenticated, authLoading, router]);
   const [formData, setFormData] = useState({

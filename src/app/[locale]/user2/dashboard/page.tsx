@@ -146,7 +146,7 @@ export default function DashboardPage() {
             
             <div className="divide-y divide-gray-300">
               {latestSearches.map((search) => (
-                <Link key={search.searchId} href={`/dashboard/searches/${search.searchId}`} className="block first:pt-0 last:pb-0">
+                <Link key={search.searchId} href={`/user/searches/${search.searchId}`} className="block first:pt-0 last:pb-0">
                   <div className="group cursor-pointer border border-transparent bg-gray-50/50 p-3 transition-all hover:border-gray-100 hover:bg-gray-200 sm:p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -227,13 +227,13 @@ export default function DashboardPage() {
               {t('quickActions')}
             </h3>
             <div className="space-y-3">
-              <Link href="/dashboard/searches" className="block w-full truncate rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-bold text-gray-700 transition-all hover:border-gray-900 hover:bg-gray-50 sm:px-5 sm:py-4" title={t('newScanAction')}>
+              <Link href="/user/searches" className="block w-full truncate rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-bold text-gray-700 transition-all hover:border-gray-900 hover:bg-gray-50 sm:px-5 sm:py-4" title={t('newScanAction')}>
                 {t('newScanAction')}
               </Link>
-              <Link href="/dashboard/monitoring" className="block w-full truncate rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-bold text-gray-700 transition-all hover:border-gray-900 hover:bg-gray-50 sm:px-5 sm:py-4" title={t('viewMonitoringAction')}>
+              <Link href="/user/monitoring" className="block w-full truncate rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-bold text-gray-700 transition-all hover:border-gray-900 hover:bg-gray-50 sm:px-5 sm:py-4" title={t('viewMonitoringAction')}>
                 {t('viewMonitoringAction')}
               </Link>
-              <Link href="/dashboard/billing" className="block w-full truncate rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-bold text-gray-700 transition-all hover:border-gray-900 hover:bg-gray-50 sm:px-5 sm:py-4" title={t('generateReportAction')}>
+              <Link href="/user/billing" className="block w-full truncate rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-bold text-gray-700 transition-all hover:border-gray-900 hover:bg-gray-50 sm:px-5 sm:py-4" title={t('generateReportAction')}>
                 {t('generateReportAction')}
               </Link>
             </div>

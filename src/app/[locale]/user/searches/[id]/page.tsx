@@ -260,7 +260,7 @@ export default function SearchDetailsPage() {
 					<p className="mt-1 text-sm text-gray-500">Review and manage image search results.</p>
 				</div>
 				<Link
-					href="/dashboard/monitoring"
+					href="/user/monitoring"
 					className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" />
@@ -355,7 +355,7 @@ export default function SearchDetailsPage() {
 						{planLimits?.lockedCount} result{planLimits?.lockedCount === 1 ? '' : 's'} hidden by plan limit. Upgrade to unlock full thumbnails and source links.
 						<button
 							type="button"
-							onClick={() => router.push('/dashboard/billing')}
+							onClick={() => router.push('/user/billing')}
 							className="ml-2 cursor-pointer font-semibold underline"
 						>
 							Upgrade plan
