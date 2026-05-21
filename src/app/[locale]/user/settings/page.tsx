@@ -1,8 +1,18 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Bell, CheckCircle2, Mail, RefreshCcw, Search, Shield, Trash2, UserCircle2 } from 'lucide-react';
+import { Bell, CheckCircle2, Mail, Palette, RefreshCcw, Search, Shield, Trash2, UserCircle2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import {
+  setFontFamily,
+  setFontSize,
+  FONT_FAMILY_MAP,
+  FONT_FAMILY_LABELS,
+  FONT_SIZE_MAP,
+  FONT_SIZE_LABELS,
+  type FontFamilyKey,
+  type FontSizeKey,
+} from '@/lib/store/slices/themeSlice';
 import {
   deleteAllNotifications,
   deleteNotification,
@@ -61,7 +71,8 @@ export default function SettingsPage() {
   const unreadCount = useAppSelector((state) => state.account.notifications.unreadCount);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [settingsSection, setSettingsSection] = useState<'profile' | 'notifications'>('profile');
+  const [settingsSection, setSettingsSection] = useState<'profile' | 'notifications' | 'appearance'>('profile');
+  const { fontFamily, fontSize } = useAppSelector((state) => state.theme);
 
   const [profile, setProfile] = useState<SettingsProfile>({
     name: '',
@@ -299,6 +310,21 @@ export default function SettingsPage() {
                 {unreadCount}
               </span>
             )}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={settingsSection === 'appearance'}
+            onClick={() => setSettingsSection('appearance')}
+            className={[
+              'inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+              settingsSection === 'appearance'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900',
+            ].join(' ')}
+          >
+            <Palette className="h-4 w-4" />
+            Appearance
           </button>
         </div>
       </div>
@@ -603,6 +629,72 @@ export default function SettingsPage() {
               </div>
             ))
           )}
+        </div>
+      </section>
+      )}
+
+      {settingsSection === 'appearance' && (
+      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center gap-2 text-gray-900">
+          <Palette className="h-5 w-5" />
+          <h2 className="text-lg font-semibold">Appearance</h2>
+        </div>
+
+        <div className="space-y-8">
+          {/* Font Family */}
+          <div>
+            <p className="mb-1 text-sm font-semibold text-gray-900">Font Family</p>
+            <p className="mb-3 text-xs text-gray-500">Choose the typeface used throughout the app.</p>
+            <div className="flex flex-wrap gap-2">
+              {(Object.keys(FONT_FAMILY_LABELS) as FontFamilyKey[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => dispatch(setFontFamily(key))}
+                  style={{ fontFamily: FONT_FAMILY_MAP[key] }}
+                  className={[
+                    'rounded-lg border px-4 py-2 text-sm transition-colors',
+                    fontFamily === key
+                      ? 'border-gray-900 bg-gray-900 text-white'
+                      : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100',
+                  ].join(' ')}
+                >
+                  {FONT_FAMILY_LABELS[key]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Font Size */}
+          <div>
+            <p className="mb-1 text-sm font-semibold text-gray-900">Font Size</p>
+            <p className="mb-3 text-xs text-gray-500">Scales text across the entire app.</p>
+            <div className="flex flex-wrap gap-2">
+              {(Object.keys(FONT_SIZE_LABELS) as FontSizeKey[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => dispatch(setFontSize(key))}
+                  className={[
+                    'rounded-lg border px-4 py-2 text-sm transition-colors',
+                    fontSize === key
+                      ? 'border-gray-900 bg-gray-900 text-white'
+                      : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100',
+                  ].join(' ')}
+                >
+                  {FONT_SIZE_LABELS[key]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Live Preview */}
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gray-400">Preview</p>
+            <p className="text-2xl font-bold text-gray-900">The quick brown fox</p>
+            <p className="text-base text-gray-600">jumps over the lazy dog. 0123456789</p>
+            <p className="mt-1 text-sm text-gray-400">ABCDEFGHIJKLMNOPQRSTUVWXYZ · abcdefghijklmnopqrstuvwxyz</p>
+          </div>
         </div>
       </section>
       )}

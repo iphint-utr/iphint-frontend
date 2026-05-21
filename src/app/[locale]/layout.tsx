@@ -1,5 +1,5 @@
 ﻿import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, Roboto } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { isLocale } from "@/lib/i18n";
@@ -8,11 +8,23 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import AppLayoutRouter from '@/components/layout/AppLayoutRouter';
 import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
+import FontProvider from '@/components/layout/FontProvider';
 import { notFound } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta",
+});
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
@@ -38,11 +50,12 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} antialiased bg-white`} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${plusJakarta.variable} ${roboto.variable}`}>
+      <body className="antialiased bg-white" suppressHydrationWarning>
         <ExtensionAttrSuppressor />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <StoreProvider>
+            <FontProvider />
             <AppLayoutRouter>{children}</AppLayoutRouter>
           </StoreProvider>
         </NextIntlClientProvider>
