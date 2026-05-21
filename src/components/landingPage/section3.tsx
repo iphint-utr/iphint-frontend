@@ -86,9 +86,9 @@ export default function Section3() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="mt-16 bg-black text-white text-center py-4 text-sm">
-        {t("footerQuestion")} {" "}
-        <span className="underline cursor-pointer">{t("footerCta")}</span>
+      <div className="mt-16 bg-black text-white text-center px-6 py-5 text-sm flex flex-wrap justify-center gap-x-1 gap-y-1">
+        <span>{t("footerQuestion")}</span>
+        <span className="underline cursor-pointer whitespace-nowrap">{t("footerCta")}</span>
       </div>
 
     </section>
