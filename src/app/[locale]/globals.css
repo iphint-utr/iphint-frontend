@@ -6,6 +6,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── App text palette ── */
+  --color-tx-1: var(--tx-1);
+  --color-tx-2: var(--tx-2);
+  --color-tx-3: var(--tx-3);
+  --color-tx-4: var(--tx-4);
+  --color-tx-5: var(--tx-5);
+  --color-tx-6: var(--tx-6);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--app-font-family);
@@ -49,23 +57,31 @@
 }
 
 :root {
+  /* ── Text palette ── */
+  --tx-1: #000000;
+  --tx-2: #333333;
+  --tx-3: #555555;
+  --tx-4: #656565;
+  --tx-5: #767676;
+  --tx-6: #888888;
+
   --app-font-family: var(--font-inter);
   --app-font-size-base: 16px;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: #000000;
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #000000;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: #000000;
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary-foreground: #333333;
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: #888888;
   --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: #333333;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -122,6 +138,19 @@
   html {
     font-size: var(--app-font-size-base);
     font-family: var(--app-font-family);
+    color: var(--tx-1);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--tx-1);
+  }
+  p {
+    color: var(--tx-3);
+  }
+  label, legend {
+    color: var(--tx-2);
+  }
+  ::placeholder {
+    color: var(--tx-6);
   }
 }
 
