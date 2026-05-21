@@ -40,7 +40,7 @@ export default function Header() {
         <Link
           href="/"
           className="flex items-center gap-1.5 shrink-0"
-          aria-label="IpHint home"
+          aria-label="IPHINT home"
         >
           {/* Bookmark icon mark */}
           <svg
@@ -63,7 +63,7 @@ export default function Header() {
             />
           </svg>
           <span className="text-[22px] font-extrabold tracking-tight text-gray-950 leading-none">
-            Ip<span className="font-extrabold">H</span>int
+            IPHINT
           </span>
         </Link>
 

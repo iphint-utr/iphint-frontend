@@ -74,6 +74,16 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
         ].join(' ')}
       >
         <div className="flex h-full flex-col">
+          {/* Logo */}
+          <div className="flex items-center justify-start gap-2 border-b border-gray-100 px-6 py-5">
+            <svg width="22" height="26" viewBox="0 0 22 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 0H22V26L11 19.5L0 26V0Z" fill="#111111" />
+              <path d="M6 8H16" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <span className="text-xl font-extrabold tracking-tight text-gray-950 leading-none">
+              IPHINT
+            </span>
+          </div>
           <nav className="flex-1 px-3 py-4 space-y-1">
             {menu.map((item) => {
               const Icon = item.icon;
