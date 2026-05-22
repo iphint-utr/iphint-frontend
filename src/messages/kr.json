@@ -1,4 +1,5 @@
-{  "header": {
+{
+  "header": {
     "pricing": "요금제",
     "service": "서비스",
     "contactUs": "문의하기",
@@ -214,7 +215,6 @@
     "passwordLabel": "비밀번호",
     "passwordPlaceholder": "비밀번호를 입력해주세요",
     "submitSignup": "7일 무료로 시작하기",
-    
     "loginTitle": "로그인",
     "continueWithGoogle": "Google로 계속하기",
     "emailOnlyLabel": "이메일",
@@ -515,65 +515,191 @@
       "generatedAt": "생성 시각"
     }
   },
-  "services":{
-  "about": {
-    "title": "ImgMov 소개",
-    "subtitle": "콘텐츠를 모니터링하는 가장 쉬운 방법."
-  },
-  "commonReality": {
-    "title": "현실",
-    "subtitle": "디지털 콘텐츠, 침해는 빠르고 도용은 쉽습니다.",
-    "stats": {
-      "unauthorizedCopies": {
-        "value": "85%",
-        "label": "무단\n복제"
-      },
-      "imagesShared": {
-        "value": "2.5B",
-        "label": "일일\n이미지 공유"
-      },
-      "manualTracking": {
-        "value": "3%",
-        "label": "수동 추적\n한계"
-      },
-      "unprotectedContent": {
-        "value": "97%",
-        "label": "미보호\n콘텐츠"
-      }
+  "services": {
+    "about": {
+      "title": "ImgMov 소개",
+      "subtitle": "콘텐츠를 모니터링하는 가장 쉬운 방법."
     },
-    "infoBoxTitle": "온라인 이미지의 85%가 무단으로 사용됩니다.",
-    "infoBoxBody": "소셜 미디어와 웹 플랫폼이 폭발적으로 증가하면서, 작업물이 언제 어디서 도용되는지 추적하는 것이 사실상 불가능해졌습니다. 창작자 중 단 3%만이 침해에 대해 조치를 취하며, 나머지 97%는 무방비 상태로 도용에 노출되어 있습니다.",
-    "source": "ipHint 내부 분석 출처: 글로벌 이미지 도용 보고서 및 내부 분석"
-  },
-  "ourSolution": {
-    "title": "솔루션",
-    "subtitle": "브랜드와 창작자를 디지털 위험으로부터 보호합니다",
-    "features": {
-      "brandProtection": "브랜드\n보호",
-      "contentProtection": "콘텐츠\n보호",
-      "infringementPrevention": "침해\n방지",
-      "copyrightManagement": "저작권\n관리"
+    "commonReality": {
+      "title": "현실",
+      "subtitle": "디지털 콘텐츠, 침해는 빠르고 도용은 쉽습니다.",
+      "stats": {
+        "unauthorizedCopies": {
+          "value": "85%",
+          "label": "무단\n복제"
+        },
+        "imagesShared": {
+          "value": "2.5B",
+          "label": "일일\n이미지 공유"
+        },
+        "manualTracking": {
+          "value": "3%",
+          "label": "수동 추적\n한계"
+        },
+        "unprotectedContent": {
+          "value": "97%",
+          "label": "미보호\n콘텐츠"
+        }
+      },
+      "infoBoxTitle": "온라인 이미지의 85%가 무단으로 사용됩니다.",
+      "infoBoxBody": "소셜 미디어와 웹 플랫폼이 폭발적으로 증가하면서, 작업물이 언제 어디서 도용되는지 추적하는 것이 사실상 불가능해졌습니다. 창작자 중 단 3%만이 침해에 대해 조치를 취하며, 나머지 97%는 무방비 상태로 도용에 노출되어 있습니다.",
+      "source": "ipHint 내부 분석 출처: 글로벌 이미지 도용 보고서 및 내부 분석"
     },
-    "infoBoxTitle": "직접 이미지 데이터 분석으로 모든 수정 사항을 식별합니다.",
-    "infoBoxBody": "방대한 디지털 콘텐츠 속에서 브랜드와 창작 권리를 보호하기 위한 기술적 우위를 제공합니다."
-  },
-  "ourService": {
-    "title": "서비스",
-    "subtitle": "디지털 콘텐츠 IP 보호 및 모니터링 도구",
-    "features": {
-      "contentRegistration": "콘텐츠\n등록",
-      "matchDetection": "일치\n감지",
-      "dashboardReview": "대시보드\n검토",
-      "instantAlert": "즉시\n알림"
+    "ourSolution": {
+      "title": "솔루션",
+      "subtitle": "브랜드와 창작자를 디지털 위험으로부터 보호합니다",
+      "features": {
+        "brandProtection": "브랜드\n보호",
+        "contentProtection": "콘텐츠\n보호",
+        "infringementPrevention": "침해\n방지",
+        "copyrightManagement": "저작권\n관리"
+      },
+      "infoBoxTitle": "직접 이미지 데이터 분석으로 모든 수정 사항을 식별합니다.",
+      "infoBoxBody": "방대한 디지털 콘텐츠 속에서 브랜드와 창작 권리를 보호하기 위한 기술적 우위를 제공합니다."
     },
-    "bullets": [
-      "모니터링 기술은 과거 대기업만 이용할 수 있는 고비용 전용 서비스였습니다.",
-      "개인 창작자와 중소 브랜드는 자신의 권리를 보호하는 데 높은 진입 장벽에 직면해 왔습니다.",
-      "이제 당사의 확장 가능한 모니터링 기술로 기업 규모에 관계없이 지식재산권을 보호할 수 있습니다."
-    ],
-    "infoBoxTitle": "수동 검색의 한계를 넘어. 지금 바로 작업물을 보호하세요.",
-    "infoBoxBody": "디지털 핑거프린팅 기술로 수정되거나 변형된 콘텐츠도 탐지합니다. 24시간 자동 모니터링으로 침해 발생 즉시 알림을 받아 권리 보호에서 항상 한 발 앞서 나갈 수 있습니다."
+    "ourService": {
+      "title": "서비스",
+      "subtitle": "디지털 콘텐츠 IP 보호 및 모니터링 도구",
+      "features": {
+        "contentRegistration": "콘텐츠\n등록",
+        "matchDetection": "일치\n감지",
+        "dashboardReview": "대시보드\n검토",
+        "instantAlert": "즉시\n알림"
+      },
+      "bullets": [
+        "모니터링 기술은 과거 대기업만 이용할 수 있는 고비용 전용 서비스였습니다.",
+        "개인 창작자와 중소 브랜드는 자신의 권리를 보호하는 데 높은 진입 장벽에 직면해 왔습니다.",
+        "이제 당사의 확장 가능한 모니터링 기술로 기업 규모에 관계없이 지식재산권을 보호할 수 있습니다."
+      ],
+      "infoBoxTitle": "수동 검색의 한계를 넘어. 지금 바로 작업물을 보호하세요.",
+      "infoBoxBody": "디지털 핑거프린팅 기술로 수정되거나 변형된 콘텐츠도 탐지합니다. 24시간 자동 모니터링으로 침해 발생 즉시 알림을 받아 권리 보호에서 항상 한 발 앞서 나갈 수 있습니다."
+    }
+  },
+  "Pricing": {
+    "heading": "요금제",
+    "subheading": "모두를 위한 자율성. 나에게 맞는 플랜을 선택하세요.",
+    "monthly": "월간",
+    "yearly": "연간",
+    "sale": "40% 할인",
+    "getStarted": "시작하기",
+    "contact": "문의하기",
+    "perMonth": "/월",
+    "perUnit": "건당",
+    "billedMonthly": "월 청구 금액",
+    "starter": {
+      "name": "STARTER",
+      "tagline": "개인 및 프리랜서에게 적합",
+      "subtext": "추천 코드로 무료 등록",
+      "features": [
+        "등록 항목 최대 10개 모니터링",
+        "누적 탐지 알림 최대 1,000건",
+        "자동 중복 콘텐츠 필터",
+        "콘텐츠 노출 위험 분석"
+      ]
+    },
+    "pro": {
+      "name": "PRO",
+      "tagline": "크리에이터 및 인플루언서에게 적합",
+      "subtext": "STARTER의 약 절반 가격",
+      "features": [
+        "STARTER의 모든 기능 포함",
+        "등록 항목 최대 50개 모니터링",
+        "누적 탐지 알림 최대 5,000건",
+        "PDF 보고서 생성"
+      ]
+    },
+    "premium": {
+      "name": "PREMIUM",
+      "tagline": "기업 및 에이전시에게 적합",
+      "subtext": "전 플랜 중 건당 최저 단가",
+      "footerNote": "대기업 플랜 문의하기",
+      "features": [
+        "PRO의 모든 기능 포함",
+        "등록 항목 최대 100개 모니터링",
+        "무제한 탐지 알림",
+        "1:1 전담 매니저 배정"
+      ]
+    },
+    "comparison": {
+      "heading": "플랜 비교",
+      "planNames": [
+        "STARTER",
+        "PRO",
+        "PREMIUM"
+      ],
+      "rows": [
+        {
+          "label": "연간 결제 (월 환산)",
+          "starter": ".30",
+          "pro": ".57",
+          "premium": ".66"
+        },
+        {
+          "label": "월간 결제",
+          "starter": ".62",
+          "pro": ".39",
+          "premium": ".77"
+        },
+        {
+          "label": "연간 할인율",
+          "starter": "20%",
+          "pro": "30%",
+          "premium": "40%"
+        },
+        {
+          "label": "모니터링 항목 수",
+          "starter": "최대 10개",
+          "pro": "최대 50개",
+          "premium": "최대 100개"
+        },
+        {
+          "label": "알림 한도",
+          "starter": "1,000건",
+          "pro": "5,000건",
+          "premium": "무제한"
+        },
+        {
+          "label": "건당 단가 (연간)",
+          "starter": ".53",
+          "pro": ".27",
+          "premium": ".20"
+        }
+      ]
+    },
+    "faq": {
+      "heading": "자주 묻는 질문",
+      "items": [
+        {
+          "question": "모니터링은 어떻게 작동하나요?",
+          "answer": "당사의 지능형 AI가 등록된 이미지를 기반으로 24시간 365일 빠짐없이 전체 웹을 스캔합니다. 유사한 이미지가 발견되는 즉시 상세 분석이 이루어지고 대시보드에 기록되며, 즉각적인 조치를 취할 수 있도록 실시간 알림이 전송됩니다. 최적화된 데이터 관리를 위해 발견된 모든 데이터는 30일간 안전하게 보관됩니다."
+        },
+        {
+          "question": "누적 탐지 한도에 도달하면 어떻게 되나요?",
+          "answer": "한도를 초과하면 새로운 탐지에 대한 모니터링 및 알림이 일시 중지됩니다. 중단 없이 서비스를 계속 이용하려면 상위 플랜으로 업그레이드하거나 다음 결제일에 한도가 초기화될 때까지 기다리시면 됩니다. (PREMIUM 플랜은 탐지 한도 없이 무제한 이용 가능합니다!)"
+        },
+        {
+          "question": "구독 중간에 플랜을 변경할 수 있나요?",
+          "answer": "네, 언제든지 플랜을 변경할 수 있습니다! 업그레이드 시 남은 기간에 대한 차액만 결제하면 확장된 혜택을 즉시 이용할 수 있습니다. 다운그레이드는 현재 구독 기간이 종료된 후 다음 결제 주기부터 적용됩니다."
+        },
+        {
+          "question": "연간 구독 중 취소하면 어떻게 되나요?",
+          "answer": "취소 후에도 현재 선불 결제된 구독 기간이 끝날 때까지 모든 기능을 정상적으로 이용하실 수 있습니다. 다음 해에는 구독이 자동 갱신되지 않습니다. 단, 연간 플랜에는 할인이 포함되어 있으므로 중도 환불은 이용 약관에 따라 제한될 수 있습니다."
+        },
+        {
+          "question": "계정을 삭제하면 등록된 이미지는 어떻게 되나요?",
+          "answer": "계정 삭제 시 등록된 모든 이미지와 모니터링 데이터는 개인정보 및 소중한 창작물 보호를 위해 즉시 영구적으로 삭제됩니다. 삭제된 데이터는 복구가 불가능하므로, 계정 해지 전에 필요한 보고서를 미리 다운로드하시기를 권장합니다."
+        }
+      ]
+    },
+    "referral": {
+      "title": "추천 코드가 있으신가요?",
+      "description": "회원가입 시 코드를 입력하면 즉시 무료 체험이 시작됩니다.",
+      "steps": [
+        "코드 받기",
+        "가입 시 입력",
+        "1개월 무료",
+        "플랜 선택"
+      ]
+    }
   }
-}
-
 }

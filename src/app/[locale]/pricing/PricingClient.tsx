@@ -276,13 +276,13 @@ export default function PricingClient({
               {t.billing.monthly}
             </button>
             <button
-              onClick={() => dispatch(setBillingCycle('annual'))}
+              onClick={() => dispatch(setBillingCycle('yearly'))}
               className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
-                billingCycle === 'annual'
+                billingCycle === 'yearly'
                   ? 'text-white shadow-sm'
                   : 'text-gray-400 hover:text-gray-600'
               }`}
-              style={billingCycle === 'annual' ? { background:  '#000000'} : {}}
+              style={billingCycle === 'yearly' ? { background:  '#000000'} : {}}
             >
               {t.billing.annual}
               <span className="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">

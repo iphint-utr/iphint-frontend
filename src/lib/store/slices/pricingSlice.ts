@@ -1,96 +1,59 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from '../store' // adjust path to your store
-import type { BillingCycle, PlanId, Locale } from '../../../app/[locale]/pricing/pricing'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// ─── State ─────────────────────────────────────────────────────────────────
-export interface PricingState {
-  locale: Locale
-  billingCycle: BillingCycle
-  selectedPlan: PlanId | null
-  expandedFaqIndex: number | null
-  highlightedFeature: string | null
-  ctaLoading: PlanId | null
+type BillingCycle = "monthly" | "yearly";
+
+interface PricingState {
+  billingCycle: BillingCycle;
+  openFaqIndex: number | null;
+  highlightedFeature: string | null;
+  locale: string;
+  ctaLoading: string | null;
 }
 
 const initialState: PricingState = {
-  locale: 'en',
-  billingCycle: 'monthly',
-  selectedPlan: null,
-  expandedFaqIndex: null,
+  billingCycle: "yearly",
+  openFaqIndex: null,
   highlightedFeature: null,
+  locale: "en",
   ctaLoading: null,
-}
+};
 
-// ─── Slice ─────────────────────────────────────────────────────────────────
-export const pricingSlice = createSlice({
-  name: 'pricing',
+const pricingSlice = createSlice({
+  name: "pricing",
   initialState,
   reducers: {
-    setLocale(state, action: PayloadAction<Locale>) {
-      state.locale = action.payload
-    },
-
     setBillingCycle(state, action: PayloadAction<BillingCycle>) {
-      state.billingCycle = action.payload
+      state.billingCycle = action.payload;
     },
-
-    toggleBillingCycle(state) {
-      state.billingCycle =
-        state.billingCycle === 'monthly' ? 'annual' : 'monthly'
-    },
-
-    selectPlan(state, action: PayloadAction<PlanId>) {
-      state.selectedPlan = action.payload
-    },
-
-    clearSelectedPlan(state) {
-      state.selectedPlan = null
-    },
-
     toggleFaq(state, action: PayloadAction<number>) {
-      state.expandedFaqIndex =
-        state.expandedFaqIndex === action.payload ? null : action.payload
+      state.openFaqIndex =
+        state.openFaqIndex === action.payload ? null : action.payload;
     },
-
-    closeFaq(state) {
-      state.expandedFaqIndex = null
-    },
-
     setHighlightedFeature(state, action: PayloadAction<string | null>) {
-      state.highlightedFeature = action.payload
+      state.highlightedFeature = action.payload;
     },
-
-    setCtaLoading(state, action: PayloadAction<PlanId | null>) {
-      state.ctaLoading = action.payload
+    setLocale(state, action: PayloadAction<string>) {
+      state.locale = action.payload;
     },
-
-    resetPricingState() {
-      return initialState
+    setCtaLoading(state, action: PayloadAction<string | null>) {
+      state.ctaLoading = action.payload;
     },
   },
-})
+});
 
-// ─── Actions ───────────────────────────────────────────────────────────────
-export const {
-  setLocale,
-  setBillingCycle,
-  toggleBillingCycle,
-  selectPlan,
-  clearSelectedPlan,
-  toggleFaq,
-  closeFaq,
-  setHighlightedFeature,
-  setCtaLoading,
-  resetPricingState,
-} = pricingSlice.actions
+export const { setBillingCycle, toggleFaq, setHighlightedFeature, setLocale, setCtaLoading } = pricingSlice.actions;
+export default pricingSlice.reducer;
 
-// ─── Selectors ─────────────────────────────────────────────────────────────
-export const selectPricingLocale      = (state: RootState) => state.pricing.locale
-export const selectBillingCycle       = (state: RootState) => state.pricing.billingCycle
-export const selectSelectedPlan       = (state: RootState) => state.pricing.selectedPlan
-export const selectExpandedFaqIndex   = (state: RootState) => state.pricing.expandedFaqIndex
-export const selectHighlightedFeature = (state: RootState) => state.pricing.highlightedFeature
-export const selectCtaLoading         = (state: RootState) => state.pricing.ctaLoading
-export const selectIsAnnual           = (state: RootState) => state.pricing.billingCycle === 'annual'
-
-export default pricingSlice.reducer
+// Selectors
+export const selectBillingCycle = (state: { pricing: PricingState }) =>
+  state.pricing.billingCycle;
+export const selectOpenFaqIndex = (state: { pricing: PricingState }) =>
+  state.pricing.openFaqIndex;
+export const selectExpandedFaqIndex = (state: { pricing: PricingState }) =>
+  state.pricing.openFaqIndex;
+export const selectHighlightedFeature = (state: { pricing: PricingState }) =>
+  state.pricing.highlightedFeature;
+export const selectCtaLoading = (state: { pricing: PricingState }) =>
+  state.pricing.ctaLoading;
+export const selectIsAnnual = (state: { pricing: PricingState }) =>
+  state.pricing.billingCycle === "yearly";
