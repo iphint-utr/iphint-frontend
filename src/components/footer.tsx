@@ -24,12 +24,12 @@ const translations = {
         { label: "환불 정책",        href: "/refund_policy"    },
       ],
     },
-    copyright: "©2026 Toostar. All Rights Reserved.",
+    copyright: "©2026 IPHINT. All Rights Reserved.",
     langLabel:  "한국어",
   },
   en: {
     col1: {
-      heading: "Toostar",
+      heading: "IPHINT",
       links: [
         { label: "Research", href: "/research" },
         { label: "API",      href: "/api"      },
@@ -45,7 +45,7 @@ const translations = {
         { label: "Refund Policy",    href: "/refund_policy"   },
       ],
     },
-    copyright: "©2026 Toostar. All Rights Reserved.",
+    copyright: "©2026 IPHINT. All Rights Reserved.",
     langLabel:  "English",
   },
 } as const;
@@ -154,9 +154,9 @@ export default function Footer() {
 
           {/* Logo — top-left, does not grow */}
           <div className="flex-shrink-0">
-            <Link href="/" aria-label="Toostar home" className="block text-gray-950">
+            <Link href="/" aria-label="IPHINT home" className="block text-gray-950">
               <div className="relative h-8 w-32">
-                <Image src="/logo_footer.svg" alt="Toostar" fill className="object-contain object-left" />
+                <Image src="/logo_footer.svg" alt="IPHINT" fill className="object-contain object-left" />
               </div>
             </Link>
           </div>

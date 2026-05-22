@@ -14,7 +14,6 @@ const SLIDES = [
 // [clone-of-last, ...real slides, clone-of-first] for seamless infinite loop
 const EXTENDED = [SLIDES[SLIDES.length - 1], ...SLIDES, SLIDES[0]];
 const REAL_COUNT = SLIDES.length;
-const SLIDE_STEP = 100 / EXTENDED.length;
 const AUTO_SLIDE_INTERVAL = 4000;
 
 export default function Section4() {
@@ -22,7 +21,8 @@ export default function Section4() {
 
   // currentIdx 1 = first real slide, REAL_COUNT = last real
   const [currentIdx, setCurrentIdx] = useState(1);
-  const [animated, setAnimated] = useState(true);
+  // Start with no transition so the initial transform is applied instantly (no flash on cold load)
+  const [animated, setAnimated] = useState(false);
   const [paused, setPaused] = useState(false);
 
   // 0-based real index for tabs / dots / progress bar
@@ -98,14 +98,6 @@ export default function Section4() {
     if (dx < 0) goNext(); else goPrev();
   };
 
-  const stripStyle = {
-    width: `${EXTENDED.length * 100}%`,
-    transform: `translateX(-${currentIdx * SLIDE_STEP}%)`,
-  };
-  const stripClass = animated
-    ? "flex transition-transform duration-500 ease-in-out"
-    : "flex";
-
   return (
     <section className="min-h-[500px] w-full bg-[#fafafa] py-20 font-sans text-slate-900">
       <div className="w-full px-6 lg:px-16 xl:px-24 flex flex-col gap-12">
@@ -129,30 +121,27 @@ export default function Section4() {
           onMouseUp={(e) => onDragEnd(e.clientX, e.clientY)}
           onMouseLeave={() => { pointerStartX.current = null; }}
         >
-          {/* Image strip */}
-          <div className="relative min-h-72 lg:min-h-0 rounded-2xl lg:rounded-none overflow-hidden lg:mr-10">
-            <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_2px,transparent_2px)] [background-size:24px_24px] opacity-80" />
-            <div className="relative z-10 h-full overflow-hidden">
-              <div className={`h-full ${stripClass}`} style={stripStyle} onTransitionEnd={handleTransitionEnd}>
-                {EXTENDED.map((item, i) => (
-                  <div
-                    key={`img-${i}`}
-                    className="flex items-center justify-center p-8 flex-shrink-0"
-                    style={{ width: `${SLIDE_STEP}%` }}
-                  >
-                    <div className="relative w-full lg:w-[55%] aspect-square">
-                      <Image
-                        src={item.file}
-                        alt={t(`items.${item.key}.title`)}
-                        fill
-                        className="object-contain"
-                        priority={i === 1}
-                      />
-                    </div>
-                  </div>
-                ))}
+          {/* Image column — absolute-positioned slides, no h-full dependency */}
+          <div
+            className="relative min-h-72 lg:min-h-[440px] overflow-hidden rounded-2xl lg:rounded-none lg:mr-10 bg-[radial-gradient(#cbd5e1_2px,transparent_2px)] [background-size:24px_24px]"
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {EXTENDED.map((item, i) => (
+              <div
+                key={`img-${i}`}
+                className={`absolute inset-0 flex items-center justify-center p-8${animated ? " transition-transform duration-500 ease-in-out" : ""}`}
+                style={{ transform: `translateX(${(i - currentIdx) * 100}%)` }}
+              >
+                <Image
+                  src={item.file}
+                  alt={t(`items.${item.key}.title`)}
+                  width={380}
+                  height={380}
+                  className="w-full max-w-[55%] object-contain"
+                  priority={i < 2}
+                />
               </div>
-            </div>
+            ))}
           </div>
 
           {/* Text column */}
@@ -174,24 +163,27 @@ export default function Section4() {
               ))}
             </div>
 
-            {/* Text strip */}
-            <div className="overflow-hidden">
-              <div className={stripClass} style={stripStyle}>
-                {EXTENDED.map((item, i) => (
-                  <div
-                    key={`txt-${i}`}
-                    className="flex flex-col gap-3 pr-4 flex-shrink-0"
-                    style={{ width: `${SLIDE_STEP}%` }}
-                  >
-                    <h3 className="text-2xl font-semibold leading-snug">
-                      {t(`items.${item.key}.heading`)}
-                    </h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                      {t(`items.${item.key}.description`)}
-                    </p>
-                  </div>
-                ))}
+            {/* Text slides — absolute-positioned, same pattern as image column */}
+            <div className="relative overflow-hidden">
+              {/* Invisible spacer: reserves height equal to the tallest text item */}
+              <div className="flex flex-col gap-3 pr-4 invisible pointer-events-none select-none" aria-hidden="true">
+                <h3 className="text-2xl font-semibold leading-snug">{t(`items.${SLIDES[activeIndex].key}.heading`)}</h3>
+                <p className="text-sm leading-relaxed">{t(`items.${SLIDES[activeIndex].key}.description`)}</p>
               </div>
+              {EXTENDED.map((item, i) => (
+                <div
+                  key={`txt-${i}`}
+                  className={`absolute inset-x-0 top-0 flex flex-col gap-3 pr-4${animated ? " transition-transform duration-500 ease-in-out" : ""}`}
+                  style={{ transform: `translateX(${(i - currentIdx) * 100}%)` }}
+                >
+                  <h3 className="text-2xl font-semibold leading-snug">
+                    {t(`items.${item.key}.heading`)}
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    {t(`items.${item.key}.description`)}
+                  </p>
+                </div>
+              ))}
             </div>
 
             {/* Progress bar */}

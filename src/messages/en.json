@@ -64,7 +64,7 @@
     "forgetPassword": "Forget Password",
     "submitLogin": "Log in",
     "noAccountText": "Don't have an account?",
-    "noAccountLink": "Sign in"
+    "noAccountLink": "Sign up"
   },
   "Admin": {
     "sidebar": {
@@ -415,7 +415,7 @@
     },
     "section4": {
       "title": "Creators and Brands",
-      "description": "We grow together with influencers, artists, and creators from all over the world. Check out the results achieved by teams using ImgMov.",
+      "description": "We grow together with influencers, artists, and creators from all over the world. Check out the results achieved by teams using IPHINT.",
       "items": {
         "artist": {
           "title": "Artist",
