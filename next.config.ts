@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
+import path from "path";
 // Point explicitly to your request config inside src
 const withNextIntl = require('next-intl/plugin')('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: 'C:/Users/HP/OneDrive/Desktop/RAJU/image_reverse/image-search',
+  outputFileTracingRoot: path.resolve(__dirname),
   reactCompiler: true,
   images: {
     remotePatterns: [
