@@ -146,10 +146,18 @@ export const fetchBillingPageData = createAsyncThunk<
   { rejectValue: string }
 >('account/fetchBillingPageData', async (_, { rejectWithValue }) => {
   try {
-    const countryCodePromise = apiClient
-      .get('https://ipapi.co/json/')
-      .then((response) => String(response.data?.country_code || 'US'))
-      .catch(() => 'US');
+    const countryCodePromise: Promise<string> = (async () => {
+      try {
+        // Use native fetch (not apiClient) to avoid sending auth headers to a third party
+        const res = await fetch('https://get.geojs.io/v1/ip/country.json');
+        const data = await res.json();
+        return String(data?.country || 'US');
+      } catch {
+        // Fall back to browser locale — 'ko' prefix → show KRW pricing
+        if (typeof navigator !== 'undefined' && navigator.language?.startsWith('ko')) return 'KR';
+        return 'US';
+      }
+    })();
 
     const [plansResponse, snapshotResponse, countryCode] = await Promise.all([
       apiClient.get('/billing/plans'),
