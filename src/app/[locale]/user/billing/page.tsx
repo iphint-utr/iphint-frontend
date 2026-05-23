@@ -224,13 +224,19 @@ export default function BillingPage() {
         billingCycle: cycle,
       });
 
+      const transactionId: string | undefined = response.data?.transactionId;
       const checkoutUrl: string | undefined = response.data?.checkoutUrl;
-      if (!checkoutUrl) {
-        throw new Error('Billing API did not return a checkout URL.');
+      if (!transactionId && !checkoutUrl) {
+        throw new Error('Billing API did not return a transaction ID.');
       }
 
+      // Always prefer transactionId for overlay — using the URL causes "bad request"
+      const openPayload = transactionId
+        ? { transactionId }
+        : { url: checkoutUrl! };
+
       paddle.Checkout.open({
-        url: checkoutUrl,
+        ...openPayload,
         settings: {
           displayMode: 'overlay',
           theme: 'light',
