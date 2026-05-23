@@ -58,7 +58,7 @@ export default function LoginPage() {
       <div className="grid min-h-screen lg:grid-cols-2">
         <div
           aria-hidden="true"
-          className="min-h-[280px] bg-slate-100 bg-cover bg-center bg-no-repeat lg:min-h-screen"
+          className="hidden lg:block lg:min-h-screen bg-slate-100 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/login.svg')" }}
         />
 

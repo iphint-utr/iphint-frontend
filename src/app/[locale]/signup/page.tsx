@@ -69,11 +69,11 @@ useEffect(() => {
     .sort((a, b) => (a!.dial > b!.dial ? 1 : -1));
 
   return (
-    <div className="w-full max-w-[800px]">
+    <div className="w-full">
       <h1 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-10 text-black">{t('signupTitle')}</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
           
           {/* Name */}
           <div>
@@ -160,7 +160,7 @@ useEffect(() => {
           </div>
 
           {/* Password */}
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('passwordLabel')}</label>
             <input 
               name="password" type="password" required placeholder={t('passwordPlaceholder')} 
@@ -183,11 +183,11 @@ useEffect(() => {
           </div>
         )}
 
-        <div className="flex justify-center mt-10">
+        <div className="mt-10">
           <button 
             type="submit" 
             disabled={authLoading}
-            className="w-full md:w-[400px] bg-black text-white font-semibold py-4 sm:py-5 rounded-2xl hover:bg-gray-900 transition-all disabled:opacity-50 text-sm sm:text-base"
+            className="w-full bg-black text-white font-semibold py-4 sm:py-5 rounded-2xl hover:bg-gray-900 transition-all disabled:opacity-50 text-sm sm:text-base"
           >
             {authLoading ? '...' : t('submitSignup')}
           </button>
@@ -204,11 +204,11 @@ export default function SignupPage() {
       <div className="grid min-h-screen lg:grid-cols-2">
         <div
           aria-hidden="true"
-          className="min-h-[280px] bg-slate-100 bg-cover bg-center bg-no-repeat lg:min-h-screen"
+          className="hidden lg:block lg:min-h-screen bg-slate-100 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/signup2.svg')" }}
         />
 
-        <div className="flex items-center justify-center">
+        <div className="flex items-start justify-center px-6 sm:px-10 py-10 lg:py-12 w-full">
           <Suspense fallback={<div className="w-full text-center">Loading...</div>}>
             <SignupForm />
           </Suspense>
