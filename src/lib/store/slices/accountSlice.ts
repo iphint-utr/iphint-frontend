@@ -12,7 +12,7 @@ export interface BillingPlan {
   tier: PlanTier;
   name: string;
   imageUploadLimit: number;
-  maxResults: number;
+  alertLimit: number;
   pdfEnabled: boolean;
   weeklyEmailAlerts: boolean;
   features: string[];
@@ -21,21 +21,28 @@ export interface BillingPlan {
 
 export interface BillingSnapshot {
   subscription: {
-    id: string;
-    status: 'active' | 'cancelled' | 'expired' | 'pending';
+    id?: string;
+    status: 'active' | 'trialing' | 'past_due' | 'paused' | 'cancelled' | 'expired' | 'pending';
     billingCycle: BillingCycle;
+    grantSource?: 'paid' | 'trial' | 'referral';
+    isTrial?: boolean;
+    isTrialing?: boolean;
+    isPastDue?: boolean;
+    paddleManaged?: boolean;
+    trialEndsAt?: string | null;
+    trialDaysLeft?: number;
     activationDate?: string;
     currentPeriodEnd?: string;
     nextBillingDate?: string;
     cancelDate?: string;
-    isTrial?: boolean;
-    trialDaysLeft?: number;
+    paddleStatus?: string;
   } | null;
   plan: BillingPlan;
+  credits?: number;
   usage: {
     imagesUsedThisMonth: number;
     imageUploadLimit: number;
-    maxResults: number;
+    alertLimit: number;
     pdfEnabled: boolean;
   };
 }
@@ -90,9 +97,10 @@ export interface ReportItem {
 
 export interface ReportPlanLimits {
   tier: PlanTier;
-  maxResults: number;
+  alertLimit: number;
   imageUploadLimit: number;
   pdfEnabled: boolean;
+  permanentPdfAccess?: boolean;
 }
 
 const defaultProfile: SettingsProfile = {
@@ -181,6 +189,32 @@ export const cancelPlanSubscription = createAsyncThunk<
     return await dispatch(fetchBillingPageData()).unwrap();
   } catch (error) {
     return rejectWithValue(getApiErrorMessage(error, 'Failed to cancel subscription.'));
+  }
+});
+
+export const pauseSubscription = createAsyncThunk<
+  { plans: BillingPlan[]; snapshot: BillingSnapshot | null; countryCode: string },
+  void,
+  { rejectValue: string }
+>('account/pauseSubscription', async (_, { dispatch, rejectWithValue }) => {
+  try {
+    await apiClient.post('/billing/pause');
+    return await dispatch(fetchBillingPageData()).unwrap();
+  } catch (error) {
+    return rejectWithValue(getApiErrorMessage(error, 'Failed to pause subscription.'));
+  }
+});
+
+export const resumeSubscription = createAsyncThunk<
+  { plans: BillingPlan[]; snapshot: BillingSnapshot | null; countryCode: string },
+  void,
+  { rejectValue: string }
+>('account/resumeSubscription', async (_, { dispatch, rejectWithValue }) => {
+  try {
+    await apiClient.post('/billing/resume');
+    return await dispatch(fetchBillingPageData()).unwrap();
+  } catch (error) {
+    return rejectWithValue(getApiErrorMessage(error, 'Failed to resume subscription.'));
   }
 });
 
@@ -383,6 +417,8 @@ interface AccountState {
     error: string | null;
     savingPlan: PlanTier | null;
     cancelLoading: boolean;
+    pauseLoading: boolean;
+    resumeLoading: boolean;
     countryCode: string;
   };
   referral: {
@@ -434,6 +470,8 @@ const initialState: AccountState = {
     error: null,
     savingPlan: null,
     cancelLoading: false,
+    pauseLoading: false,
+    resumeLoading: false,
     countryCode: 'US',
   },
   referral: {
@@ -533,6 +571,34 @@ const accountSlice = createSlice({
       .addCase(cancelPlanSubscription.rejected, (state, action) => {
         state.billing.cancelLoading = false;
         state.billing.error = action.payload ?? 'Failed to cancel subscription.';
+      })
+      .addCase(pauseSubscription.pending, (state) => {
+        state.billing.pauseLoading = true;
+        state.billing.error = null;
+      })
+      .addCase(pauseSubscription.fulfilled, (state, action) => {
+        state.billing.pauseLoading = false;
+        state.billing.plans = action.payload.plans;
+        state.billing.countryCode = action.payload.countryCode;
+        state.subscription.data = action.payload.snapshot;
+      })
+      .addCase(pauseSubscription.rejected, (state, action) => {
+        state.billing.pauseLoading = false;
+        state.billing.error = action.payload ?? 'Failed to pause subscription.';
+      })
+      .addCase(resumeSubscription.pending, (state) => {
+        state.billing.resumeLoading = true;
+        state.billing.error = null;
+      })
+      .addCase(resumeSubscription.fulfilled, (state, action) => {
+        state.billing.resumeLoading = false;
+        state.billing.plans = action.payload.plans;
+        state.billing.countryCode = action.payload.countryCode;
+        state.subscription.data = action.payload.snapshot;
+      })
+      .addCase(resumeSubscription.rejected, (state, action) => {
+        state.billing.resumeLoading = false;
+        state.billing.error = action.payload ?? 'Failed to resume subscription.';
       })
       .addCase(fetchReferralStatus.pending, (state) => {
         state.referral.loading = true;

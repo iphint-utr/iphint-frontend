@@ -1,11 +1,16 @@
-'use client';
+﻿'use client';
 
-import type { CheckoutCustomer, CheckoutOpenLineItem, CheckoutOpenOptions, Paddle, PaddleEventData } from '@paddle/paddle-js';
+import type { CheckoutOpenOptions, Paddle, PaddleEventData } from '@paddle/paddle-js';
 import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Crown } from 'lucide-react';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { cancelPlanSubscription, fetchBillingPageData } from '@/lib/store/slices/accountSlice';
+import {
+  cancelPlanSubscription,
+  fetchBillingPageData,
+  pauseSubscription,
+  resumeSubscription,
+} from '@/lib/store/slices/accountSlice';
 
 const KRW_PER_USD = 1360;
 
@@ -16,7 +21,7 @@ interface Plan {
   tier: PlanTier;
   name: string;
   imageUploadLimit: number;
-  maxResults: number;
+  alertLimit: number;
   pdfEnabled: boolean;
   weeklyEmailAlerts: boolean;
   features: string[];
@@ -25,41 +30,34 @@ interface Plan {
 
 interface BillingSnapshot {
   subscription: {
-    id: string;
-    status: 'active' | 'cancelled' | 'expired' | 'pending';
+    id?: string;
+    status: 'active' | 'trialing' | 'past_due' | 'paused' | 'cancelled' | 'expired' | 'pending';
     billingCycle: BillingCycle;
+    grantSource?: 'paid' | 'trial' | 'referral';
+    isTrial?: boolean;
+    isTrialing?: boolean;
+    isPastDue?: boolean;
+    paddleManaged?: boolean;
+    trialEndsAt?: string | null;
+    trialDaysLeft?: number;
     activationDate?: string;
     currentPeriodEnd?: string;
     nextBillingDate?: string;
     cancelDate?: string;
+    paddleStatus?: string;
   } | null;
   plan: Plan;
+  credits?: number;
   usage: {
     imagesUsedThisMonth: number;
     imageUploadLimit: number;
-    maxResults: number;
+    alertLimit: number;
     pdfEnabled: boolean;
   };
 }
 
-interface PaddleCheckoutPayload {
-  transactionId?: string;
-  items?: CheckoutOpenLineItem[];
-  customer?: CheckoutCustomer;
-  customerAuthToken?: string;
-  customData?: Record<string, unknown>;
-  settings?: CheckoutOpenOptions['settings'];
-  discountCode?: string | null;
-}
-
-interface PaddleCheckoutResponse extends PaddleCheckoutPayload {
-  checkout?: PaddleCheckoutPayload;
-}
-
 const paddleEnvironment = process.env.NEXT_PUBLIC_PADDLE_ENV === 'sandbox' ? 'sandbox' : 'production';
-const paddleClientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN?.trim().replace(/^['"]|['"]$/g, '') || undefined;
-
-const normalizePaddleCheckoutPayload = (payload: PaddleCheckoutResponse) => payload.checkout ?? payload;
+const paddleClientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN?.trim().replace(/^['"']|['"']$/g, '') || undefined;
 
 const getPaymentErrorMessage = (error: unknown, fallback: string) => {
   if (typeof error === 'string') {
@@ -81,13 +79,15 @@ const getPaymentErrorMessage = (error: unknown, fallback: string) => {
 
 export default function BillingPage() {
   const dispatch = useAppDispatch();
-  const { plans, loading, error, savingPlan, cancelLoading, countryCode } = useAppSelector((state) => state.account.billing);
+  const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<PlanTier | null>(null);
+  const [updatePaymentLoading, setUpdatePaymentLoading] = useState(false);
   const paddleRef = useRef<Paddle | null>(null);
   const paddlePromiseRef = useRef<Promise<Paddle> | null>(null);
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isKorean = countryCode.toUpperCase() === 'KR';
 
@@ -116,9 +116,20 @@ export default function BillingPage() {
     if (event.name === 'checkout.completed') {
       setCheckoutPlan(null);
       setCheckoutError(null);
-      startTransition(() => {
-        void dispatch(fetchBillingPageData());
-      });
+      // Poll until subscription is active and Paddle-managed
+      let attempts = 0;
+      const poll = () => {
+        if (attempts >= 10) return;
+        attempts++;
+        pollTimerRef.current = setTimeout(async () => {
+          const result = await dispatch(fetchBillingPageData());
+          const sub = (result as { payload?: { snapshot?: BillingSnapshot | null } }).payload?.snapshot?.subscription;
+          if (sub?.status === 'active' && sub?.paddleManaged) return;
+          poll();
+        }, 2000);
+      };
+      poll();
+      startTransition(() => { void dispatch(fetchBillingPageData()); });
       return;
     }
 
@@ -187,33 +198,18 @@ export default function BillingPage() {
         tier,
         billingCycle: cycle,
       });
-      const checkoutPayload = normalizePaddleCheckoutPayload((response.data ?? {}) as PaddleCheckoutResponse);
 
-      if (!checkoutPayload.transactionId && !checkoutPayload.items?.length) {
-        throw new Error('Billing API did not return Paddle checkout data.');
+      const checkoutUrl: string | undefined = response.data?.checkoutUrl;
+      if (!checkoutUrl) {
+        throw new Error('Billing API did not return a checkout URL.');
       }
 
       const checkoutOptions: CheckoutOpenOptions = {
-        ...(checkoutPayload.transactionId
-          ? { transactionId: checkoutPayload.transactionId }
-          : {
-              items: checkoutPayload.items!.map((item) => ({
-                priceId: item.priceId,
-                quantity: item.quantity ?? 1,
-              })),
-            }),
-        ...(checkoutPayload.customerAuthToken
-          ? { customerAuthToken: checkoutPayload.customerAuthToken }
-          : checkoutPayload.customer
-            ? { customer: checkoutPayload.customer }
-            : {}),
-        ...(checkoutPayload.customData ? { customData: checkoutPayload.customData } : {}),
-        ...(checkoutPayload.discountCode ? { discountCode: checkoutPayload.discountCode } : {}),
+        url: checkoutUrl,
         settings: {
           displayMode: 'overlay',
           theme: 'light',
           successUrl: typeof window !== 'undefined' ? window.location.href : undefined,
-          ...(checkoutPayload.settings ?? {}),
         },
       };
 
@@ -227,6 +223,30 @@ export default function BillingPage() {
   const cancelSubscription = async () => {
     await dispatch(cancelPlanSubscription());
   };
+
+  const handlePause = async () => {
+    await dispatch(pauseSubscription());
+  };
+
+  const handleResume = async () => {
+    await dispatch(resumeSubscription());
+  };
+
+  const handleUpdatePayment = async () => {
+    setUpdatePaymentLoading(true);
+    try {
+      const response = await apiClient.get('/billing/payment-method');
+      const updateUrl: string | undefined = response.data?.updateUrl;
+      if (updateUrl) window.location.href = updateUrl;
+    } catch {
+      // ignore
+    } finally {
+      setUpdatePaymentLoading(false);
+    }
+  };
+
+  // Cleanup polling on unmount
+  useEffect(() => () => { if (pollTimerRef.current) clearTimeout(pollTimerRef.current); }, []);
 
   if (loading) {
     return (
@@ -251,6 +271,66 @@ export default function BillingPage() {
         </p>
       </div>
 
+      {/* Trial / referral banner */}
+      {snapshot?.subscription && (snapshot.subscription.isTrial || snapshot.subscription.status === 'trialing') && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <span className="font-semibold">
+            {snapshot.subscription.trialDaysLeft != null
+              ? `${snapshot.subscription.trialDaysLeft} day${snapshot.subscription.trialDaysLeft !== 1 ? 's' : ''} left on your free trial.`
+              : 'Free trial active.'}
+          </span>{' '}
+          Subscribe below to keep access when it ends.
+        </div>
+      )}
+
+      {/* Past-due warning */}
+      {snapshot?.subscription?.status === 'past_due' && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <span className="font-semibold">Payment failed — please update your payment method to avoid losing access.</span>
+          {snapshot.subscription.paddleManaged && (
+            <button
+              type="button"
+              disabled={updatePaymentLoading}
+              onClick={handleUpdatePayment}
+              className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
+            >
+              {updatePaymentLoading ? 'Loading...' : 'Update Payment Method'}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Paused notice */}
+      {snapshot?.subscription?.status === 'paused' && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+          <span>
+            <span className="mr-2 inline-block rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold uppercase text-gray-700">Paused</span>
+            Your subscription is paused.
+            {snapshot.subscription.currentPeriodEnd && (
+              <> Resumes or expires on {new Date(snapshot.subscription.currentPeriodEnd).toLocaleDateString()}.</>
+            )}
+          </span>
+          {snapshot.subscription.paddleManaged && (
+            <button
+              type="button"
+              disabled={resumeLoading}
+              onClick={handleResume}
+              className="rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-60"
+            >
+              {resumeLoading ? 'Resuming...' : 'Resume'}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Cancelled notice */}
+      {snapshot?.subscription?.status === 'cancelled' && snapshot.subscription.cancelDate && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Your plan is cancelled. Access continues until{' '}
+          <span className="font-semibold">{new Date(snapshot.subscription.cancelDate).toLocaleDateString()}</span>.
+        </div>
+      )}
+
       {error && (
         <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
@@ -265,11 +345,17 @@ export default function BillingPage() {
         </div>
       )}
 
+      {/* Subscription status card */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-gray-900">Current Plan: {snapshot?.plan?.name || 'Starter'}</p>
             <p className="mt-1 text-xs text-gray-500">{usageLabel}</p>
+            {snapshot?.credits != null && (
+              <p className="mt-1 text-xs text-gray-500">
+                {snapshot.credits === -1 ? 'Unlimited searches remaining' : `${snapshot.credits} searches remaining`}
+              </p>
+            )}
             {snapshot?.subscription?.nextBillingDate && (
               <p className="mt-1 text-xs text-gray-500">
                 Next billing: {new Date(snapshot.subscription.nextBillingDate).toLocaleDateString()}
@@ -277,12 +363,18 @@ export default function BillingPage() {
             )}
             {autoPayEnabled && snapshot?.subscription?.billingCycle && (
               <p className="mt-1 text-xs text-gray-500">
-                Auto-pay is active via Paddle and renews every {snapshot.subscription.billingCycle === 'annual' ? 'year' : 'month'} until cancelled.
+                Auto-pay is active via Paddle and renews every{' '}
+                {snapshot.subscription.billingCycle === 'annual' ? 'year' : 'month'} until cancelled.
+              </p>
+            )}
+            {!snapshot?.subscription?.paddleManaged && snapshot?.subscription && (
+              <p className="mt-1 text-xs text-gray-400">
+                Subscribe to a paid plan to manage billing options.
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="inline-flex items-center rounded-lg border border-gray-300 bg-white p-1">
               <button
                 type="button"
@@ -306,12 +398,25 @@ export default function BillingPage() {
               </button>
             </div>
 
-            {snapshot?.subscription?.status === 'active' && (
+            {/* Pause — only for active + paddle-managed */}
+            {snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged && !snapshot.subscription.isTrial && (
+              <button
+                type="button"
+                onClick={handlePause}
+                disabled={pauseLoading}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-60"
+              >
+                {pauseLoading ? 'Pausing...' : 'Pause'}
+              </button>
+            )}
+
+            {/* Cancel — only for active + paddle-managed */}
+            {snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged && (
               <button
                 type="button"
                 onClick={cancelSubscription}
                 disabled={cancelLoading}
-                className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
               >
                 {cancelLoading ? 'Cancelling...' : 'Cancel plan'}
               </button>
@@ -320,6 +425,7 @@ export default function BillingPage() {
         </div>
       </div>
 
+      {/* Plan cards */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {plans.map((plan) => {
           const price = cycle === 'annual' ? plan.pricing.annual : plan.pricing.monthly;
