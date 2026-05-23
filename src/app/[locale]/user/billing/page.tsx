@@ -229,16 +229,14 @@ export default function BillingPage() {
         throw new Error('Billing API did not return a checkout URL.');
       }
 
-      const checkoutOptions: CheckoutOpenOptions = {
+      paddle.Checkout.open({
         url: checkoutUrl,
         settings: {
           displayMode: 'overlay',
           theme: 'light',
           successUrl: typeof window !== 'undefined' ? window.location.href : undefined,
         },
-      };
-
-      paddle.Checkout.open(checkoutOptions);
+      } as unknown as CheckoutOpenOptions);
     } catch (paymentError) {
       setCheckoutPlan(null);
       setCheckoutError(getPaymentErrorMessage(paymentError, 'Unable to start Paddle checkout.'));
