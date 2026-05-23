@@ -39,6 +39,7 @@ export interface BillingSnapshot {
   } | null;
   plan: BillingPlan;
   credits?: number;
+  alertsRemaining?: number;
   usage: {
     imagesUsedThisMonth: number;
     imageUploadLimit: number;
@@ -215,6 +216,19 @@ export const resumeSubscription = createAsyncThunk<
     return await dispatch(fetchBillingPageData()).unwrap();
   } catch (error) {
     return rejectWithValue(getApiErrorMessage(error, 'Failed to resume subscription.'));
+  }
+});
+
+export const upgradeSubscription = createAsyncThunk<
+  { plans: BillingPlan[]; snapshot: BillingSnapshot | null; countryCode: string },
+  { tier: PlanTier; billingCycle?: BillingCycle },
+  { rejectValue: string }
+>('account/upgradeSubscription', async (payload, { dispatch, rejectWithValue }) => {
+  try {
+    await apiClient.patch('/billing/subscription', payload);
+    return await dispatch(fetchBillingPageData()).unwrap();
+  } catch (error) {
+    return rejectWithValue(getApiErrorMessage(error, 'Failed to change subscription.'));
   }
 });
 
@@ -419,6 +433,7 @@ interface AccountState {
     cancelLoading: boolean;
     pauseLoading: boolean;
     resumeLoading: boolean;
+    upgradeLoading: PlanTier | null;
     countryCode: string;
   };
   referral: {
@@ -472,6 +487,7 @@ const initialState: AccountState = {
     cancelLoading: false,
     pauseLoading: false,
     resumeLoading: false,
+    upgradeLoading: null,
     countryCode: 'US',
   },
   referral: {
@@ -599,6 +615,20 @@ const accountSlice = createSlice({
       .addCase(resumeSubscription.rejected, (state, action) => {
         state.billing.resumeLoading = false;
         state.billing.error = action.payload ?? 'Failed to resume subscription.';
+      })
+      .addCase(upgradeSubscription.pending, (state, action) => {
+        state.billing.upgradeLoading = action.meta.arg.tier;
+        state.billing.error = null;
+      })
+      .addCase(upgradeSubscription.fulfilled, (state, action) => {
+        state.billing.upgradeLoading = null;
+        state.billing.plans = action.payload.plans;
+        state.billing.countryCode = action.payload.countryCode;
+        state.subscription.data = action.payload.snapshot;
+      })
+      .addCase(upgradeSubscription.rejected, (state, action) => {
+        state.billing.upgradeLoading = null;
+        state.billing.error = action.payload ?? 'Failed to change subscription.';
       })
       .addCase(fetchReferralStatus.pending, (state) => {
         state.referral.loading = true;

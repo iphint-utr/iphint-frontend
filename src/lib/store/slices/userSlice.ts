@@ -29,6 +29,11 @@ interface RegisterPayload {
   name: string;
   email: string;
   password: string;
+  referralCode?: string;
+  companyName?: string;
+  specificRole?: string;
+  country?: string;
+  phoneNumber?: string;
 }
 
 interface UserState extends DashboardState {

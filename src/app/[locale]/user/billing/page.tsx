@@ -10,6 +10,7 @@ import {
   fetchBillingPageData,
   pauseSubscription,
   resumeSubscription,
+  upgradeSubscription,
 } from '@/lib/store/slices/accountSlice';
 
 const KRW_PER_USD = 1360;
@@ -48,6 +49,7 @@ interface BillingSnapshot {
   } | null;
   plan: Plan;
   credits?: number;
+  alertsRemaining?: number;
   usage: {
     imagesUsedThisMonth: number;
     imageUploadLimit: number;
@@ -79,7 +81,7 @@ const getPaymentErrorMessage = (error: unknown, fallback: string) => {
 
 export default function BillingPage() {
   const dispatch = useAppDispatch();
-  const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, countryCode } = useAppSelector((state) => state.account.billing);
+  const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -145,7 +147,30 @@ export default function BillingPage() {
   }, [dispatch]);
 
   const currentTier = snapshot?.plan?.tier || 'starter';
-  const autoPayEnabled = snapshot?.subscription?.status === 'active' && currentTier !== 'starter';
+  const autoPayEnabled = snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged;
+  const isPaddleActive = snapshot?.subscription?.status === 'active' && snapshot?.subscription?.paddleManaged;
+
+  const tierOrder: PlanTier[] = ['starter', 'pro', 'premium'];
+  const currentTierIndex = tierOrder.indexOf(currentTier);
+
+  const getPlanCtaLabel = (planTier: PlanTier, isWorking: boolean) => {
+    if (isWorking) return 'Processing...';
+    const planIndex = tierOrder.indexOf(planTier);
+    if (isPaddleActive) {
+      if (planIndex > currentTierIndex) return `Upgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
+      if (planIndex < currentTierIndex) return `Downgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
+    }
+    return `Subscribe to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
+  };
+
+  const handlePlanAction = async (tier: PlanTier) => {
+    if (isPaddleActive) {
+      setCheckoutError(null);
+      await dispatch(upgradeSubscription({ tier, billingCycle: cycle }));
+    } else {
+      await subscribe(tier);
+    }
+  };
 
   const usageLabel = useMemo(() => {
     if (!snapshot) return '';
@@ -325,9 +350,18 @@ export default function BillingPage() {
 
       {/* Cancelled notice */}
       {snapshot?.subscription?.status === 'cancelled' && snapshot.subscription.cancelDate && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Your plan is cancelled. Access continues until{' '}
-          <span className="font-semibold">{new Date(snapshot.subscription.cancelDate).toLocaleDateString()}</span>.
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <span>
+            Your plan is cancelled. Access continues until{' '}
+            <span className="font-semibold">{new Date(snapshot.subscription.cancelDate).toLocaleDateString()}</span>.
+          </span>
+          <button
+            type="button"
+            onClick={() => document.getElementById('plan-cards')?.scrollIntoView({ behavior: 'smooth' })}
+            className="rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
+          >
+            Re-subscribe
+          </button>
         </div>
       )}
 
@@ -348,13 +382,49 @@ export default function BillingPage() {
       {/* Subscription status card */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-gray-900">Current Plan: {snapshot?.plan?.name || 'Starter'}</p>
             <p className="mt-1 text-xs text-gray-500">{usageLabel}</p>
             {snapshot?.credits != null && (
               <p className="mt-1 text-xs text-gray-500">
                 {snapshot.credits === -1 ? 'Unlimited searches remaining' : `${snapshot.credits} searches remaining`}
               </p>
+            )}
+            {snapshot?.alertsRemaining != null && (
+              <p className="mt-1 text-xs text-gray-500">
+                {snapshot.alertsRemaining === -1 ? 'Unlimited alerts' : `${snapshot.alertsRemaining} alerts remaining`}
+              </p>
+            )}
+
+            {/* Upload quota progress bar */}
+            {snapshot && snapshot.usage.imageUploadLimit > 0 && (() => {
+              const used = snapshot.usage.imageUploadLimit - (snapshot.credits ?? 0);
+              const total = snapshot.usage.imageUploadLimit;
+              const pct = Math.min(100, Math.max(0, Math.round((used / total) * 100)));
+              return (
+                <div className="mt-3 max-w-xs">
+                  <div className="mb-1 flex justify-between text-[10px] text-gray-400">
+                    <span>Uploads used</span>
+                    <span>{used} / {total}</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div className="h-full rounded-full bg-gray-900 transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Alerts quota — unlimited indicator */}
+            {snapshot && snapshot.usage.alertLimit === 0 && (
+              <div className="mt-3 max-w-xs">
+                <div className="mb-1 flex justify-between text-[10px] text-gray-400">
+                  <span>Alerts</span>
+                  <span>Unlimited</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div className="h-full w-full rounded-full bg-emerald-500" />
+                </div>
+              </div>
             )}
             {snapshot?.subscription?.nextBillingDate && (
               <p className="mt-1 text-xs text-gray-500">
@@ -426,12 +496,12 @@ export default function BillingPage() {
       </div>
 
       {/* Plan cards */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      <div id="plan-cards" className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {plans.map((plan) => {
           const price = cycle === 'annual' ? plan.pricing.annual : plan.pricing.monthly;
           const isCurrent = plan.tier === currentTier;
-          const isWorking = savingPlan === plan.tier || checkoutPlan === plan.tier;
-          const isPaddleUnavailable = !paddleClientToken;
+          const isWorking = savingPlan === plan.tier || checkoutPlan === plan.tier || upgradeLoading === plan.tier;
+          const isPaddleUnavailable = !paddleClientToken && !isPaddleActive;
 
           return (
             <div
@@ -468,14 +538,12 @@ export default function BillingPage() {
               <button
                 type="button"
                 disabled={isCurrent || isWorking || isPaddleUnavailable}
-                onClick={() => subscribe(plan.tier)}
+                onClick={() => handlePlanAction(plan.tier)}
                 className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isCurrent
                   ? 'Current plan'
-                  : isWorking
-                    ? 'Opening Paddle...'
-                    : `Subscribe to ${plan.name}`}
+                  : getPlanCtaLabel(plan.tier, isWorking)}
               </button>
             </div>
           );

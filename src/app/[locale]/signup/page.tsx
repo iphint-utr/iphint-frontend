@@ -16,7 +16,7 @@ import { selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/sli
 function SignupForm() {
   const t = useTranslations('Auth');
   const searchParams = useSearchParams();
-  const referralCode = searchParams.get('ref') || searchParams.get('referralCode') || '';
+  const referralCode = searchParams.get('refCode') || searchParams.get('ref') || searchParams.get('referralCode') || '';
   const dispatch = useDispatch<AppDispatch>();
   const { authError } = useSelector((state: RootState) => state.user);
 const router = useRouter();
