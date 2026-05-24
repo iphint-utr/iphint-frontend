@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   cancelPlanSubscription,
   fetchBillingPageData,
+  resumeAutoRenew,
   resumeSubscription,
   upgradeSubscription,
 } from '@/lib/store/slices/accountSlice';
@@ -57,6 +58,15 @@ interface BillingSnapshot {
   };
 }
 
+interface BillingHistoryItem {
+  _id: string;
+  amount: number;
+  currency: string;
+  status: 'completed' | 'failed' | 'refunded';
+  paddleTransactionId: string;
+  createdAt: string;
+}
+
 const paddleEnvironment =
   (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT ?? process.env.NEXT_PUBLIC_PADDLE_ENV) === 'sandbox'
     ? 'sandbox'
@@ -83,12 +93,16 @@ const getPaymentErrorMessage = (error: unknown, fallback: string) => {
 
 export default function BillingPage() {
   const dispatch = useAppDispatch();
-  const { plans, loading, error, savingPlan, cancelLoading, resumeLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
+  const { plans, loading, error, savingPlan, cancelLoading, resumeLoading, resumeAutoRenewLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<PlanTier | null>(null);
   const [updatePaymentLoading, setUpdatePaymentLoading] = useState(false);
+  const [historyItems, setHistoryItems] = useState<BillingHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const paddleRef = useRef<Paddle | null>(null);
   const paddlePromiseRef = useRef<Promise<Paddle> | null>(null);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -115,6 +129,29 @@ export default function BillingPage() {
   useEffect(() => {
     dispatch(fetchBillingPageData());
   }, [dispatch]);
+
+  useEffect(() => {
+    let active = true;
+    const loadHistory = async () => {
+      setHistoryLoading(true);
+      setHistoryError(null);
+      try {
+        const response = await apiClient.get('/billing/history', { params: { page: 1, limit: 20 } });
+        if (!active) return;
+        setHistoryItems(Array.isArray(response.data?.items) ? response.data.items : []);
+      } catch (err) {
+        if (!active) return;
+        setHistoryError(getPaymentErrorMessage(err, 'Could not load billing history.'));
+      } finally {
+        if (active) setHistoryLoading(false);
+      }
+    };
+
+    void loadHistory();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handlePaddleEvent = useCallback((event: PaddleEventData) => {
     if (event.name === 'checkout.completed') {
@@ -151,6 +188,18 @@ export default function BillingPage() {
   const currentTier = snapshot?.plan?.tier || 'starter';
   const autoPayEnabled = snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged;
   const isPaddleActive = snapshot?.subscription?.status === 'active' && snapshot?.subscription?.paddleManaged;
+  const cancelEffectiveDate = snapshot?.subscription?.cancelDate
+    ? new Date(snapshot.subscription.cancelDate)
+    : null;
+  const isCancelScheduled =
+    snapshot?.subscription?.status === 'active' &&
+    !!snapshot?.subscription?.paddleManaged &&
+    !!cancelEffectiveDate &&
+    !Number.isNaN(cancelEffectiveDate.getTime()) &&
+    cancelEffectiveDate.getTime() > Date.now();
+  const scheduledCancelDaysLeft = isCancelScheduled && cancelEffectiveDate
+    ? Math.max(0, Math.ceil((cancelEffectiveDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : null;
 
   const tierOrder: PlanTier[] = ['starter', 'pro', 'premium'];
   const currentTierIndex = tierOrder.indexOf(currentTier);
@@ -259,6 +308,10 @@ export default function BillingPage() {
     await dispatch(resumeSubscription());
   };
 
+  const handleResumeAutoRenew = async () => {
+    await dispatch(resumeAutoRenew());
+  };
+
   const handleUpdatePayment = async () => {
     setUpdatePaymentLoading(true);
     try {
@@ -269,6 +322,32 @@ export default function BillingPage() {
       // ignore
     } finally {
       setUpdatePaymentLoading(false);
+    }
+  };
+
+  const handleOpenInvoicePortal = async () => {
+    setPortalLoading(true);
+    try {
+      const response = await apiClient.get('/billing/portal');
+      const portalUrl: string | undefined = response.data?.portalUrl;
+      if (portalUrl) {
+        window.open(portalUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch {
+      // ignore
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const formatPaymentAmount = (amount: number, currency: string) => {
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency || 'USD',
+      }).format(amount);
+    } catch {
+      return `${currency || 'USD'} ${amount}`;
     }
   };
 
@@ -347,6 +426,28 @@ export default function BillingPage() {
               {resumeLoading ? 'Resuming...' : 'Resume'}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Scheduled cancellation notice */}
+      {isCancelScheduled && cancelEffectiveDate && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <span>
+            <span className="mr-2 inline-block rounded-full bg-amber-600 px-2 py-0.5 text-xs font-semibold uppercase text-white">Auto-renew off</span>
+            Cancellation is scheduled for{' '}
+            <span className="font-semibold">{cancelEffectiveDate.toLocaleDateString()}</span>.
+            {scheduledCancelDaysLeft != null && (
+              <> {scheduledCancelDaysLeft} day{scheduledCancelDaysLeft !== 1 ? 's' : ''} remaining in this billing period.</>
+            )}
+          </span>
+          <button
+            type="button"
+            onClick={handleResumeAutoRenew}
+            disabled={resumeAutoRenewLoading}
+            className="rounded-md bg-amber-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-800 disabled:opacity-60"
+          >
+            {resumeAutoRenewLoading ? 'Resuming...' : 'Resume auto-renew'}
+          </button>
         </div>
       )}
 
@@ -433,10 +534,15 @@ export default function BillingPage() {
                 Next billing: {new Date(snapshot.subscription.nextBillingDate).toLocaleDateString()}
               </p>
             )}
-            {autoPayEnabled && snapshot?.subscription?.billingCycle && (
+            {autoPayEnabled && snapshot?.subscription?.billingCycle && !isCancelScheduled && (
               <p className="mt-1 text-xs text-gray-500">
                 Auto-pay is active via Paddle and renews every{' '}
                 {snapshot.subscription.billingCycle === 'annual' ? 'year' : 'month'} until cancelled.
+              </p>
+            )}
+            {isCancelScheduled && cancelEffectiveDate && (
+              <p className="mt-1 text-xs text-amber-700">
+                Auto-renew is off. Access remains active until {cancelEffectiveDate.toLocaleDateString()}.
               </p>
             )}
             {!snapshot?.subscription?.paddleManaged && snapshot?.subscription && (
@@ -475,10 +581,10 @@ export default function BillingPage() {
               <button
                 type="button"
                 onClick={cancelSubscription}
-                disabled={cancelLoading}
+                disabled={cancelLoading || isCancelScheduled}
                 className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
               >
-                {cancelLoading ? 'Cancelling...' : 'Cancel plan'}
+                {cancelLoading ? 'Cancelling...' : isCancelScheduled ? 'Cancellation scheduled' : 'Cancel at period end'}
               </button>
             )}
           </div>
@@ -538,6 +644,68 @@ export default function BillingPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Billing history */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Billing history</h2>
+            <p className="mt-1 text-xs text-gray-500">View your past charges and open the Paddle invoice portal to download receipts.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleOpenInvoicePortal}
+            disabled={portalLoading}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+          >
+            {portalLoading ? 'Opening...' : 'Open invoice portal'}
+          </button>
+        </div>
+
+        {historyError && (
+          <div className="mb-3 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">{historyError}</div>
+        )}
+
+        {historyLoading ? (
+          <div className="text-sm text-gray-500">Loading billing history...</div>
+        ) : historyItems.length === 0 ? (
+          <div className="text-sm text-gray-500">No billing records yet.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
+                  <th className="px-2 py-2">Date</th>
+                  <th className="px-2 py-2">Amount</th>
+                  <th className="px-2 py-2">Status</th>
+                  <th className="px-2 py-2">Transaction</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historyItems.map((item) => (
+                  <tr key={item._id} className="border-b border-gray-100 text-gray-700">
+                    <td className="px-2 py-2">{new Date(item.createdAt).toLocaleDateString()}</td>
+                    <td className="px-2 py-2">{formatPaymentAmount(item.amount, item.currency)}</td>
+                    <td className="px-2 py-2">
+                      <span className={[
+                        'inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase',
+                        item.status === 'completed'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : item.status === 'refunded'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-red-100 text-red-700',
+                      ].join(' ')}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="px-2 py-2 font-mono text-xs text-gray-500">{item.paddleTransactionId}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

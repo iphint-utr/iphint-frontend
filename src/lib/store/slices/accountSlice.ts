@@ -227,6 +227,19 @@ export const resumeSubscription = createAsyncThunk<
   }
 });
 
+export const resumeAutoRenew = createAsyncThunk<
+  { plans: BillingPlan[]; snapshot: BillingSnapshot | null; countryCode: string },
+  void,
+  { rejectValue: string }
+>('account/resumeAutoRenew', async (_, { dispatch, rejectWithValue }) => {
+  try {
+    await apiClient.post('/billing/resume-auto-renew');
+    return await dispatch(fetchBillingPageData()).unwrap();
+  } catch (error) {
+    return rejectWithValue(getApiErrorMessage(error, 'Failed to resume auto-renew.'));
+  }
+});
+
 export const upgradeSubscription = createAsyncThunk<
   { plans: BillingPlan[]; snapshot: BillingSnapshot | null; countryCode: string },
   { tier: PlanTier; billingCycle?: BillingCycle },
@@ -441,6 +454,7 @@ interface AccountState {
     cancelLoading: boolean;
     pauseLoading: boolean;
     resumeLoading: boolean;
+    resumeAutoRenewLoading: boolean;
     upgradeLoading: PlanTier | null;
     countryCode: string;
   };
@@ -495,6 +509,7 @@ const initialState: AccountState = {
     cancelLoading: false,
     pauseLoading: false,
     resumeLoading: false,
+    resumeAutoRenewLoading: false,
     upgradeLoading: null,
     countryCode: 'US',
   },
@@ -623,6 +638,20 @@ const accountSlice = createSlice({
       .addCase(resumeSubscription.rejected, (state, action) => {
         state.billing.resumeLoading = false;
         state.billing.error = action.payload ?? 'Failed to resume subscription.';
+      })
+      .addCase(resumeAutoRenew.pending, (state) => {
+        state.billing.resumeAutoRenewLoading = true;
+        state.billing.error = null;
+      })
+      .addCase(resumeAutoRenew.fulfilled, (state, action) => {
+        state.billing.resumeAutoRenewLoading = false;
+        state.billing.plans = action.payload.plans;
+        state.billing.countryCode = action.payload.countryCode;
+        state.subscription.data = action.payload.snapshot;
+      })
+      .addCase(resumeAutoRenew.rejected, (state, action) => {
+        state.billing.resumeAutoRenewLoading = false;
+        state.billing.error = action.payload ?? 'Failed to resume auto-renew.';
       })
       .addCase(upgradeSubscription.pending, (state, action) => {
         state.billing.upgradeLoading = action.meta.arg.tier;
