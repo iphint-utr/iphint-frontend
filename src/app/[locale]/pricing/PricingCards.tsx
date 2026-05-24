@@ -2,6 +2,8 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
+import { selectToken } from "@/lib/store/slices/userSlice";
 import { setBillingCycle, selectBillingCycle } from "@/lib/store/slices/pricingSlice";
 
 const PLAN_DATA = [
@@ -38,10 +40,21 @@ const PLAN_DATA = [
 ];
 
 export default function PricingCards() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const billingCycle = useSelector(selectBillingCycle);
+  const token = useSelector(selectToken);
   const isYearly = billingCycle === "yearly";
   const t = useTranslations("Pricing");
+
+  const handlePlanClick = () => {
+    if (token) {
+      router.push('/user/billing');
+      return;
+    }
+
+    router.push('/login2?redirect=%2Fuser%2Fbilling');
+  };
 
   return (
     <section className="w-full max-w-6xl mx-auto px-6 py-20">
@@ -173,7 +186,9 @@ export default function PricingCards() {
 
               {/* CTA Button */}
               <button
-                className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-gray-950 border border-gray-300 group-hover:bg-gray-950 group-hover:text-white group-hover:border-gray-950 active:scale-[0.98]"
+                type="button"
+                onClick={handlePlanClick}
+                className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-gray-950 text-white border border-gray-950 hover:bg-gray-900 active:scale-[0.98]"
               >
                 {t("getStarted")}
               </button>

@@ -23,9 +23,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push('/user');
+      const redirectTarget = searchParams.get('redirect');
+      router.push(redirectTarget || '/user');
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [authLoading, isAuthenticated, router, searchParams]);
   const t = useTranslations('Auth');
   const dispatch = useDispatch<AppDispatch>();
   const loading = authLoading;
