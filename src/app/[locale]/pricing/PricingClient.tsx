@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setBillingCycle,
@@ -16,6 +16,8 @@ import {
 } from '../../../lib/store/slices/pricingSlice'
 import type { Translations, PlanId, Plan } from './pricing'
 import { ChevronRight } from 'lucide-react'
+import { detectCountryCodeByIp, formatPriceByCountry, isKoreanCountry } from '@/lib/currency'
+
 function CheckIconLg() {
   return (
     <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 20 20" fill="none">
@@ -60,7 +62,7 @@ function CtaButton({ plan, isLoading, onClick }: { plan: Plan; isLoading: boolea
 function PlanCard({
   plan,
   isPopular,
-  price,
+  priceLabel,
   perMonth,
   mostPopular,
   isLoading,
@@ -68,7 +70,7 @@ function PlanCard({
 }: {
   plan: Plan
   isPopular: boolean
-  price: number
+  priceLabel: string
   perMonth: string
   mostPopular: string
   isLoading: boolean
@@ -135,7 +137,7 @@ function PlanCard({
 
         {/* Price */}
         <div className="flex items-end gap-1 mb-6">
-          <span className="text-5xl font-black text-gray-900 leading-none">${price}</span>
+          <span className="text-5xl font-black text-gray-900 leading-none">{priceLabel}</span>
           <span className="text-gray-400 text-sm mb-1">{perMonth}</span>
         </div>
 
@@ -209,10 +211,36 @@ export default function PricingClient({
   const highlightedFeat = useSelector(selectHighlightedFeature)
   const ctaLoading      = useSelector(selectCtaLoading)
   const isAnnual        = useSelector(selectIsAnnual)
+  const [countryCode, setCountryCode] = useState('US')
+
+  const isKorean = isKoreanCountry(countryCode)
+
+  const formatPrice = (usd: number) => formatPriceByCountry(usd, countryCode)
 
   useEffect(() => {
     if (locale === 'en' || locale === 'kr') dispatch(setLocale(locale))
   }, [locale, dispatch])
+
+  useEffect(() => {
+    let active = true
+
+    const loadCountryCode = async () => {
+      try {
+        const detectedCountry = await detectCountryCodeByIp()
+        if (!active) return
+        setCountryCode(detectedCountry)
+      } catch {
+        if (!active) return
+        setCountryCode('US')
+      }
+    }
+
+    void loadCountryCode()
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const handleCta = async (planId: PlanId) => {
     dispatch(setCtaLoading(planId))
@@ -301,7 +329,7 @@ export default function PricingClient({
               key={plan.id}
               plan={plan}
               isPopular={!!plan.popular}
-              price={isAnnual ? plan.price.annual : plan.price.monthly}
+              priceLabel={formatPrice(isAnnual ? plan.price.annual : plan.price.monthly)}
               perMonth={t.perMonth}
               mostPopular={t.mostPopular}
               isLoading={ctaLoading === plan.id}

@@ -5,49 +5,23 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   Copy,
   Check,
-  RefreshCw,
   Users,
   Gift,
-  Clock,
   Trophy,
   Link2,
   AlertCircle,
 } from 'lucide-react';
-import { fetchReferralStatus, generateReferralWindow } from '@/lib/store/slices/accountSlice';
-
-function CountdownTimer({ expiresAt }: { expiresAt: string }) {
-  const [remaining, setRemaining] = useState('');
-
-  useEffect(() => {
-    const tick = () => {
-      const diff = new Date(expiresAt).getTime() - Date.now();
-      if (diff <= 0) { setRemaining('Expired'); return; }
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      setRemaining(`${h}h ${m}m ${s}s`);
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [expiresAt]);
-
-  return <span className="font-mono font-semibold text-gray-900">{remaining}</span>;
-}
+import { fetchReferralStatus } from '@/lib/store/slices/accountSlice';
 
 export default function ReferralPage() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { data: status, loading, generating, error } = useAppSelector((state) => state.account.referral);
+  const { data: status, loading, error } = useAppSelector((state) => state.account.referral);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     dispatch(fetchReferralStatus());
   }, [dispatch]);
-
-  const handleGenerate = async () => {
-    await dispatch(generateReferralWindow());
-  };
 
   const handleCopy = async () => {
     const code = status?.referralCode || user?.referralCode || '';
@@ -93,7 +67,7 @@ export default function ReferralPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">Referral Program</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Invite friends within a 24-hour window. Refer 5 users who sign up and log in to unlock permanent PDF &amp; Reports access.
+          Share your referral link anytime. Refer 5 users who sign up and log in to unlock permanent PDF &amp; Reports access.
         </p>
       </div>
 
@@ -113,7 +87,7 @@ export default function ReferralPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900">Milestone Reward</p>
-              <p className="text-xs text-gray-500">Refer {status?.milestoneTarget ?? 5} users within 24 h → Permanent PDF &amp; Reports access</p>
+              <p className="text-xs text-gray-500">Refer {status?.milestoneTarget ?? 5} users → Permanent PDF &amp; Reports access</p>
             </div>
           </div>
           {status?.milestoneReached && (
@@ -124,7 +98,7 @@ export default function ReferralPage() {
         {!status?.milestoneReached && (
           <div className="mt-5">
             <div className="mb-1 flex justify-between text-xs text-gray-500">
-              <span>Progress in current window</span>
+              <span>Progress</span>
               <span>{status?.completedInWindow ?? 0} / {status?.milestoneTarget ?? 5}</span>
             </div>
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
@@ -147,7 +121,7 @@ export default function ReferralPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
           <Check size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.completedInWindow ?? 0}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Completed this window</p>
+          <p className="text-xs text-gray-500 mt-0.5">Completed referrals</p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
           <Gift size={20} className="mx-auto mb-1 text-gray-700" />
@@ -183,43 +157,16 @@ export default function ReferralPage() {
         </p>
       </div>
 
-      {/* 24-h window card */}
+      {/* Referral status card */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <Clock size={18} className="text-gray-500" />
-          <h2 className="text-sm font-semibold text-gray-900">24-Hour Referral Window</h2>
+          <Link2 size={18} className="text-gray-500" />
+          <h2 className="text-sm font-semibold text-gray-900">Referral Status</h2>
         </div>
 
-        {status?.windowOpen && status.expiresAt ? (
-          <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm">
-            <p className="text-gray-700">Window is <span className="font-semibold">active</span>. Expires in:</p>
-            <p className="mt-1 text-lg">
-              <CountdownTimer expiresAt={status.expiresAt} />
-            </p>
-            <p className="mt-2 text-xs text-gray-500">
-              Only users who sign up <em>and</em> log in before the window closes count towards your milestone.
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-500">
-            {status?.generatedAt
-              ? 'Your previous 24-hour window has expired.'
-              : 'No active referral window. Start one to begin tracking referrals.'}
-          </div>
-        )}
-
-        <button
-          onClick={handleGenerate}
-          disabled={generating || (status?.windowOpen ?? false)}
-          className="btn-primary gap-2"
-        >
-          <RefreshCw size={15} className={generating ? 'animate-spin' : ''} />
-          {status?.windowOpen ? 'Window Active' : generating ? 'Activating…' : 'Start New Window'}
-        </button>
-
-        <p className="text-xs text-gray-400">
-          Starting a new window resets the 24-h countdown. Previous completions in old windows still count towards lifetime totals.
-        </p>
+        <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-500">
+          Referral link is always active. Completed referrals are tracked continuously.
+        </div>
       </div>
 
       {/* How it works */}
@@ -227,10 +174,9 @@ export default function ReferralPage() {
         <h2 className="mb-4 text-sm font-semibold text-gray-900">How It Works</h2>
         <ol className="space-y-3">
           {[
-            { step: '1', text: 'Click "Start New Window" to open your 24-hour referral period.' },
-            { step: '2', text: 'Share your referral link. Friends who sign up using your link get 1 month free Premium.' },
-            { step: '3', text: 'A referral is "completed" only when the new user logs in for the first time.' },
-            { step: '4', text: 'Get 5 completed referrals within the 24-hour window to permanently unlock PDF & Reports access.' },
+            { step: '1', text: 'Share your referral link. Friends who sign up using your link get 1 month free Premium.' },
+            { step: '2', text: 'A referral is "completed" only when the new user logs in for the first time.' },
+            { step: '3', text: 'Get 5 completed referrals to permanently unlock PDF & Reports access.' },
           ].map(({ step, text }) => (
             <li key={step} className="flex items-start gap-3 text-sm text-gray-600">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">

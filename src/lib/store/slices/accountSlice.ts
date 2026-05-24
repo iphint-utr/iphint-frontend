@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
+import { detectCountryCodeByIp } from '../../currency';
 
 export type PlanTier = 'starter' | 'pro' | 'premium';
 export type BillingCycle = 'monthly' | 'annual';
@@ -148,13 +149,10 @@ export const fetchBillingPageData = createAsyncThunk<
   try {
     const countryCodePromise: Promise<string> = (async () => {
       try {
-        // Use native fetch (not apiClient) to avoid sending auth headers to a third party
-        const res = await fetch('https://get.geojs.io/v1/ip/country.json');
-        const data = await res.json();
-        return String(data?.country || 'US');
+        return await detectCountryCodeByIp();
       } catch {
-        // Fall back to browser locale — 'ko' prefix → show KRW pricing
-        if (typeof navigator !== 'undefined' && navigator.language?.startsWith('ko')) return 'KR';
+        // Strict requirement: KRW only when Korean IP is detected.
+        // If geo lookup fails, keep default USD.
         return 'US';
       }
     })();

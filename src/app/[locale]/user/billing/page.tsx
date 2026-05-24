@@ -4,6 +4,7 @@ import type { CheckoutOpenOptions, Paddle, PaddleEventData } from '@paddle/paddl
 import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Crown } from 'lucide-react';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
+import { formatPriceByCountry, isKoreanCountry } from '@/lib/currency';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   cancelPlanSubscription,
@@ -12,8 +13,6 @@ import {
   resumeSubscription,
   upgradeSubscription,
 } from '@/lib/store/slices/accountSlice';
-
-const KRW_PER_USD = 1360;
 
 type PlanTier = 'starter' | 'pro' | 'premium';
 type BillingCycle = 'monthly' | 'annual';
@@ -107,23 +106,10 @@ export default function BillingPage() {
   const paddlePromiseRef = useRef<Promise<Paddle> | null>(null);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isKorean = countryCode.toUpperCase() === 'KR';
+  const isKorean = isKoreanCountry(countryCode);
 
   const formatPrice = (usd: number) => {
-    if (isKorean) {
-      const krw = Math.round(usd * KRW_PER_USD);
-      return new Intl.NumberFormat('ko-KR', {
-        style: 'currency',
-        currency: 'KRW',
-        maximumFractionDigits: 0,
-      }).format(krw);
-    }
-
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(usd);
+    return formatPriceByCountry(usd, countryCode);
   };
 
   useEffect(() => {
@@ -229,6 +215,22 @@ export default function BillingPage() {
     const limit = snapshot.usage.imageUploadLimit;
     if (!limit) return `${used} uploads this month (unlimited plan)`;
     return `${used}/${limit} uploads used this month`;
+  }, [snapshot]);
+
+  const searchUsage = useMemo(() => {
+    if (!snapshot) {
+      return { used: 0, limit: 0, remaining: 0, unlimited: false };
+    }
+
+    const used = Number(snapshot.usage.imagesUsedThisMonth || 0);
+    const limit = Number(snapshot.usage.imageUploadLimit || 0);
+    if (limit <= 0) {
+      return { used, limit, remaining: -1, unlimited: true };
+    }
+
+    const safeUsed = Math.max(0, used);
+    const remaining = Math.max(0, limit - safeUsed);
+    return { used: safeUsed, limit, remaining, unlimited: false };
   }, [snapshot]);
 
   const ensurePaddle = async () => {
@@ -488,9 +490,11 @@ export default function BillingPage() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-gray-900">Current Plan: {snapshot?.plan?.name || 'Starter'}</p>
             <p className="mt-1 text-xs text-gray-500">{usageLabel}</p>
-            {snapshot?.credits != null && (
+            {snapshot && (
               <p className="mt-1 text-xs text-gray-500">
-                {snapshot.credits === -1 ? 'Unlimited searches remaining' : `${snapshot.credits} searches remaining`}
+                {searchUsage.unlimited
+                  ? 'Unlimited searches remaining'
+                  : `${searchUsage.remaining} searches remaining`}
               </p>
             )}
             {snapshot?.alertsRemaining != null && (
@@ -501,8 +505,8 @@ export default function BillingPage() {
 
             {/* Upload quota progress bar */}
             {snapshot && snapshot.usage.imageUploadLimit > 0 && (() => {
-              const used = snapshot.usage.imageUploadLimit - (snapshot.credits ?? 0);
-              const total = snapshot.usage.imageUploadLimit;
+              const used = searchUsage.used;
+              const total = searchUsage.limit;
               const pct = Math.min(100, Math.max(0, Math.round((used / total) * 100)));
               return (
                 <div className="mt-3 max-w-xs">

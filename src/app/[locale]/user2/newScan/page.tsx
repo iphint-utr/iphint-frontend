@@ -429,7 +429,18 @@ export default function ScanPage() {
                   {lockedResultsCount > 0 && (
                     <tr>
                       <td colSpan={4} className="bg-amber-50 px-6 py-2 text-xs text-amber-800">
-                        {lockedResultsCount} result{lockedResultsCount === 1 ? '' : 's'} hidden by your current plan. Upgrade membership to unlock full thumbnails and source links.
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span>
+                            {lockedResultsCount} result{lockedResultsCount === 1 ? '' : 's'} hidden by your current plan. Upgrade membership to unlock full thumbnails and source links.
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => (window.location.href = '/user/billing')}
+                            className="rounded-md bg-amber-700 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-amber-800"
+                          >
+                            Upgrade plan
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -473,7 +484,9 @@ export default function ScanPage() {
                           </div>
                           <div className="text-xs text-gray-500 flex items-center gap-1">
                             <span className="bg-gray-100 px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold text-[10px]">Source</span>
-                            <span className="truncate" title={result.details?.source || 'Website'}>{result.details?.source || 'Website'}</span>
+                            <span className="truncate" title={result.isLocked ? 'Upgrade required' : (result.details?.source || 'Website')}>
+                              {result.isLocked ? 'Hidden - upgrade required' : (result.details?.source || 'Website')}
+                            </span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -547,7 +560,9 @@ export default function ScanPage() {
                           <p className="line-clamp-2 text-sm font-medium text-gray-900">
                             {result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'No title')}
                           </p>
-                          <p className="mt-1 text-xs text-gray-500">{result.details?.source || 'Website'}</p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {result.isLocked ? 'Source hidden until plan upgrade' : (result.details?.source || 'Website')}
+                          </p>
                         </div>
                         {result.details?.link && !result.isLocked && (
                           <a
