@@ -33,9 +33,9 @@ export default function Section1() {
               {t("primaryCta")}
             </Link>
 
-            <button className="btn-secondary">
+            <Link href="/contact" className="btn-secondary">
               {t("secondaryCta")}
-            </button>
+            </Link>
           </div>
         </div>
 

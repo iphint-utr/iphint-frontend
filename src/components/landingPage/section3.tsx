@@ -1,6 +1,7 @@
 // components/landing/Section3.tsx
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 
 const features = [
   {
@@ -88,7 +89,9 @@ export default function Section3() {
       {/* Bottom Bar */}
       <div className="mt-16 bg-black text-white text-center px-6 py-5 text-sm flex flex-wrap justify-center gap-x-1 gap-y-1">
         <span>{t("footerQuestion")}</span>
-        <span className="underline cursor-pointer whitespace-nowrap">{t("footerCta")}</span>
+        <Link href="/contact" className="underline whitespace-nowrap">
+          {t("footerCta")}
+        </Link>
       </div>
 
     </section>

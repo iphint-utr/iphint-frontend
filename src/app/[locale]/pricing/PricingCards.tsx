@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { selectToken } from "@/lib/store/slices/userSlice";
 import { setBillingCycle, selectBillingCycle } from "@/lib/store/slices/pricingSlice";
 
@@ -201,12 +201,12 @@ export default function PricingCards() {
               {footerNote && (
                 <p className="text-center text-xs text-gray-400 mt-3">
                   {footerNote}{" "}
-                  <a
-                    href="#"
+                  <Link
+                    href="/contact"
                     className="underline underline-offset-2 hover:text-gray-700 transition-colors"
                   >
                     {t("contact")}
-                  </a>
+                  </Link>
                 </p>
               )}
             </div>
