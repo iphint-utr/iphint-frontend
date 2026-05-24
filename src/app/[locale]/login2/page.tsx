@@ -125,7 +125,15 @@ export default function LoginPage() {
                 disabled={loading}
                 className="btn-primary w-full mt-6"
               >
-                {loading ? '...' : t('submitLogin')}
+                {loading ? (
+                  <>
+                    <span
+                      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                      aria-hidden="true"
+                    />
+                    <span>Processing...</span>
+                  </>
+                ) : t('submitLogin')}
               </button>
             </form>
 
