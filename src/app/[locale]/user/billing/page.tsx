@@ -97,6 +97,7 @@ export default function BillingPage() {
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<PlanTier | null>(null);
+  const [popupMessage, setPopupMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [updatePaymentLoading, setUpdatePaymentLoading] = useState(false);
   const [historyItems, setHistoryItems] = useState<BillingHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
@@ -105,12 +106,26 @@ export default function BillingPage() {
   const paddleRef = useRef<Paddle | null>(null);
   const paddlePromiseRef = useRef<Promise<Paddle> | null>(null);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isKorean = isKoreanCountry(countryCode);
 
   const formatPrice = (usd: number) => {
     return formatPriceByCountry(usd, countryCode);
   };
+
+  const showPopup = useCallback((type: 'success' | 'error' | 'info', text: string) => {
+    setPopupMessage({ type, text });
+
+    if (popupTimerRef.current) {
+      clearTimeout(popupTimerRef.current);
+    }
+
+    popupTimerRef.current = setTimeout(() => {
+      setPopupMessage(null);
+      popupTimerRef.current = null;
+    }, 3500);
+  }, []);
 
   useEffect(() => {
     dispatch(fetchBillingPageData());
@@ -203,7 +218,13 @@ export default function BillingPage() {
   const handlePlanAction = async (tier: PlanTier) => {
     if (isPaddleActive) {
       setCheckoutError(null);
-      await dispatch(upgradeSubscription({ tier, billingCycle: cycle }));
+      try {
+        await dispatch(upgradeSubscription({ tier, billingCycle: cycle })).unwrap();
+        const planName = plans.find((plan) => plan.tier === tier)?.name || tier;
+        showPopup('success', `Your plan was updated to ${planName}.`);
+      } catch (err) {
+        showPopup('error', getPaymentErrorMessage(err, 'Unable to change your plan right now.'));
+      }
     } else {
       await subscribe(tier);
     }
@@ -296,22 +317,40 @@ export default function BillingPage() {
           successUrl: typeof window !== 'undefined' ? window.location.href : undefined,
         },
       } as unknown as CheckoutOpenOptions);
+      const planName = plans.find((plan) => plan.tier === tier)?.name || tier;
+      showPopup('info', `Checkout opened for ${planName}. Complete payment to activate it.`);
     } catch (paymentError) {
       setCheckoutPlan(null);
       setCheckoutError(getPaymentErrorMessage(paymentError, 'Unable to start Paddle checkout.'));
+      showPopup('error', getPaymentErrorMessage(paymentError, 'Unable to start Paddle checkout.'));
     }
   };
 
   const cancelSubscription = async () => {
-    await dispatch(cancelPlanSubscription());
+    try {
+      await dispatch(cancelPlanSubscription()).unwrap();
+      showPopup('success', 'Your subscription was cancelled.');
+    } catch (err) {
+      showPopup('error', getPaymentErrorMessage(err, 'Unable to cancel subscription.'));
+    }
   };
 
   const handleResume = async () => {
-    await dispatch(resumeSubscription());
+    try {
+      await dispatch(resumeSubscription()).unwrap();
+      showPopup('success', 'Your subscription has been resumed.');
+    } catch (err) {
+      showPopup('error', getPaymentErrorMessage(err, 'Unable to resume subscription.'));
+    }
   };
 
   const handleResumeAutoRenew = async () => {
-    await dispatch(resumeAutoRenew());
+    try {
+      await dispatch(resumeAutoRenew()).unwrap();
+      showPopup('success', 'Auto-renew has been turned back on.');
+    } catch (err) {
+      showPopup('error', getPaymentErrorMessage(err, 'Unable to resume auto-renew.'));
+    }
   };
 
   const handleUpdatePayment = async () => {
@@ -355,6 +394,7 @@ export default function BillingPage() {
 
   // Cleanup polling on unmount
   useEffect(() => () => { if (pollTimerRef.current) clearTimeout(pollTimerRef.current); }, []);
+  useEffect(() => () => { if (popupTimerRef.current) clearTimeout(popupTimerRef.current); }, []);
 
   if (loading) {
     return (
@@ -372,6 +412,22 @@ export default function BillingPage() {
 
   return (
     <div className="space-y-6">
+      {popupMessage && (
+        <div
+          className={`fixed right-4 top-4 z-50 max-w-sm rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-sm ${
+            popupMessage.type === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+              : popupMessage.type === 'info'
+                ? 'border-sky-200 bg-sky-50 text-sky-900'
+                : 'border-red-200 bg-red-50 text-red-800'
+          }`}
+          role="status"
+          aria-live="polite"
+        >
+          <p className="text-sm font-medium">{popupMessage.text}</p>
+        </div>
+      )}
+
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">Billing</h1>
         <p className="mt-1 text-sm text-gray-500">
