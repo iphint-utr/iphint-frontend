@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   cancelPlanSubscription,
   fetchBillingPageData,
-  pauseSubscription,
   resumeSubscription,
   upgradeSubscription,
 } from '@/lib/store/slices/accountSlice';
@@ -58,7 +57,10 @@ interface BillingSnapshot {
   };
 }
 
-const paddleEnvironment = process.env.NEXT_PUBLIC_PADDLE_ENV === 'sandbox' ? 'sandbox' : 'production';
+const paddleEnvironment =
+  (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT ?? process.env.NEXT_PUBLIC_PADDLE_ENV) === 'sandbox'
+    ? 'sandbox'
+    : 'production';
 const paddleClientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN?.trim().replace(/^['"']|['"']$/g, '') || undefined;
 
 const getPaymentErrorMessage = (error: unknown, fallback: string) => {
@@ -81,7 +83,7 @@ const getPaymentErrorMessage = (error: unknown, fallback: string) => {
 
 export default function BillingPage() {
   const dispatch = useAppDispatch();
-  const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
+  const { plans, loading, error, savingPlan, cancelLoading, resumeLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -253,10 +255,6 @@ export default function BillingPage() {
     await dispatch(cancelPlanSubscription());
   };
 
-  const handlePause = async () => {
-    await dispatch(pauseSubscription());
-  };
-
   const handleResume = async () => {
     await dispatch(resumeSubscription());
   };
@@ -265,7 +263,7 @@ export default function BillingPage() {
     setUpdatePaymentLoading(true);
     try {
       const response = await apiClient.get('/billing/payment-method');
-      const updateUrl: string | undefined = response.data?.updateUrl;
+      const updateUrl: string | undefined = response.data?.updateUrl ?? response.data?.portalUrl;
       if (updateUrl) window.location.href = updateUrl;
     } catch {
       // ignore
@@ -471,18 +469,6 @@ export default function BillingPage() {
                 Annual
               </button>
             </div>
-
-            {/* Pause — only for active + paddle-managed */}
-            {snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged && !snapshot.subscription.isTrial && (
-              <button
-                type="button"
-                onClick={handlePause}
-                disabled={pauseLoading}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-60"
-              >
-                {pauseLoading ? 'Pausing...' : 'Pause'}
-              </button>
-            )}
 
             {/* Cancel — only for active + paddle-managed */}
             {snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged && (

@@ -277,7 +277,7 @@ export const fetchSettingsOverview = createAsyncThunk<
     return {
       profile: { ...defaultProfile, ...(settings.profile || {}) },
       notifications: { ...defaultNotificationPrefs, ...(settings.notifications || {}) },
-      unreadCount: Number(response.data?.unreadNotifications || 0),
+      unreadCount: Number(settings.unreadNotifications || 0),
     };
   } catch (error) {
     return rejectWithValue(getApiErrorMessage(error, 'Failed to load settings.'));

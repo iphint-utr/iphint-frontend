@@ -110,15 +110,15 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	return (
 		<header className="sticky top-0 z-20 h-16 border-b border-gray-200 bg-white shadow-sm">
 			<div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
-				<div className="flex items-center gap-3">
+				<div className="flex min-w-0 items-center gap-3">
 					<button
 						aria-label="Open sidebar"
 						onClick={onMenuClick}
-						className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+						className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 lg:hidden"
 					>
 						<Menu size={18} />
 					</button>
-					<h1 className="max-w-[9rem] truncate text-base font-semibold leading-6 text-gray-900 sm:max-w-none sm:text-lg">{pageTitle}</h1>
+					<h1 className="max-w-[9rem] truncate text-base font-semibold leading-none text-gray-900 sm:max-w-none sm:text-lg">{pageTitle}</h1>
 				</div>
 
 				<div className="flex items-center gap-1.5 sm:gap-2">

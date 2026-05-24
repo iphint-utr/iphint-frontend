@@ -522,7 +522,7 @@ export default function SettingsPage() {
           disabled={passwordSaving}
           className="btn-primary mt-5"
         >
-          {passwordSaving ? 'Updating...' : 'Update Password'}}
+          {passwordSaving ? 'Updating...' : 'Update Password'}
         </button>
       </section>
       )}

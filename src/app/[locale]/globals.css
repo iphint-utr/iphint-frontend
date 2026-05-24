@@ -182,6 +182,25 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  a[href],
+  button,
+  [role='button'],
+  summary,
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+
   body {
     @apply bg-background text-foreground;
   }

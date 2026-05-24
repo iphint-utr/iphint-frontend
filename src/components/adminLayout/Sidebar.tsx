@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { BarChart3, LayoutDashboard, LogOut, Search, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -50,28 +51,30 @@ export default function AdminSidebar({
 			{open && (
 				<button
 					aria-label="Close admin sidebar overlay"
-					className="fixed inset-x-0 bottom-0 top-16 z-30 bg-slate-950/30 lg:hidden"
+					className="fixed inset-0 z-30 bg-slate-950/30 lg:hidden"
 					onClick={onClose}
 				/>
 			)}
 
 			<aside
 				className={[
-					'fixed left-0 top-16 z-40 h-[calc(100vh-64px)] w-72 border-r border-slate-200 bg-white shadow-sm transition-transform duration-200',
-					open ? 'translate-x-0' : '-translate-x-full',
+					'fixed inset-y-0 left-0 z-40 w-72 border-r border-slate-200 bg-white shadow-sm transition-transform duration-200',
+					open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
 				].join(' ')}
 			>
 				<div className="flex h-full flex-col">
-					{/* Logo */}
-					<div className="flex items-center justify-start gap-2 border-b border-slate-100 px-6 py-5">
-					<svg width="22" height="26" viewBox="0 0 22 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-						<path d="M0 0H22V26L11 19.5L0 26V0Z" fill="#111111" />
-						<path d="M6 8H16" stroke="white" strokeWidth="2" strokeLinecap="round" />
-					</svg>
-					<span className="text-xl font-extrabold tracking-tight text-gray-950 leading-none">
-						IPHINT
-						</span>
-					</div>
+					<button
+						type="button"
+						onClick={() => {
+							closeOnMobileOnly(onClose);
+							router.push('/admin');
+						}}
+						className="flex h-16 items-center border-b border-slate-200 px-5"
+						aria-label="Go to admin dashboard"
+					>
+						<Image src="/logo_mo.svg" alt="IPHINT" width={102} height={28} priority className="h-7 w-auto" />
+					</button>
+
 					<nav className="flex-1 space-y-1 px-3 py-4">
 						{menu.map((item) => {
 							const Icon = item.icon;

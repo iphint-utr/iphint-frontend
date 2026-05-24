@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
       { source: '/dashboard', destination: '/en/dashboard', permanent: false },
       { source: '/dashboard/:path*', destination: '/en/dashboard/:path*', permanent: false },
       { source: '/login', destination: '/en/login', permanent: false },
+      { source: '/signup', destination: '/en/signup', permanent: false },
       { source: '/register', destination: '/en/register', permanent: false },
       { source: '/newScan', destination: '/en/newScan', permanent: false },
       { source: '/about', destination: '/en/about', permanent: false },

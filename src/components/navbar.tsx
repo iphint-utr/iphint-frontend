@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
@@ -39,32 +40,10 @@ export default function Header() {
         {/* ── Logo ── */}
         <Link
           href="/"
-          className="flex items-center gap-1.5 shrink-0"
+          className="inline-flex shrink-0 items-center"
           aria-label="IPHINT home"
         >
-          {/* Bookmark icon mark */}
-          <svg
-            width="22"
-            height="26"
-            viewBox="0 0 22 26"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              d="M0 0H22V26L11 19.5L0 26V0Z"
-              fill="#111111"
-            />
-            <path
-              d="M6 8H16"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span className="text-[22px] font-extrabold tracking-tight text-gray-950 leading-none">
-            IPHINT
-          </span>
+          <Image src="/logo_mo.svg" alt="IPHINT" width={102} height={28} priority className="block h-7 w-auto" />
         </Link>
 
         {/* ── Desktop Nav ── */}
