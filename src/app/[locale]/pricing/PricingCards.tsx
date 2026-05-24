@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { selectToken } from "@/lib/store/slices/userSlice";
 import { setBillingCycle, selectBillingCycle } from "@/lib/store/slices/pricingSlice";
 
@@ -188,7 +188,11 @@ export default function PricingCards() {
               <button
                 type="button"
                 onClick={handlePlanClick}
-                className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-gray-950 text-white border border-gray-950 hover:bg-gray-900 active:scale-[0.98]"
+                className={`w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
+                  plan.id === "pro"
+                    ? "bg-gray-950 text-white border border-gray-950 hover:bg-gray-900"
+                    : "bg-white text-gray-950 border border-gray-300 group-hover:bg-gray-950 group-hover:text-white group-hover:border-gray-950"
+                }`}
               >
                 {t("getStarted")}
               </button>
@@ -197,12 +201,12 @@ export default function PricingCards() {
               {footerNote && (
                 <p className="text-center text-xs text-gray-400 mt-3">
                   {footerNote}{" "}
-                  <a
-                    href="#"
+                  <Link
+                    href="/contact"
                     className="underline underline-offset-2 hover:text-gray-700 transition-colors"
                   >
                     {t("contact")}
-                  </a>
+                  </Link>
                 </p>
               )}
             </div>
