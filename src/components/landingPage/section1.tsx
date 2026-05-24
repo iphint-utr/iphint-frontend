@@ -28,12 +28,12 @@ export default function Section1() {
           <div className="flex flex-wrap gap-4 pt-4">
             <Link
               href="/signup"
-              className="bg-black text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition"
+              className="btn-primary"
             >
               {t("primaryCta")}
             </Link>
 
-            <button className="border border-gray-300 px-6 py-3 rounded-xl font-medium hover:bg-gray-100 transition">
+            <button className="btn-secondary">
               {t("secondaryCta")}
             </button>
           </div>

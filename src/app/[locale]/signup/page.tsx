@@ -81,7 +81,7 @@ useEffect(() => {
             <input 
               name="name" type="text" required placeholder={t('namePlaceholder')} 
               value={formData.name} onChange={handleChange}
-              className="w-full p-3 sm:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none placeholder-gray-300 transition-all text-sm sm:text-base" 
+              className="input-field" 
             />
           </div>
 
@@ -91,7 +91,7 @@ useEffect(() => {
             <input 
               name="companyName" type="text" placeholder={t('businessPlaceholder')} 
               value={formData.companyName} onChange={handleChange}
-              className="w-full p-3 sm:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none placeholder-gray-300 transition-all text-sm sm:text-base" 
+              className="input-field" 
             />
           </div>
 
@@ -101,17 +101,17 @@ useEffect(() => {
             <input 
               name="specificRole" type="text" placeholder={t('rolePlaceholder')} 
               value={formData.specificRole} onChange={handleChange}
-              className="w-full p-3 sm:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none placeholder-gray-300 transition-all text-sm sm:text-base" 
+              className="input-field" 
             />
           </div>
 
           {/* Alert Contact Info */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('contactLabel')}</label>
-            <div className="flex border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-black transition-all bg-white">
+            <div className="flex border border-gray-300 rounded-[12px] overflow-hidden focus-within:ring-2 focus-within:ring-black transition-all bg-white h-14">
               <select 
                 name="phoneCode" value={formData.phoneCode} onChange={handleChange} 
-                className="p-3 sm:p-4 bg-transparent border-r border-gray-300 outline-none cursor-pointer min-w-[80px] sm:min-w-[100px] text-sm sm:text-base appearance-none"
+                className="px-4 py-3 bg-transparent border-r border-gray-300 outline-none cursor-pointer min-w-[80px] text-sm appearance-none"
               >
                 {uniqueDialCodes.map((country, idx) => (
                   <option key={idx} value={country!.dial}>{country!.dial}</option>
@@ -120,7 +120,7 @@ useEffect(() => {
               <input 
                 name="phoneNumber" type="tel" placeholder="010-0000-0000" 
                 value={formData.phoneNumber} onChange={handleChange}
-                className="w-full p-3 sm:p-4 outline-none placeholder-gray-300 text-sm sm:text-base" 
+                className="w-full px-4 py-3 outline-none placeholder-gray-300 text-sm" 
               />
             </div>
           </div>
@@ -131,7 +131,7 @@ useEffect(() => {
             <div className="relative">
               <select 
                 name="country" value={formData.country} onChange={handleChange}
-                className="w-full p-3 sm:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base transition-all"
+                className="input-field cursor-pointer"
               >
                 <option value="KR">대한민국 KR</option>
                 <option disabled>──────────</option>
@@ -155,7 +155,7 @@ useEffect(() => {
             <input 
               name="email" type="email" required placeholder={t('emailPlaceholder')} 
               value={formData.email} onChange={handleChange}
-              className="w-full p-3 sm:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none placeholder-gray-300 transition-all text-sm sm:text-base" 
+              className="input-field" 
             />
           </div>
 
@@ -165,7 +165,7 @@ useEffect(() => {
             <input 
               name="password" type="password" required placeholder={t('passwordPlaceholder')} 
               value={formData.password} onChange={handleChange}
-              className="w-full p-3 sm:p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black outline-none placeholder-gray-300 transition-all text-sm sm:text-base" 
+              className="input-field" 
             />
           </div>
         </div>
@@ -187,7 +187,7 @@ useEffect(() => {
           <button 
             type="submit" 
             disabled={authLoading}
-            className="w-full bg-black text-white font-semibold py-4 sm:py-5 rounded-2xl hover:bg-gray-900 transition-all disabled:opacity-50 text-sm sm:text-base"
+            className="btn-primary"
           >
             {authLoading ? '...' : t('submitSignup')}
           </button>

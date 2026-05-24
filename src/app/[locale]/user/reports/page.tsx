@@ -101,7 +101,7 @@ export default function ReportsPage() {
           <button
             type="button"
             onClick={() => (window.location.href = '/user/billing')}
-            className="mt-5 inline-flex items-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            className="btn-primary mt-5"
           >
             Upgrade plan to unlock this feature
           </button>

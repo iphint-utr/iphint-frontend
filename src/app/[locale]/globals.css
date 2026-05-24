@@ -201,3 +201,101 @@
   animation: gradient-flow 4s ease infinite; /* 15s for a slow, dreamy feel */
 }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CENTRALIZED BUTTON SYSTEM
+   ───────────────────────────────────────────────────────────────
+   Variants : .btn-primary   .btn-secondary
+   Sizes    : size-1 default (h:40  px:20  py:10)
+              .btn-lg        (h:80  px:40  py:20)
+   Width    : inline (content-fit) by default
+              add w-full to fill parent
+   Colors   : pulled from CSS theme variables
+═══════════════════════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Shared base ─────────────────────────────── */
+  .btn-primary,
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    /* Size 1 — default (small) */
+    height: 36px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 0.625rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* ── Size 2 modifier ─────────────────────────── */
+  .btn-lg {
+    height: 56px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border-radius: 0.875rem;
+  }
+
+  /* ── Primary — uses --primary / --primary-foreground ── */
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+  }
+  .btn-primary:hover   { background-color: color-mix(in srgb, var(--primary) 85%, transparent); }
+  .btn-primary:active  { transform: scale(0.97); }
+  .btn-primary:disabled,
+  .btn-primary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+  /* ── Secondary — uses --secondary / --secondary-foreground ── */
+  .btn-secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover   { background-color: color-mix(in srgb, var(--secondary) 80%, var(--border)); }
+  .btn-secondary:active  { transform: scale(0.97); }
+  .btn-secondary:disabled,
+  .btn-secondary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CENTRALIZED INPUT / SELECT SYSTEM
+   h:56px  px:16px  py:12px  border-radius:12px  w-full
+═══════════════════════════════════════════════════════════════ */
+@layer components {
+  .input-field {
+    width: 100%;
+    height: 56px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background-color: var(--card);
+    font-size: 0.875rem;
+    color: var(--foreground);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+  }
+  .input-field::placeholder {
+    color: var(--tx-6);
+  }
+  .input-field:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+}

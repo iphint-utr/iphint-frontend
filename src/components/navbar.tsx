@@ -96,7 +96,7 @@ export default function Header() {
           {/* Get Started Now */}
           <Link
             href="/signup"
-            className="inline-flex h-10 items-center rounded-full bg-gray-950 px-5 text-[14px] font-semibold text-white hover:bg-black transition-colors duration-150"
+            className="btn-primary"
           >
             {t("getStarted")}
           </Link>

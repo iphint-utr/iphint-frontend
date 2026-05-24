@@ -211,7 +211,7 @@ export default function ReferralPage() {
         <button
           onClick={handleGenerate}
           disabled={generating || (status?.windowOpen ?? false)}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="btn-primary gap-2"
         >
           <RefreshCw size={15} className={generating ? 'animate-spin' : ''} />
           {status?.windowOpen ? 'Window Active' : generating ? 'Activating…' : 'Start New Window'}

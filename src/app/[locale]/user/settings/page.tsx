@@ -494,7 +494,7 @@ export default function SettingsPage() {
               type="password"
               value={passwordForm.currentPassword}
               onChange={(e) => setPasswordForm((p) => ({ ...p, currentPassword: e.target.value }))}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
+              className="input-field mt-1"
             />
           </label>
           <label className="text-sm text-gray-600">
@@ -503,7 +503,7 @@ export default function SettingsPage() {
               type="password"
               value={passwordForm.newPassword}
               onChange={(e) => setPasswordForm((p) => ({ ...p, newPassword: e.target.value }))}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
+              className="input-field mt-1"
             />
           </label>
           <label className="text-sm text-gray-600">
@@ -512,7 +512,7 @@ export default function SettingsPage() {
               type="password"
               value={passwordForm.confirmPassword}
               onChange={(e) => setPasswordForm((p) => ({ ...p, confirmPassword: e.target.value }))}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
+              className="input-field mt-1"
             />
           </label>
         </div>
@@ -520,9 +520,9 @@ export default function SettingsPage() {
         <button
           onClick={handleUpdatePassword}
           disabled={passwordSaving}
-          className="mt-5 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-primary mt-5"
         >
-          {passwordSaving ? 'Updating...' : 'Update Password'}
+          {passwordSaving ? 'Updating...' : 'Update Password'}}
         </button>
       </section>
       )}

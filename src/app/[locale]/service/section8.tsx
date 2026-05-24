@@ -13,10 +13,10 @@ export default function Section8() {
         </h2>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <button className="bg-black text-white px-10 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95">
+          <button className="btn-primary">
             {t("primaryCta")}
           </button>
-          <button className="bg-white text-black border border-gray-200 px-10 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-all active:scale-95">
+          <button className="btn-secondary">
             {t("secondaryCta")}
           </button>
         </div>
