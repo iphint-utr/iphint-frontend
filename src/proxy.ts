@@ -13,6 +13,8 @@ const localizedTopLevelRoutes = new Set([
   'signin',
   'signup',
   'user',
+    'forgot-password',
+    'reset-password',
 ]);
 
 const intlMiddleware = createMiddleware({
