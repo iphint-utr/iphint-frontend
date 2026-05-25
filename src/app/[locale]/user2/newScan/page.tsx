@@ -506,7 +506,13 @@ export default function ScanPage() {
                               Visit Site <ExternalLink className="w-3.5 h-3.5" />
                             </a>
                             ) : (
-                              <span className="text-xs font-medium text-amber-700">Upgrade required</span>
+                              <button
+                                type="button"
+                                onClick={() => (window.location.href = '/user/billing')}
+                                className="rounded-md bg-amber-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-800"
+                              >
+                                Upgrade now
+                              </button>
                             )
                           )}
                         </td>
@@ -575,7 +581,13 @@ export default function ScanPage() {
                           </a>
                         )}
                         {result.isLocked && (
-                          <p className="mt-3 text-xs font-medium text-amber-700">Upgrade required</p>
+                          <button
+                            type="button"
+                            onClick={() => (window.location.href = '/user/billing')}
+                            className="mt-3 rounded-md bg-amber-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-800"
+                          >
+                            Upgrade now
+                          </button>
                         )}
                       </div>
                     ))}
