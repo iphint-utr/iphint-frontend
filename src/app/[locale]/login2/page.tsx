@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 import {
   loginUser,
   clearError,
@@ -20,6 +21,8 @@ export default function LoginPage() {
   const authLoading = useSelector(selectAuthLoading);
   const authError = useSelector(selectAuthError);
   const searchParams = useSearchParams();
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
+  const [verificationFailed, setVerificationFailed] = useState(false);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -27,6 +30,30 @@ export default function LoginPage() {
       router.push(redirectTarget || '/user');
     }
   }, [authLoading, isAuthenticated, router, searchParams]);
+
+  useEffect(() => {
+    const verifyToken = searchParams.get('verifyToken');
+    if (!verifyToken) return;
+
+    const verify = async () => {
+      try {
+        await apiClient.get('/auth/verify-email', { params: { token: verifyToken } });
+        setVerificationMessage('Email verified successfully. You can now log in.');
+        setVerificationFailed(false);
+      } catch (err) {
+        setVerificationMessage(getApiErrorMessage(err, 'Verification link is invalid or expired.'));
+        setVerificationFailed(true);
+      } finally {
+        if (typeof window !== 'undefined' && window.history?.replaceState) {
+          const current = new URL(window.location.href);
+          current.searchParams.delete('verifyToken');
+          window.history.replaceState(null, '', `${current.pathname}${current.search}`);
+        }
+      }
+    };
+
+    verify();
+  }, [searchParams]);
   const t = useTranslations('Auth');
   const dispatch = useDispatch<AppDispatch>();
   const loading = authLoading;
@@ -151,6 +178,30 @@ export default function LoginPage() {
                   <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
                 <span className="text-sm font-medium">{error}</span>
+              </div>
+            )}
+
+            {verificationMessage && !error && (
+              <div
+                className={[
+                  'mt-4 flex items-center justify-center gap-2 rounded-xl p-4',
+                  verificationFailed
+                    ? 'border border-[#FEE2E2] bg-[#FFF1F0] text-[#D93025]'
+                    : 'border border-green-200 bg-green-50 text-green-700',
+                ].join(' ')}
+              >
+                {verificationFailed ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#D93025"/>
+                    <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#16A34A"/>
+                    <path d="M8 12.5L10.5 15L16 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                <span className="text-sm font-medium">{verificationMessage}</span>
               </div>
             )}
           </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser, clearError } from '../../../lib/store/slices/userSlice';
+import { registerUser, clearError, selectAuthNotice } from '../../../lib/store/slices/userSlice';
 import { AppDispatch, RootState } from '../../../lib/store/store';
 import { countries } from './countries';
 import { useRouter } from '@/i18n/routing';
@@ -19,6 +19,7 @@ function SignupForm() {
   const referralCode = searchParams.get('refCode') || searchParams.get('ref') || searchParams.get('referralCode') || '';
   const dispatch = useDispatch<AppDispatch>();
   const { authError } = useSelector((state: RootState) => state.user);
+  const authNotice = useSelector(selectAuthNotice);
 const router = useRouter();
 const isAuthenticated = useSelector(selectIsAuthenticated);
 const authLoading = useSelector(selectAuthLoading);
@@ -180,6 +181,16 @@ useEffect(() => {
               <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             {authError}
+          </div>
+        )}
+
+        {authNotice && (
+          <div className="text-green-700 bg-green-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="#16A34A"/>
+              <path d="M8 12.5L10.5 15L16 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            {authNotice}
           </div>
         )}
 
