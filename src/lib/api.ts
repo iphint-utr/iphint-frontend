@@ -104,6 +104,23 @@ const extractApiErrorMessage = (value: unknown): string | null => {
 export const getApiErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError(error)) {
     const responseMessage = extractApiErrorMessage(error.response?.data);
+    const status = error.response?.status;
+
+    if (status === 429) {
+      const retryAfterRaw = error.response?.headers?.['retry-after'];
+      const retryAfterSeconds = Number(retryAfterRaw);
+
+      if (responseMessage) {
+        if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+          const retryMinutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+          return `${responseMessage} Please wait about ${retryMinutes} minute${retryMinutes === 1 ? '' : 's'} before trying again.`;
+        }
+
+        return responseMessage;
+      }
+
+      return 'Too many attempts. Please wait a few minutes before trying again.';
+    }
 
     if (responseMessage) {
       return responseMessage;

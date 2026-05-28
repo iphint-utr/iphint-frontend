@@ -16,8 +16,9 @@ interface UserData {
 
 interface AuthResponse {
   success: boolean;
-  token: string;
-  data: UserData;
+  token?: string;
+  data?: UserData;
+  message?: string;
 }
 
 interface LoginCredentials {
@@ -42,6 +43,7 @@ interface UserState extends DashboardState {
   isAuthenticated: boolean;
   authLoading: boolean;
   authError: string | null;
+  authNotice: string | null;
 
   // User info
   id: string | null;
@@ -95,6 +97,7 @@ const initialState: UserState = {
   isAuthenticated: !!token,
   authLoading: false,
   authError: null,
+  authNotice: null,
 
   // ── User info ──────────────────────────────────────────────────────────────
   id: user?.id || null,
@@ -183,11 +186,13 @@ const userSlice = createSlice({
         referralCount: 0,
         authLoading: false,
         authError: null,
+        authNotice: null,
       });
     },
 
     clearError(state) {
       state.authError = null;
+      state.authNotice = null;
     },
 
     updateCredits(state, action: PayloadAction<number>) {
@@ -223,12 +228,19 @@ const userSlice = createSlice({
       .addCase(loginUser.pending, (state) => {
         state.authLoading = true;
         state.authError = null;
+        state.authNotice = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         const { token, data } = action.payload;
+        if (!token || !data) {
+          state.authLoading = false;
+          state.authError = 'Unexpected login response. Please try again.';
+          return;
+        }
         saveSession(token, data);
         state.authLoading = false;
         state.authError = null;
+        state.authNotice = null;
         state.token = token;
         state.isAuthenticated = true;
         state.id = data.id;
@@ -248,25 +260,37 @@ const userSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.authLoading = true;
         state.authError = null;
+        state.authNotice = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        const { token, data } = action.payload;
-        saveSession(token, data);
         state.authLoading = false;
         state.authError = null;
-        state.token = token;
-        state.isAuthenticated = true;
-        state.id = data.id;
-        state.name = data.name;
-        state.email = data.email;
-        state.role = data.role;
-        state.credits = data.credits;
-        state.referralCode = data.referralCode;
-        state.referralCount = data.referralCount;
+        const { token, data, message } = action.payload;
+
+        if (token && data) {
+          saveSession(token, data);
+          state.authNotice = null;
+          state.token = token;
+          state.isAuthenticated = true;
+          state.id = data.id;
+          state.name = data.name;
+          state.email = data.email;
+          state.role = data.role;
+          state.credits = data.credits;
+          state.referralCode = data.referralCode;
+          state.referralCount = data.referralCount;
+          return;
+        }
+
+        // Verification-required registration flow: no active session yet.
+        state.authNotice = message ?? 'Registration successful. Please verify your email before logging in.';
+        state.token = null;
+        state.isAuthenticated = false;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.authLoading = false;
         state.authError = action.payload ?? 'Something went wrong';
+        state.authNotice = null;
       });
   },
 });
@@ -289,6 +313,7 @@ export const selectIsAuthenticated = (state: RootState): boolean => state.user.i
 export const selectToken = (state: RootState): string | null => state.user.token;
 export const selectAuthLoading = (state: RootState): boolean => state.user.authLoading;
 export const selectAuthError = (state: RootState): string | null => state.user.authError;
+export const selectAuthNotice = (state: RootState): string | null => state.user.authNotice;
 
 // User info
 export const selectUserId = (state: RootState): string | null => state.user.id;
