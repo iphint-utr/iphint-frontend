@@ -187,6 +187,11 @@ export default function BillingPage() {
   }, [dispatch]);
 
   const currentTier = snapshot?.plan?.tier || 'starter';
+  const currentSubscription = snapshot?.subscription ?? null;
+  const isProTrial =
+    currentTier === 'pro' &&
+    !!currentSubscription &&
+    (currentSubscription.status === 'trialing' || currentSubscription.isTrialing || currentSubscription.isTrial);
   const autoPayEnabled = snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged;
   const isPaddleActive = snapshot?.subscription?.status === 'active' && snapshot?.subscription?.paddleManaged;
   const cancelEffectiveDate = snapshot?.subscription?.cancelDate
@@ -207,6 +212,12 @@ export default function BillingPage() {
 
   const getPlanCtaLabel = (planTier: PlanTier, isWorking: boolean) => {
     if (isWorking) return 'Processing...';
+
+    if (isProTrial) {
+      if (planTier === 'pro') return 'Subscribe now';
+      if (planTier === 'premium') return 'Upgrade to Premium';
+    }
+
     const planIndex = tierOrder.indexOf(planTier);
     if (isPaddleActive) {
       if (planIndex > currentTierIndex) return `Upgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
@@ -226,7 +237,7 @@ export default function BillingPage() {
         showPopup('error', getPaymentErrorMessage(err, 'Unable to change your plan right now.'));
       }
     } else {
-      await subscribe(tier);
+      await subscribe(tier, { withTrial: !isProTrial });
     }
   };
 
@@ -287,7 +298,7 @@ export default function BillingPage() {
     return paddlePromiseRef.current;
   };
 
-  const subscribe = async (tier: PlanTier) => {
+  const subscribe = async (tier: PlanTier, options?: { withTrial?: boolean }) => {
     setCheckoutError(null);
     setCheckoutPlan(tier);
 
@@ -296,6 +307,7 @@ export default function BillingPage() {
       const response = await apiClient.post('/billing/paddle/checkout', {
         tier,
         billingCycle: cycle,
+        withTrial: options?.withTrial,
       });
 
       const transactionId: string | undefined = response.data?.transactionId;
@@ -440,10 +452,10 @@ export default function BillingPage() {
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           <span className="font-semibold">
             {snapshot.subscription.trialDaysLeft != null
-              ? `${snapshot.subscription.trialDaysLeft} day${snapshot.subscription.trialDaysLeft !== 1 ? 's' : ''} left on your free trial.`
-              : 'Free trial active.'}
+              ? `Pro Trial: ${snapshot.subscription.trialDaysLeft} day${snapshot.subscription.trialDaysLeft !== 1 ? 's' : ''} remaining.`
+              : 'Pro Trial is active.'}
           </span>{' '}
-          Subscribe below to keep access when it ends.
+          Subscribe now to convert to a paid Pro subscription immediately.
         </div>
       )}
 
@@ -656,8 +668,16 @@ export default function BillingPage() {
         {plans.map((plan) => {
           const price = cycle === 'annual' ? plan.pricing.annual : plan.pricing.monthly;
           const isCurrent = plan.tier === currentTier;
+          const isCurrentPaidPlan =
+            isCurrent &&
+            !!currentSubscription &&
+            currentSubscription.status === 'active' &&
+            !currentSubscription.isTrial &&
+            !currentSubscription.isTrialing;
+          const isCurrentTrialPlan = isCurrent && plan.tier === 'pro' && isProTrial;
           const isWorking = savingPlan === plan.tier || checkoutPlan === plan.tier || upgradeLoading === plan.tier;
           const isPaddleUnavailable = !paddleClientToken && !isPaddleActive;
+          const isDisabled = isWorking || isPaddleUnavailable || isCurrentPaidPlan;
 
           return (
             <div
@@ -667,16 +687,31 @@ export default function BillingPage() {
                 isCurrent ? 'border-gray-900 ring-1 ring-gray-900/10' : 'border-gray-200',
               ].join(' ')}
             >
-              {isCurrent && (
+              {isCurrentPaidPlan && (
                 <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                   <Crown className="h-3 w-3" />
                   Current
                 </span>
               )}
 
+              {isCurrentTrialPlan && (
+                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-blue-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                  <Crown className="h-3 w-3" />
+                  Pro Trial
+                </span>
+              )}
+
               <h2 className="text-lg font-semibold text-gray-900">{plan.name}</h2>
               <p className="mt-2 text-2xl font-bold text-gray-900">{formatPrice(price)}</p>
               <p className="text-xs text-gray-500">per month ({cycle === 'annual' ? 'billed annually' : 'billed monthly'})</p>
+
+              {isCurrentTrialPlan && (
+                <p className="mt-2 text-xs font-medium text-blue-700">
+                  {currentSubscription?.trialDaysLeft != null
+                    ? `${currentSubscription.trialDaysLeft} day${currentSubscription.trialDaysLeft !== 1 ? 's' : ''} left. Subscribe now to activate paid Pro immediately.`
+                    : 'Trial active. Subscribe now to activate paid Pro immediately.'}
+                </p>
+              )}
 
               <p className="mt-2 text-xs text-gray-500">
                 Auto-pay starts after checkout and renews {cycle === 'annual' ? 'yearly' : 'monthly'} until you cancel.
@@ -693,11 +728,11 @@ export default function BillingPage() {
 
               <button
                 type="button"
-                disabled={isCurrent || isWorking || isPaddleUnavailable}
+                disabled={isDisabled}
                 onClick={() => handlePlanAction(plan.tier)}
                 className="btn-primary w-full mt-5"
               >
-                {isCurrent
+                {isCurrentPaidPlan
                   ? 'Current plan'
                   : getPlanCtaLabel(plan.tier, isWorking)}
               </button>
