@@ -118,18 +118,30 @@ export default function Header() {
           {isAuthenticated ? (
             <>
               <Link
-                href="/user"
-                className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
-              >
-                Dashboard
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
+                href="/contact"
                 className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
               >
-                Logout
-              </button>
+                {t("contactUs")}
+              </Link>
+
+              <div className="relative group">
+                <Link
+                  href="/user"
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
+                >
+                  Dashboard
+                </Link>
+
+                <div className="invisible absolute right-0 top-full z-50 mt-2 min-w-[140px] rounded-xl border border-gray-200 bg-white p-1 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full rounded-lg px-3 py-2 text-left text-[13px] font-semibold text-gray-700 transition-colors hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </>
           ) : (
             <>
@@ -214,6 +226,13 @@ export default function Header() {
           <div className="pt-4 flex flex-col gap-3">
             {isAuthenticated ? (
               <>
+                <Link
+                  href="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
+                >
+                  {t("contactUs")}
+                </Link>
                 <Link
                   href="/user"
                   onClick={() => setIsMobileMenuOpen(false)}
