@@ -22,7 +22,7 @@ export default function SessionInactivityHandler() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const timeoutRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   const idleTimeoutMs = useMemo(() => getIdleTimeoutMs(), []);
 
   useEffect(() => {
