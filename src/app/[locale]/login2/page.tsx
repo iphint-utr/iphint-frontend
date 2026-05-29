@@ -23,6 +23,9 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const [verificationFailed, setVerificationFailed] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [resendFailed, setResendFailed] = useState(false);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -68,6 +71,8 @@ export default function LoginPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(clearError());
+    setResendMessage(null);
+    setResendFailed(false);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -80,6 +85,37 @@ export default function LoginPage() {
     const base = process.env.NEXT_PUBLIC_BASE_URL ?? '';
     window.location.href = `${base}/auth/google`;
   };
+
+  const handleResendVerification = async () => {
+    const email = formData.email.trim();
+    if (!email) {
+      setResendMessage('Enter your email address first, then resend verification.');
+      setResendFailed(true);
+      return;
+    }
+
+    try {
+      setResendLoading(true);
+      setResendMessage(null);
+      setResendFailed(false);
+
+      const response = await apiClient.post('/auth/resend-verification', { email });
+      const message =
+        typeof response.data?.message === 'string' && response.data.message.trim()
+          ? response.data.message
+          : 'Verification email sent. Please check your inbox.';
+      setResendMessage(message);
+      setResendFailed(false);
+    } catch (err) {
+      setResendMessage(getApiErrorMessage(err, 'Failed to resend verification email. Please try again.'));
+      setResendFailed(true);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const shouldShowResendVerification =
+    !!authError && /verify your email/i.test(authError);
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
@@ -178,6 +214,43 @@ export default function LoginPage() {
                   <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
                 <span className="text-sm font-medium">{error}</span>
+              </div>
+            )}
+
+            {shouldShowResendVerification && (
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  className="rounded-lg border border-black px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {resendLoading ? 'Sending verification...' : 'Resend verification email'}
+                </button>
+              </div>
+            )}
+
+            {resendMessage && (
+              <div
+                className={[
+                  'mt-3 flex items-center justify-center gap-2 rounded-xl p-4',
+                  resendFailed
+                    ? 'border border-[#FEE2E2] bg-[#FFF1F0] text-[#D93025]'
+                    : 'border border-green-200 bg-green-50 text-green-700',
+                ].join(' ')}
+              >
+                {resendFailed ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#D93025"/>
+                    <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#16A34A"/>
+                    <path d="M8 12.5L10.5 15L16 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                <span className="text-sm font-medium">{resendMessage}</span>
               </div>
             )}
 
