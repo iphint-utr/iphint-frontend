@@ -449,25 +449,7 @@ export default function SearchDetailsPage() {
 
 				<div className="border-b border-gray-100 bg-white p-4">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
-							<div className="relative w-full sm:w-40">
-								<select
-									value={dateFilter}
-									onChange={(event) => setDateFilter(event.target.value as DateFilter)}
-									className="w-full cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
-								>
-									{DATE_FILTER_OPTIONS.map((option) => (
-										<option key={option.value} value={option.value} className="bg-white text-gray-900">
-											{option.label}
-										</option>
-									))}
-								</select>
-								<ChevronDown
-									size={14}
-									className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
-								/>
-							</div>
-
+						<div className="flex w-full items-center gap-2 sm:w-auto">
 							<div className="flex items-center gap-2">
 							<input
 								type="checkbox"
@@ -484,13 +466,30 @@ export default function SearchDetailsPage() {
 							</p>
 							</div>
 						</div>
-						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+							<div className="relative w-full sm:w-36">
+								<select
+									value={dateFilter}
+									onChange={(event) => setDateFilter(event.target.value as DateFilter)}
+									className="h-9 w-full cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-1.5 pl-2.5 pr-7 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+								>
+									{DATE_FILTER_OPTIONS.map((option) => (
+										<option key={option.value} value={option.value} className="bg-white text-gray-900">
+											{option.label}
+										</option>
+									))}
+								</select>
+								<ChevronDown
+									size={13}
+									className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+								/>
+							</div>
 							<div className="relative w-full sm:w-auto">
 								<select
 									value={bulkAction}
 									onChange={(event) => setBulkAction(event.target.value as BulkAction)}
 									disabled={isBulkUpdating || resultsLoading || selectedResultIds.length === 0}
-									className="w-full sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+									className="h-9 w-full sm:w-44 cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-1.5 pl-3 pr-8 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
 								>
 									{BULK_ACTION_OPTIONS.map((option) => (
 										<option key={option.value} value={option.value} className="bg-white text-gray-900">
@@ -499,15 +498,15 @@ export default function SearchDetailsPage() {
 									))}
 								</select>
 								<ChevronDown
-									size={14}
-									className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+									size={13}
+									className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
 								/>
 							</div>
 
 							<button
 								onClick={applyBulkAction}
 								disabled={isBulkUpdating || resultsLoading || bulkDeleting || selectedResultIds.length === 0 || bulkAction === '__none'}
-								className="w-full cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 sm:w-auto"
+								className="h-9 w-full cursor-pointer rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 sm:w-auto"
 							>
 								{isBulkUpdating || bulkDeleting ? 'Working...' : 'Apply'}
 							</button>

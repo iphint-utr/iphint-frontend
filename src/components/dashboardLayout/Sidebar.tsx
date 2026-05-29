@@ -81,7 +81,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
               closeOnMobileOnly(onClose);
               router.push('/user');
             }}
-            className="flex h-16 items-center border-b border-gray-200 px-4"
+            className="flex h-16 cursor-pointer items-center border-b border-gray-200 px-4"
             aria-label="Go to dashboard"
           >
             <Image src="/logo_mo.svg" alt="IPHINT" width={102} height={28} priority className="h-7 w-auto" />
@@ -129,7 +129,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                     closeOnMobileOnly(onClose);
                     router.push('/user/billing');
                   }}
-                  className="mt-2 w-full rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
+                  className="mt-2 w-full cursor-pointer rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
                 >
                   {planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired'
                     ? dashboardT('sidebar.renewPlan')
@@ -145,7 +145,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                   closeOnMobileOnly(onClose);
                   router.push('/admin');
                 }}
-                className="mb-2 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm leading-5 font-medium text-white hover:bg-gray-800"
+                className="mb-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm leading-5 font-medium text-white hover:bg-gray-800"
               >
                 <ShieldCheck size={16} strokeWidth={2} className="text-white" />
                 <span>{adminT('common.goToAdmin')}</span>
@@ -162,7 +162,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
 
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm leading-5 font-medium text-gray-700 hover:bg-gray-50"
+              className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm leading-5 font-medium text-gray-700 hover:bg-gray-50"
             >
               <LogOut size={16} strokeWidth={2} className="text-gray-600" />
               <span>{dashboardT('sidebar.logout')}</span>
