@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, CheckCircle2, Mail, Palette, RefreshCcw, Search, Shield, Trash2, UserCircle2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useRouter } from '@/i18n/routing';
 import {
   setFontFamily,
   setFontSize,
@@ -52,11 +53,13 @@ interface NotificationItem {
   message?: string;
   type?: string;
   isRead?: boolean;
+  actionUrl?: string;
   timestamp: string;
 }
 
 export default function SettingsPage() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const {
     profile: storedProfile,
     notificationPreferences: storedNotificationPrefs,
@@ -242,6 +245,20 @@ export default function SettingsPage() {
       showMessage('All notifications marked as read.');
     } catch {
       showMessage('Could not mark all notifications as read.', true);
+    }
+  };
+
+  const handleOpenNotification = async (item: NotificationItem) => {
+    try {
+      if (!item.isRead) {
+        await dispatch(markNotificationRead(item._id)).unwrap();
+      }
+
+      if (item.actionUrl) {
+        router.push(item.actionUrl);
+      }
+    } catch {
+      showMessage('Could not open notification.', true);
     }
   };
 
@@ -601,7 +618,8 @@ export default function SettingsPage() {
             notifications.map((item) => (
               <div
                 key={item._id}
-                className={`rounded-xl border px-4 py-3 ${item.isRead ? 'border-gray-200 bg-white' : 'border-emerald-200 bg-emerald-50/40'}`}
+                onClick={() => item.actionUrl && handleOpenNotification(item)}
+                className={`rounded-xl border px-4 py-3 ${item.isRead ? 'border-gray-200 bg-white' : 'border-emerald-200 bg-emerald-50/40'} ${item.actionUrl ? 'cursor-pointer transition-colors hover:border-gray-300 hover:bg-gray-50/80' : ''}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -611,16 +629,22 @@ export default function SettingsPage() {
                   </div>
                   {!item.isRead && (
                     <button
-                      onClick={() => handleMarkRead(item._id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-50"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleMarkRead(item._id);
+                      }}
+                      className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-50"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       Mark read
                     </button>
                   )}
                   <button
-                    onClick={() => handleDeleteNotification(item._id)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleDeleteNotification(item._id);
+                    }}
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete

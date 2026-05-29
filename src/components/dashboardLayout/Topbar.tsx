@@ -54,6 +54,33 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 		).unwrap();
 	};
 
+	const loadUnreadCount = async () => {
+		await dispatch(
+			fetchNotifications({
+				scope: 'topbar',
+				status: 'unread',
+				page: 1,
+				limit: 1,
+			}),
+		).unwrap();
+	};
+
+	useEffect(() => {
+		loadUnreadCount().catch(() => {
+			return;
+		});
+
+		const refreshInterval = window.setInterval(() => {
+			loadUnreadCount().catch(() => {
+				return;
+			});
+		}, 30000);
+
+		return () => {
+			window.clearInterval(refreshInterval);
+		};
+	}, [dispatch]);
+
 	useEffect(() => {
 		if (!notificationOpen) return;
 
@@ -178,7 +205,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 													<button
 														type="button"
 														onClick={() => goToNotification(item)}
-														className="min-w-0 flex-1 text-left"
+														className="min-w-0 flex-1 cursor-pointer text-left"
 													>
 														<p className="line-clamp-1 text-xs font-semibold text-gray-900">{item.title}</p>
 														{item.message && <p className="mt-0.5 line-clamp-2 text-xs text-gray-600">{item.message}</p>}

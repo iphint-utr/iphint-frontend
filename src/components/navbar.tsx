@@ -124,7 +124,7 @@ export default function Header() {
                 {t("contactUs")}
               </Link>
 
-              <div className="relative group">
+              <div className="relative inline-block group">
                 <Link
                   href="/user"
                   className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
@@ -132,7 +132,7 @@ export default function Header() {
                   Dashboard
                 </Link>
 
-                <div className="invisible absolute right-0 top-full z-50 mt-2 min-w-[140px] rounded-xl border border-gray-200 bg-white p-1 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <div className="invisible absolute left-0 top-full z-50 mt-1 w-full rounded-xl border border-gray-200 bg-white p-1 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                   <button
                     type="button"
                     onClick={handleLogout}
