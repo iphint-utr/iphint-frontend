@@ -154,16 +154,22 @@
     font-family: var(--app-font-family);
     color: var(--tx-1);
   }
-  h1, h2, h3, h4, h5, h6 {
+  .public-theme h1,
+  .public-theme h2,
+  .public-theme h3,
+  .public-theme h4,
+  .public-theme h5,
+  .public-theme h6 {
     color: var(--tx-1);
   }
-  p {
+  .public-theme p {
     color: var(--tx-3);
   }
-  label, legend {
+  .public-theme label,
+  .public-theme legend {
     color: var(--tx-2);
   }
-  ::placeholder {
+  .public-theme ::placeholder {
     color: var(--tx-6);
   }
 }
@@ -179,33 +185,33 @@
 }
 
 @layer base {
-  * {
+  .public-theme * {
     @apply border-border outline-ring/50;
   }
 
-  a[href],
-  button,
-  [role='button'],
-  summary,
-  input[type='button'],
-  input[type='submit'],
-  input[type='reset'] {
+  .public-theme a[href],
+  .public-theme button,
+  .public-theme [role='button'],
+  .public-theme summary,
+  .public-theme input[type='button'],
+  .public-theme input[type='submit'],
+  .public-theme input[type='reset'] {
     cursor: pointer;
   }
 
-  button:disabled,
-  input:disabled,
-  select:disabled,
-  textarea:disabled,
-  [aria-disabled='true'] {
+  .public-theme button:disabled,
+  .public-theme input:disabled,
+  .public-theme select:disabled,
+  .public-theme textarea:disabled,
+  .public-theme [aria-disabled='true'] {
     cursor: not-allowed;
   }
 
-  body {
+  .public-theme {
     @apply bg-background text-foreground;
   }
 
-  .fc{
+  .public-theme .fc {
     @apply flex items-center justify-center;
   }
 
@@ -215,7 +221,7 @@
   100% { background-position: 0% 50%; }
 }
 
-.flow {
+.public-theme .flow {
   background-size: 300% 300%; /* Stretch it so there is room to move */
   animation: gradient-flow 4s ease infinite; /* 15s for a slow, dreamy feel */
 }
@@ -234,8 +240,8 @@
 @layer components {
 
   /* ── Shared base ─────────────────────────────── */
-  .btn-primary,
-  .btn-secondary {
+  .public-theme .btn-primary,
+  .public-theme .btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -255,7 +261,7 @@
   }
 
   /* ── Size 2 modifier ─────────────────────────── */
-  .btn-lg {
+  .public-theme .btn-lg {
     height: 56px;
     padding-left: 24px;
     padding-right: 24px;
@@ -267,26 +273,26 @@
   }
 
   /* ── Primary — uses --primary / --primary-foreground ── */
-  .btn-primary {
+  .public-theme .btn-primary {
     background-color: var(--primary);
     color: var(--primary-foreground);
     border: none;
   }
-  .btn-primary:hover   { background-color: color-mix(in srgb, var(--primary) 85%, transparent); }
-  .btn-primary:active  { transform: scale(0.97); }
-  .btn-primary:disabled,
-  .btn-primary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .public-theme .btn-primary:hover   { background-color: color-mix(in srgb, var(--primary) 85%, transparent); }
+  .public-theme .btn-primary:active  { transform: scale(0.97); }
+  .public-theme .btn-primary:disabled,
+  .public-theme .btn-primary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
   /* ── Secondary — uses --secondary / --secondary-foreground ── */
-  .btn-secondary {
+  .public-theme .btn-secondary {
     background-color: var(--secondary);
     color: var(--secondary-foreground);
     border: 1px solid var(--border);
   }
-  .btn-secondary:hover   { background-color: color-mix(in srgb, var(--secondary) 80%, var(--border)); }
-  .btn-secondary:active  { transform: scale(0.97); }
-  .btn-secondary:disabled,
-  .btn-secondary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .public-theme .btn-secondary:hover   { background-color: color-mix(in srgb, var(--secondary) 80%, var(--border)); }
+  .public-theme .btn-secondary:active  { transform: scale(0.97); }
+  .public-theme .btn-secondary:disabled,
+  .public-theme .btn-secondary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -294,7 +300,7 @@
    h:56px  px:16px  py:12px  border-radius:12px  w-full
 ═══════════════════════════════════════════════════════════════ */
 @layer components {
-  .input-field {
+  .public-theme .input-field {
     width: 100%;
     height: 56px;
     padding-left: 16px;
@@ -310,10 +316,10 @@
     transition: border-color 0.2s, box-shadow 0.2s;
     appearance: none;
   }
-  .input-field::placeholder {
+  .public-theme .input-field::placeholder {
     color: var(--tx-6);
   }
-  .input-field:focus {
+  .public-theme .input-field:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 15%, transparent);
   }

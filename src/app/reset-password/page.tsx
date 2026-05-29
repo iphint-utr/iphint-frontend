@@ -1,4 +1,6 @@
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { defaultLocale, locales } from '@/lib/i18n';
 
 type ResetPasswordRedirectPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -26,5 +28,14 @@ export default async function ResetPasswordRedirectPage({
   }
 
   const suffix = query.toString();
-  redirect(suffix ? `/en/reset-password?${suffix}` : '/en/reset-password');
+  const localeCookie = cookies().get('NEXT_LOCALE')?.value;
+  const preferredLocale = (localeCookie && locales.includes(localeCookie as (typeof locales)[number]))
+    ? localeCookie
+    : defaultLocale;
+
+  redirect(
+    suffix
+      ? `/${preferredLocale}/reset-password?${suffix}`
+      : `/${preferredLocale}/reset-password`,
+  );
 }

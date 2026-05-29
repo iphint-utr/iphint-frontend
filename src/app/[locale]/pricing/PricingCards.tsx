@@ -53,7 +53,7 @@ export default function PricingCards() {
       return;
     }
 
-    router.push('/login2?redirect=%2Fuser%2Fbilling');
+    router.push('/login?redirect=%2Fuser%2Fbilling');
   };
 
   return (

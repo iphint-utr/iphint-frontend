@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { Provider } from 'react-redux';
 import { makeStore, AppStore } from '@/lib/store/store';
+import SessionInactivityHandler from '@/components/auth/SessionInactivityHandler';
 
 export default function StoreProvider({
   children
@@ -17,5 +18,10 @@ export default function StoreProvider({
   }
 
   // Ensure you are using the 'Provider' component as a tag, not a type
-  return <Provider store={storeRef.current}>{children}</Provider>;
+  return (
+    <Provider store={storeRef.current}>
+      <SessionInactivityHandler />
+      {children}
+    </Provider>
+  );
 }

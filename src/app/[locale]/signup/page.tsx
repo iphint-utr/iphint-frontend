@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,15 +38,53 @@ useEffect(() => {
     phoneNumber: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const passwordChecks = useMemo(
+    () => ({
+      minLength: formData.password.length >= 8,
+      upper: /[A-Z]/.test(formData.password),
+      lower: /[a-z]/.test(formData.password),
+      number: /\d/.test(formData.password),
+      special: /[^A-Za-z0-9]/.test(formData.password),
+    }),
+    [formData.password],
+  );
+
+  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+  const passwordsMatch =
+    formData.confirmPassword.length > 0 && formData.password === formData.confirmPassword;
+  const hasPasswordInput = formData.password.length > 0;
+
+  const passwordRequirementItems = [
+    { key: 'minLength', label: '8+ chars', met: passwordChecks.minLength },
+    { key: 'upper', label: 'Upper', met: passwordChecks.upper },
+    { key: 'lower', label: 'Lower', met: passwordChecks.lower },
+    { key: 'number', label: 'Number', met: passwordChecks.number },
+    { key: 'special', label: 'Special', met: passwordChecks.special },
+  ] as const;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     dispatch(clearError());
+    setPasswordError(null);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isPasswordStrong) {
+      setPasswordError('Password does not meet all requirements.');
+      return;
+    }
+
+    if (!passwordsMatch) {
+      setPasswordError('Password and confirm password do not match.');
+      return;
+    }
+
     const fullPhone = `${formData.phoneCode}${formData.phoneNumber}`;
     
     // 2. Explicitly package the referral code into the body sent to the Thunk/Axios
@@ -161,14 +199,54 @@ useEffect(() => {
           </div>
 
           {/* Password */}
-          <div className="sm:col-span-2">
+          <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('passwordLabel')}</label>
             <input 
               name="password" type="password" required placeholder={t('passwordPlaceholder')} 
               value={formData.password} onChange={handleChange}
               className="input-field" 
             />
+            <div className="mt-2" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px]">
+                {passwordRequirementItems.map((item) => (
+                  <span
+                    key={item.key}
+                    className={[
+                      'transition-all duration-300',
+                      item.met
+                        ? 'text-black font-semibold'
+                        : hasPasswordInput
+                          ? 'text-gray-500'
+                          : 'text-gray-400',
+                    ].join(' ')}
+                  >
+                    {item.label}
+                  </span>
+                ))}
+              </div>
+
+            </div>
           </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-sm sm:text-base font-semibold text-black mb-2">Confirm Password</label>
+            <input
+              name="confirmPassword"
+              type="password"
+              required
+              placeholder="Re-enter your password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="input-field"
+            />
+            {formData.confirmPassword.length > 0 && (
+              <p className={passwordsMatch ? 'mt-2 text-xs text-emerald-700' : 'mt-2 text-xs text-red-600'}>
+                {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+              </p>
+            )}
+          </div>
+
         </div>
 
         {/* Hidden Referral Code input (Optional: for visual confirmation in DOM) */}
@@ -194,7 +272,17 @@ useEffect(() => {
           </div>
         )}
 
-        <div className="mt-10">
+        {passwordError && (
+          <div className="text-red-600 bg-red-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="#EF4444"/>
+              <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            {passwordError}
+          </div>
+        )}
+
+        <div className="mt-10 flex justify-center">
           <button 
             type="submit" 
             disabled={authLoading}

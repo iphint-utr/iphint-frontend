@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
     try {
       const response = await apiClient.post('/auth/reset-password', { token, password });
       setSuccess(response.data?.message || 'Password reset successful. You can now log in.');
-      setTimeout(() => router.push('/login2'), 1200);
+      setTimeout(() => router.push('/login'), 1200);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Unable to reset password. The link may be expired.'));
     } finally {
@@ -110,7 +110,7 @@ export default function ResetPasswordPage() {
         </form>
 
         <div className="mt-6">
-          <Link href="/login2" className="rounded-full border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50">
+          <Link href="/login" className="rounded-full border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50">
             Back to login
           </Link>
         </div>
