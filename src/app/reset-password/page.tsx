@@ -28,7 +28,8 @@ export default async function ResetPasswordRedirectPage({
   }
 
   const suffix = query.toString();
-  const localeCookie = cookies().get('NEXT_LOCALE')?.value;
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE')?.value;
   const preferredLocale = (localeCookie && locales.includes(localeCookie as (typeof locales)[number]))
     ? localeCookie
     : defaultLocale;
