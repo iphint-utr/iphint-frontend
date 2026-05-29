@@ -46,6 +46,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 type BulkAction = ReviewStatus | 'delete' | '__none';
+type DateFilter = 'latest' | 'oldest' | 'new';
 
 type DeleteConfirmState =
 	| {
@@ -73,6 +74,21 @@ const BULK_ACTION_OPTIONS: Array<{ value: BulkAction; label: string }> = [
 	{ value: 'delete', label: 'Delete' },
 ];
 
+const DATE_FILTER_OPTIONS: Array<{ value: DateFilter; label: string }> = [
+	{ value: 'latest', label: 'Latest first' },
+	{ value: 'oldest', label: 'Oldest first' },
+	{ value: 'new', label: 'New only' },
+];
+
+const NEW_BADGE_WINDOW_MS = 3 * 60 * 1000;
+
+const getFoundDateFromObjectId = (id: string): Date | null => {
+	if (!id || id.length < 8) return null;
+	const timestampSeconds = Number.parseInt(id.slice(0, 8), 16);
+	if (!Number.isFinite(timestampSeconds)) return null;
+	return new Date(timestampSeconds * 1000);
+};
+
 export default function SearchDetailsPage() {
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
@@ -80,12 +96,16 @@ export default function SearchDetailsPage() {
 	const id = params?.id as string;
 	const [selectedResultIds, setSelectedResultIds] = useState<string[]>([]);
 	const [bulkAction, setBulkAction] = useState<BulkAction>('__none');
+	const [dateFilter, setDateFilter] = useState<DateFilter>('latest');
 	const [isBulkUpdating, setIsBulkUpdating] = useState(false);
 	const [previewResultId, setPreviewResultId] = useState<string | null>(null);
 	const [deleteConfirmState, setDeleteConfirmState] = useState<DeleteConfirmState>(null);
+	const [viewedResultIds, setViewedResultIds] = useState<string[]>([]);
+	const [timeTick, setTimeTick] = useState(Date.now());
 	const { selectedSearch, results, planLimits, resultsLoading, updatingResultId, deletingResultId, bulkDeleting, error } = useSelector(
 		(state: RootState) => state.monitoring,
 	);
+	const viewedStorageKey = useMemo(() => `monitoring:viewed-results:${id}`, [id]);
 
 	useEffect(() => {
 		if (id) {
@@ -96,6 +116,36 @@ export default function SearchDetailsPage() {
 	useEffect(() => {
 		setSelectedResultIds([]);
 	}, [id]);
+
+	useEffect(() => {
+		if (!id) {
+			setViewedResultIds([]);
+			return;
+		}
+
+		try {
+			const raw = localStorage.getItem(viewedStorageKey);
+			const parsed = raw ? JSON.parse(raw) : [];
+			setViewedResultIds(Array.isArray(parsed) ? parsed : []);
+		} catch {
+			setViewedResultIds([]);
+		}
+	}, [id, viewedStorageKey]);
+
+	useEffect(() => {
+		if (!id) return;
+		localStorage.setItem(viewedStorageKey, JSON.stringify(viewedResultIds));
+	}, [id, viewedResultIds, viewedStorageKey]);
+
+	useEffect(() => {
+		const timer = window.setInterval(() => {
+			setTimeTick(Date.now());
+		}, 30000);
+
+		return () => {
+			window.clearInterval(timer);
+		};
+	}, []);
 
 	useEffect(() => {
 		return () => {
@@ -116,6 +166,38 @@ export default function SearchDetailsPage() {
 		[results, previewResultId],
 	);
 
+	const markResultViewed = (resultId: string) => {
+		setViewedResultIds((prev) => (prev.includes(resultId) ? prev : [...prev, resultId]));
+	};
+
+	const sortedResults = useMemo(() => {
+		const copy = [...results];
+		copy.sort((a, b) => {
+			const aTime = getFoundDateFromObjectId(a._id)?.getTime() || 0;
+			const bTime = getFoundDateFromObjectId(b._id)?.getTime() || 0;
+			return dateFilter === 'oldest' ? aTime - bTime : bTime - aTime;
+		});
+		return copy;
+	}, [results, dateFilter]);
+
+	const visibleResults = useMemo(() => {
+		if (dateFilter !== 'new') return sortedResults;
+		const now = timeTick;
+		return sortedResults.filter((result) => {
+			const foundAt = getFoundDateFromObjectId(result._id);
+			if (!foundAt) return false;
+			const withinWindow = now - foundAt.getTime() <= NEW_BADGE_WINDOW_MS;
+			return withinWindow && !viewedResultIds.includes(result._id);
+		});
+	}, [dateFilter, sortedResults, viewedResultIds, timeTick]);
+
+	const isResultNew = (resultId: string) => {
+		if (viewedResultIds.includes(resultId)) return false;
+		const foundAt = getFoundDateFromObjectId(resultId);
+		if (!foundAt) return false;
+		return timeTick - foundAt.getTime() <= NEW_BADGE_WINDOW_MS;
+	};
+
 	const handleStatusChange = (resultId: string, reviewStatus: ReviewStatus) => {
 		dispatch(updateMonitoringResultStatus({ resultId, reviewStatus })).then(() => {
 			dispatch(fetchMonitoringSearchResults(id));
@@ -123,14 +205,17 @@ export default function SearchDetailsPage() {
 		});
 	};
 
-	const allSelected = results.length > 0 && selectedResultIds.length === results.length;
+	const visibleResultIds = visibleResults.map((result) => result._id);
+	const allSelected =
+		visibleResultIds.length > 0 &&
+		visibleResultIds.every((resultId) => selectedResultIds.includes(resultId));
 
 	const toggleAll = () => {
 		if (allSelected) {
-			setSelectedResultIds([]);
+			setSelectedResultIds((prev) => prev.filter((resultId) => !visibleResultIds.includes(resultId)));
 			return;
 		}
-		setSelectedResultIds(results.map((result) => result._id));
+		setSelectedResultIds((prev) => Array.from(new Set([...prev, ...visibleResultIds])));
 	};
 
 	const toggleOne = (resultId: string) => {
@@ -242,7 +327,6 @@ export default function SearchDetailsPage() {
 	];
 
 	const overviewFields = [
-		{ label: 'Search ID', value: id },
 		{ label: 'File Name', value: selectedSearch?.fileName ?? '-' },
 		{
 			label: 'Date',
@@ -261,7 +345,7 @@ export default function SearchDetailsPage() {
 				</div>
 				<Link
 					href="/user/monitoring"
-					className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+					className="inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" />
 					Back to Monitoring
@@ -365,12 +449,31 @@ export default function SearchDetailsPage() {
 
 				<div className="border-b border-gray-100 bg-white p-4">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div className="flex items-center gap-2">
+						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
+							<div className="relative w-full sm:w-40">
+								<select
+									value={dateFilter}
+									onChange={(event) => setDateFilter(event.target.value as DateFilter)}
+									className="w-full cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3.5 pr-9 text-sm text-gray-900 shadow-sm outline-none transition-colors focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+								>
+									{DATE_FILTER_OPTIONS.map((option) => (
+										<option key={option.value} value={option.value} className="bg-white text-gray-900">
+											{option.label}
+										</option>
+									))}
+								</select>
+								<ChevronDown
+									size={14}
+									className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+								/>
+							</div>
+
+							<div className="flex items-center gap-2">
 							<input
 								type="checkbox"
 								checked={allSelected}
 								onChange={toggleAll}
-								disabled={resultsLoading || results.length === 0 || isBulkUpdating}
+								disabled={resultsLoading || visibleResults.length === 0 || isBulkUpdating}
 								aria-label="Select all result images"
 								className="h-4 w-4 cursor-pointer rounded border-gray-300 text-gray-900 focus:ring-gray-400"
 							/>
@@ -379,6 +482,7 @@ export default function SearchDetailsPage() {
 									? `${selectedResultIds.length} image${selectedResultIds.length > 1 ? 's' : ''} selected`
 									: 'Select all'}
 							</p>
+							</div>
 						</div>
 						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
 							<div className="relative w-full sm:w-auto">
@@ -418,7 +522,7 @@ export default function SearchDetailsPage() {
 					) : results.length === 0 ? (
 						<p className="px-4 py-10 text-center text-sm text-gray-500">No result images found for this search.</p>
 					) : (
-						results.map((result) => (
+						visibleResults.map((result) => (
 							<div key={result._id} className="p-4">
 								{/* Top row: checkbox + thumbnail + title */}
 								<div className="flex items-start gap-3">
@@ -432,7 +536,10 @@ export default function SearchDetailsPage() {
 									/>
 									<button
 										type="button"
-										onClick={() => setPreviewResultId(result._id)}
+										onClick={() => {
+											markResultViewed(result._id);
+											setPreviewResultId(result._id);
+										}}
 										disabled={result.isLocked}
 										className="shrink-0 cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
 										aria-label="Open image preview"
@@ -447,6 +554,16 @@ export default function SearchDetailsPage() {
 										/>
 									</button>
 									<div className="min-w-0 flex-1">
+										<div className="mb-1 flex items-center gap-2">
+											{isResultNew(result._id) && (
+												<span className="inline-flex rounded-full bg-black px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+													New
+												</span>
+											)}
+											<span className="text-[11px] text-gray-500">
+												Found: {getFoundDateFromObjectId(result._id)?.toLocaleString() || '-'}
+											</span>
+										</div>
 										<p className="line-clamp-2 text-sm font-medium text-gray-900">
 											{result.isLocked
 												? 'Upgrade plan to view this result'
@@ -498,7 +615,8 @@ export default function SearchDetailsPage() {
 											href={result.details.link}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-medium text-gray-700 hover:text-gray-900"
+											onClick={() => markResultViewed(result._id)}
+											className="inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap text-sm font-medium text-gray-700 hover:text-gray-900"
 										>
 											Visit <ExternalLink className="h-3.5 w-3.5" />
 										</a>
@@ -519,8 +637,9 @@ export default function SearchDetailsPage() {
 							<tr>
 								<th className="w-10 px-3 py-3" />
 								<th className="w-20 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Image</th>
-								<th className="w-[40%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
-								<th className="w-[23%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+								<th className="w-[33%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Details</th>
+								<th className="w-[17%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Found Date</th>
+								<th className="w-[20%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
 								<th className="w-[10%] px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Source</th>
 								<th className="w-[10%] pr-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500"></th>
 							</tr>
@@ -528,18 +647,18 @@ export default function SearchDetailsPage() {
 						<tbody className="divide-y divide-gray-100">
 							{resultsLoading ? (
 								<tr>
-									<td colSpan={6} className="px-4 py-10 text-center text-sm text-gray-500">
+									<td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
 										Loading results...
 									</td>
 								</tr>
-							) : results.length === 0 ? (
+							) : visibleResults.length === 0 ? (
 								<tr>
-									<td colSpan={6} className="px-4 py-10 text-center text-sm text-gray-500">
+									<td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
 										No result images found for this search.
 									</td>
 								</tr>
 							) : (
-								results.map((result) => (
+								visibleResults.map((result) => (
 									<tr key={result._id}>
 										<td className="px-3 py-3">
 											<input
@@ -554,7 +673,10 @@ export default function SearchDetailsPage() {
 										<td className="px-3 py-3">
 											<button
 												type="button"
-												onClick={() => setPreviewResultId(result._id)}
+												onClick={() => {
+													markResultViewed(result._id);
+													setPreviewResultId(result._id);
+												}}
 												disabled={result.isLocked}
 												className="cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
 												aria-label="Open image preview"
@@ -570,10 +692,20 @@ export default function SearchDetailsPage() {
 											</button>
 										</td>
 										<td className="px-3 py-3">
+											<div className="mb-1 flex items-center gap-2">
+												{isResultNew(result._id) && (
+													<span className="inline-flex rounded-full bg-black px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+														New
+													</span>
+												)}
+											</div>
 											<p className="line-clamp-2 text-sm font-medium text-gray-900" title={result.details?.title || 'Untitled result'}>
 												{result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'Untitled result')}
 											</p>
 											<p className="mt-1 truncate text-xs text-gray-500" title={result.details?.source || 'Unknown source'}>{result.details?.source || 'Unknown source'}</p>
+										</td>
+										<td className="px-3 py-3 text-sm text-gray-700">
+											{getFoundDateFromObjectId(result._id)?.toLocaleString() || '-'}
 										</td>
 										<td className="px-3 py-3">
 											<div className="relative max-w-36">
@@ -603,6 +735,7 @@ export default function SearchDetailsPage() {
 													href={result.details.link}
 													target="_blank"
 													rel="noopener noreferrer"
+													onClick={() => markResultViewed(result._id)}
 													className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900"
 												>
 													Visit <ExternalLink className="h-3.5 w-3.5" />
