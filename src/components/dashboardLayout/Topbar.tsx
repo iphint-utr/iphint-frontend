@@ -54,6 +54,33 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 		).unwrap();
 	};
 
+	const loadUnreadCount = async () => {
+		await dispatch(
+			fetchNotifications({
+				scope: 'topbar',
+				status: 'unread',
+				page: 1,
+				limit: 1,
+			}),
+		).unwrap();
+	};
+
+	useEffect(() => {
+		loadUnreadCount().catch(() => {
+			return;
+		});
+
+		const refreshInterval = window.setInterval(() => {
+			loadUnreadCount().catch(() => {
+				return;
+			});
+		}, 30000);
+
+		return () => {
+			window.clearInterval(refreshInterval);
+		};
+	}, [dispatch]);
+
 	useEffect(() => {
 		if (!notificationOpen) return;
 
