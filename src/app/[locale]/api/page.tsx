@@ -18,7 +18,7 @@ export default function ApiPage() {
         </div>
 
         <div className="flex flex-wrap gap-3 pt-2">
-          <Link href="/login2" className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800">
+          <Link href="/login" className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800">
             Back to sign in
           </Link>
           <Link href="/contact" className="rounded-full border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50">

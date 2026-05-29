@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectIsAuthenticated } from "@/lib/store/slices/userSlice";
+import type { AppDispatch } from "@/lib/store/store";
 
 const locales = [
   { code: "en", label: "English" },
@@ -17,8 +20,35 @@ export default function Header() {
   const activeLocale = locale === "kr" ? "kr" : "en";
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (!isLangMenuOpen) {
+        return;
+      }
+
+      const target = event.target as Node | null;
+      if (target && langMenuRef.current?.contains(target)) {
+        return;
+      }
+
+      setIsLangMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isLangMenuOpen]);
 
   const switchLocale = (nextLocale: (typeof locales)[number]["code"]) => {
     if (nextLocale === activeLocale) {
@@ -27,12 +57,23 @@ export default function Header() {
 
     router.replace(pathname, { locale: nextLocale });
     setIsMobileMenuOpen(false);
+    setIsLangMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/login");
+    setIsMobileMenuOpen(false);
   };
 
   const navLinks = [
     { href: "/pricing", label: t("pricing") },
     { href: "/service", label: t("service") },
   ];
+
+  const activeLocaleLabel = locales.find((loc) => loc.code === activeLocale)?.label ?? "English";
+
+  const isNavActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-sm">
@@ -55,48 +96,89 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-[15px] font-semibold text-gray-900 hover:text-black transition-colors duration-150"
+              className={[
+                "text-[15px] font-semibold transition-colors duration-150",
+                isNavActive(link.href)
+                  ? "text-black"
+                  : "text-gray-900 hover:text-black",
+              ].join(" ")}
             >
-              {link.label}
+              <span className="relative inline-flex items-center">
+                {link.label}
+                {isNavActive(link.href) && (
+                  <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded-full bg-black" />
+                )}
+              </span>
             </Link>
           ))}
         </nav>
 
         {/* ── Desktop Right Actions ── */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          {/* Contact Us */}
-          <Link
-            href="/contact"
-            className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
-          >
-            {t("contactUs")}
-          </Link>
-
-          {/* Get Started Now */}
-          <Link
-            href="/signup"
-            className="btn-primary"
-          >
-            {t("getStarted")}
-          </Link>
-
-          <div className="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 p-1">
-            {locales.map((loc) => (
-              <button
-                key={loc.code}
-                type="button"
-                onClick={() => switchLocale(loc.code)}
-                aria-pressed={activeLocale === loc.code}
-                className={[
-                  "rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-150",
-                  activeLocale === loc.code
-                    ? "bg-white text-gray-950 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900",
-                ].join(" ")}
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/user"
+                className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
               >
-                {loc.label}
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
+              >
+                Logout
               </button>
-            ))}
+            </>
+          ) : (
+            <>
+              <Link
+                href="/contact"
+                className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
+              >
+                {t("contactUs")}
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
+              >
+                Sign in
+              </Link>
+            </>
+          )}
+
+          <div ref={langMenuRef} className="relative inline-block">
+            <button
+              type="button"
+              onClick={() => setIsLangMenuOpen((prev) => !prev)}
+              className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full border border-gray-200 pl-3 pr-2.5 text-[13px] font-semibold text-gray-900 transition-colors hover:border-gray-300"
+              aria-haspopup="listbox"
+              aria-expanded={isLangMenuOpen}
+            >
+              <span className="leading-none">{activeLocaleLabel}</span>
+              <ChevronDown size={13} className={isLangMenuOpen ? "shrink-0 rotate-180 transition-transform" : "shrink-0 transition-transform"} />
+            </button>
+
+            {isLangMenuOpen && (
+              <div className="absolute left-0 top-full z-50 mt-2 w-full rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
+                {locales.map((loc) => (
+                  <button
+                    key={loc.code}
+                    type="button"
+                    onClick={() => switchLocale(loc.code)}
+                    className={[
+                      "w-full rounded-lg px-3 py-2 text-left text-[13px] transition-colors",
+                      activeLocale === loc.code
+                        ? "font-semibold text-black"
+                        : "text-gray-600 hover:text-black",
+                    ].join(" ")}
+                  >
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -130,39 +212,62 @@ export default function Header() {
           ))}
 
           <div className="pt-4 flex flex-col gap-3">
-            <Link
-              href="/contact"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
-            >
-              {t("contactUs")}
-            </Link>
-            <Link
-              href="/signup"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
-            >
-              {t("getStarted")}
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/user"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
+                >
+                  {t("contactUs")}
+                </Link>
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-full bg-black text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
+                >
+                  Sign in
+                </Link>
+              </>
+            )}
           </div>
 
-          {/* Mobile Language Toggle */}
-          <div className="pt-4 flex gap-2">
-            {locales.map((loc) => (
-              <button
-                key={loc.code}
-                onClick={() => {
-                  switchLocale(loc.code);
-                }}
-                className={`flex-1 h-9 rounded-full border text-[12px] font-semibold transition-colors ${
-                  activeLocale === loc.code
-                    ? "border-gray-950 bg-gray-950 text-white"
-                    : "border-gray-200 text-gray-600 hover:border-gray-400"
-                }`}
-              >
-                {loc.label}
-              </button>
-            ))}
+          {/* Mobile Language Buttons */}
+          <div className="pt-4">
+            <div className="grid grid-cols-2 gap-3">
+              {locales.map((loc) => (
+                <button
+                  key={loc.code}
+                  type="button"
+                  onClick={() => switchLocale(loc.code)}
+                  className={[
+                    "inline-flex h-10 w-full items-center justify-center rounded-full border text-[13px] font-semibold transition-colors",
+                    activeLocale === loc.code
+                      ? "border-black bg-black text-white"
+                      : "border-gray-300 bg-white text-gray-900 hover:border-gray-400",
+                  ].join(" ")}
+                >
+                  {loc.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

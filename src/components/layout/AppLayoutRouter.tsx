@@ -15,7 +15,6 @@ const publicChromePaths = new Set([
   '/',
   '/contact',
   '/login',
-  '/login2',
   '/register',
   '/signup',
   '/service',

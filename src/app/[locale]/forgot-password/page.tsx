@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
         </form>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/login2" className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800">
+          <Link href="/login" className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800">
             Back to login
           </Link>
           <Link href="/signup" className="rounded-full border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50">

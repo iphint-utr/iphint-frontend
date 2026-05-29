@@ -7,7 +7,6 @@ const localizedTopLevelRoutes = new Set([
   'admin',
   'dashboard',
   'login',
-  'login2',
   'pricing',
   'register',
   'signin',
@@ -33,6 +32,14 @@ export default function proxy(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     const redirectedSegments = [...segments];
     redirectedSegments[legacySignupIndex] = 'signup';
+    redirectUrl.pathname = `/${redirectedSegments.join('/')}`;
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  if (segments[legacySignupIndex] === 'login2') {
+    const redirectUrl = request.nextUrl.clone();
+    const redirectedSegments = [...segments];
+    redirectedSegments[legacySignupIndex] = 'login';
     redirectUrl.pathname = `/${redirectedSegments.join('/')}`;
     return NextResponse.redirect(redirectUrl);
   }
