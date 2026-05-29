@@ -205,7 +205,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 													<button
 														type="button"
 														onClick={() => goToNotification(item)}
-														className="min-w-0 flex-1 text-left"
+														className="min-w-0 flex-1 cursor-pointer text-left"
 													>
 														<p className="line-clamp-1 text-xs font-semibold text-gray-900">{item.title}</p>
 														{item.message && <p className="mt-0.5 line-clamp-2 text-xs text-gray-600">{item.message}</p>}
