@@ -25,7 +25,12 @@ export default function Header() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const langMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -72,6 +77,7 @@ export default function Header() {
   ];
 
   const activeLocaleLabel = locales.find((loc) => loc.code === activeLocale)?.label ?? "English";
+  const showAuthenticatedActions = isMounted && isAuthenticated;
 
   const isNavActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
@@ -115,7 +121,7 @@ export default function Header() {
 
         {/* ── Desktop Right Actions ── */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          {isAuthenticated ? (
+          {showAuthenticatedActions ? (
             <>
               <Link
                 href="/contact"
@@ -224,7 +230,7 @@ export default function Header() {
           ))}
 
           <div className="pt-4 flex flex-col gap-3">
-            {isAuthenticated ? (
+            {showAuthenticatedActions ? (
               <>
                 <Link
                   href="/contact"
