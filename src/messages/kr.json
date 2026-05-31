@@ -372,6 +372,9 @@
       "profileDescription": "신원, 승인 상태, 주요 계정 메타데이터입니다.",
       "fields": {
         "contact": "연락처",
+        "jobTitle": "직책",
+        "affiliation": "소속",
+        "country": "국가",
         "joined": "가입일",
         "referralCode": "추천 코드",
         "subscriptionId": "구독 ID"
@@ -390,7 +393,7 @@
       "subscriptionTitle": "구독",
       "subscriptionDescription": "연결된 구독 레코드의 청구 식별자와 상태입니다.",
       "subscriptionFields": {
-        "plan": "요금제 ID",
+        "plan": "요금제",
         "status": "상태",
         "billingCycle": "청구 주기"
       },

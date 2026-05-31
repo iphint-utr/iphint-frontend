@@ -87,6 +87,16 @@ export default function AdminMemberDetailsPage() {
     return null;
   }
 
+  const isTrialSubscription =
+    data.subscription?.status?.toLowerCase() === 'trialing' ||
+    data.subscription?.grantSource?.toLowerCase() === 'trial';
+  const planBaseName = data.subscription?.planName || data.subscription?.planId;
+  const planDisplayName = planBaseName
+    ? `${planBaseName}${isTrialSubscription ? ' (Trial)' : ''}`
+    : isTrialSubscription
+      ? 'Trial'
+      : t('memberDetails.unavailable');
+
   return (
     <div className="space-y-8">
       <AdminPageHeader
@@ -155,6 +165,24 @@ export default function AdminMemberDetailsPage() {
               </div>
 
               <div className="space-y-3 rounded-3xl border border-slate-100 bg-slate-50 p-5 text-sm text-slate-600">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <span>{t('memberDetails.fields.jobTitle')}</span>
+                  <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.jobTitle || t('memberDetails.unavailable')}>
+                    {truncateText(data.jobTitle || t('memberDetails.unavailable'), 24)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <span>{t('memberDetails.fields.affiliation')}</span>
+                  <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.affiliation || t('memberDetails.unavailable')}>
+                    {truncateText(data.affiliation || t('memberDetails.unavailable'), 24)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <span>{t('memberDetails.fields.country')}</span>
+                  <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.country || t('memberDetails.unavailable')}>
+                    {truncateText(data.country || t('memberDetails.unavailable'), 24)}
+                  </span>
+                </div>
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span>{t('memberDetails.fields.joined')}</span>
                   <span className="w-full font-medium break-all text-left text-slate-900 sm:w-auto sm:text-right">{formatAdminDate(data.joiningDate, locale)}</span>
@@ -303,8 +331,8 @@ export default function AdminMemberDetailsPage() {
             <div className="space-y-3 text-sm text-slate-600">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.plan')}</span>
-                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.subscription?.planId || t('memberDetails.unavailable')}>
-                  {truncateText(data.subscription?.planId || t('memberDetails.unavailable'), 24)}
+                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={planDisplayName}>
+                  {truncateText(planDisplayName, 24)}
                 </span>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">

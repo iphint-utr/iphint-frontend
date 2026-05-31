@@ -62,6 +62,8 @@ export interface AdminMemberSearch {
 
 export interface AdminMemberSubscription {
   planId: string;
+  planName: string;
+  grantSource: string;
   status: string;
   billingCycle: string;
 }
@@ -71,6 +73,9 @@ export interface AdminMemberDetails {
   name: string;
   email: string;
   phoneNumber: string;
+  affiliation: string;
+  jobTitle: string;
+  country: string;
   joiningDate: string;
   role: string;
   isActive: boolean;

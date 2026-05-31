@@ -142,6 +142,9 @@ const normalizeMemberDetails = (payload: unknown): AdminMemberDetails => {
     name: String(data.name ?? 'Unknown member'),
     email: String(data.email ?? ''),
     phoneNumber: String(data.phoneNumber ?? ''),
+    affiliation: String(data.affiliation ?? ''),
+    jobTitle: String(data.jobTitle ?? ''),
+    country: String(data.country ?? ''),
     joiningDate: String(data.joiningDate ?? data.createdAt ?? ''),
     role: String(data.role ?? 'general'),
     isActive: Boolean(data.isActive ?? false),
@@ -152,6 +155,11 @@ const normalizeMemberDetails = (payload: unknown): AdminMemberDetails => {
     subscription: subscription
       ? {
           planId: String(subscription.planId ?? ''),
+          planName:
+            typeof subscription.planId === 'object' && subscription.planId !== null
+              ? String((subscription.planId as Record<string, unknown>).name ?? '')
+              : String(subscription.planName ?? ''),
+          grantSource: String(subscription.grantSource ?? ''),
           status: String(subscription.status ?? ''),
           billingCycle: String(subscription.billingCycle ?? ''),
         }
