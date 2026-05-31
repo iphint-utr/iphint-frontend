@@ -211,6 +211,9 @@
       "profileDescription": "Identity, approval state, and primary account metadata.",
       "fields": {
         "contact": "Contact",
+        "jobTitle": "Job title",
+        "affiliation": "Affiliation",
+        "country": "Country",
         "joined": "Joined",
         "referralCode": "Referral code",
         "subscriptionId": "Subscription ID"
@@ -229,7 +232,7 @@
       "subscriptionTitle": "Subscription",
       "subscriptionDescription": "Billing identifiers and status for the linked subscription record.",
       "subscriptionFields": {
-        "plan": "Plan ID",
+        "plan": "Plan",
         "status": "Status",
         "billingCycle": "Billing cycle"
       },
