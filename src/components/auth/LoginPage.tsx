@@ -21,6 +21,7 @@ export default function LoginPage() {
   const authLoading = useSelector(selectAuthLoading);
   const authError = useSelector(selectAuthError);
   const searchParams = useSearchParams();
+  const [hasSessionToken, setHasSessionToken] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const [verificationFailed, setVerificationFailed] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -35,6 +36,11 @@ export default function LoginPage() {
       router.push(redirectTarget || '/user');
     }
   }, [authLoading, isAuthenticated, router, searchParams]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setHasSessionToken(Boolean(localStorage.getItem('token')));
+  }, []);
 
   useEffect(() => {
     const verifyToken = searchParams.get('verifyToken');
@@ -65,11 +71,22 @@ export default function LoginPage() {
   const loading = authLoading;
 
   const oauthError =
-    searchParams.get('error') === 'google_auth_failed'
+    !isAuthenticated && !hasSessionToken && searchParams.get('error') === 'google_auth_failed'
       ? 'Google sign-in failed. Please try again or use email and password.'
       : null;
   const error = authError || oauthError;
   const activeError = validationError || error;
+
+  useEffect(() => {
+    if (!oauthError) return;
+    if (typeof window === 'undefined' || !window.history?.replaceState) return;
+
+    const current = new URL(window.location.href);
+    if (!current.searchParams.has('error')) return;
+
+    current.searchParams.delete('error');
+    window.history.replaceState(null, '', `${current.pathname}${current.search}`);
+  }, [oauthError]);
 
   const [formData, setFormData] = useState({ email: '', password: '' });
 
