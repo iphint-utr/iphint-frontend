@@ -4,6 +4,25 @@ import { useEffect } from 'react';
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
+import { defaultLocale, isLocale } from '@/lib/i18n';
+
+const resolveLocale = (searchParams: URLSearchParams): string => {
+  const localeFromQuery = searchParams.get('locale');
+  if (localeFromQuery && isLocale(localeFromQuery)) {
+    return localeFromQuery;
+  }
+
+  const localeCookie = document.cookie
+    .split('; ')
+    .find((item) => item.startsWith('NEXT_LOCALE='))
+    ?.split('=')[1];
+
+  if (localeCookie && isLocale(localeCookie)) {
+    return localeCookie;
+  }
+
+  return defaultLocale;
+};
 
 function GoogleSuccessInner() {
   const searchParams = useSearchParams();
@@ -45,7 +64,8 @@ function GoogleSuccessInner() {
       }
 
       // 4. Hard-navigate to user dashboard so Redux re-hydrates from localStorage.
-      window.location.replace('/user');
+      const locale = resolveLocale(searchParams);
+      window.location.replace(`/${locale}/user`);
     };
 
     run();
