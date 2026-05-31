@@ -28,12 +28,12 @@ export default function Section1() {
           <div className="flex flex-wrap gap-4 pt-4">
             <Link
               href="/signup"
-              className="btn-primary"
+              className="btn-primary btn-lg"
             >
               {t("primaryCta")}
             </Link>
 
-            <Link href="/contact" className="btn-secondary">
+            <Link href="/contact" className="btn-secondary btn-lg">
               {t("secondaryCta")}
             </Link>
           </div>

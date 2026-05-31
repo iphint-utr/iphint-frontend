@@ -154,22 +154,16 @@
     font-family: var(--app-font-family);
     color: var(--tx-1);
   }
-  .public-theme h1,
-  .public-theme h2,
-  .public-theme h3,
-  .public-theme h4,
-  .public-theme h5,
-  .public-theme h6 {
+  h1, h2, h3, h4, h5, h6 {
     color: var(--tx-1);
   }
-  .public-theme p {
+  p {
     color: var(--tx-3);
   }
-  .public-theme label,
-  .public-theme legend {
+  label, legend {
     color: var(--tx-2);
   }
-  .public-theme ::placeholder {
+  ::placeholder {
     color: var(--tx-6);
   }
 }
@@ -185,33 +179,33 @@
 }
 
 @layer base {
-  .public-theme * {
+  * {
     @apply border-border outline-ring/50;
   }
 
-  .public-theme a[href],
-  .public-theme button,
-  .public-theme [role='button'],
-  .public-theme summary,
-  .public-theme input[type='button'],
-  .public-theme input[type='submit'],
-  .public-theme input[type='reset'] {
+  a[href],
+  button,
+  [role='button'],
+  summary,
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'] {
     cursor: pointer;
   }
 
-  .public-theme button:disabled,
-  .public-theme input:disabled,
-  .public-theme select:disabled,
-  .public-theme textarea:disabled,
-  .public-theme [aria-disabled='true'] {
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled='true'] {
     cursor: not-allowed;
   }
 
-  .public-theme {
+  body {
     @apply bg-background text-foreground;
   }
 
-  .public-theme .fc {
+  .fc{
     @apply flex items-center justify-center;
   }
 
@@ -221,7 +215,7 @@
   100% { background-position: 0% 50%; }
 }
 
-.public-theme .flow {
+.flow {
   background-size: 300% 300%; /* Stretch it so there is room to move */
   animation: gradient-flow 4s ease infinite; /* 15s for a slow, dreamy feel */
 }
@@ -240,14 +234,14 @@
 @layer components {
 
   /* ── Shared base ─────────────────────────────── */
-  .public-theme .btn-primary,
-  .public-theme .btn-secondary {
+  .btn-primary,
+  .btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     /* Size 1 — default (small) */
-    height: 40px;
+    height: 36px;
     padding-left: 14px;
     padding-right: 14px;
     padding-top: 8px;
@@ -261,7 +255,7 @@
   }
 
   /* ── Size 2 modifier ─────────────────────────── */
-  .public-theme .btn-lg {
+  .btn-lg {
     height: 56px;
     padding-left: 24px;
     padding-right: 24px;
@@ -273,26 +267,26 @@
   }
 
   /* ── Primary — uses --primary / --primary-foreground ── */
-  .public-theme .btn-primary {
+  .btn-primary {
     background-color: var(--primary);
     color: var(--primary-foreground);
     border: none;
   }
-  .public-theme .btn-primary:hover   { background-color: color-mix(in srgb, var(--primary) 85%, transparent); }
-  .public-theme .btn-primary:active  { transform: scale(0.97); }
-  .public-theme .btn-primary:disabled,
-  .public-theme .btn-primary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .btn-primary:hover   { background-color: color-mix(in srgb, var(--primary) 85%, transparent); }
+  .btn-primary:active  { transform: scale(0.97); }
+  .btn-primary:disabled,
+  .btn-primary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
   /* ── Secondary — uses --secondary / --secondary-foreground ── */
-  .public-theme .btn-secondary {
-    background-color: var(--secondary);
+  .btn-secondary {
+    background-color: #ffffff;
     color: var(--secondary-foreground);
-    border: 1px solid var(--border);
+    border: 1px solid #d1d5db;
   }
-  .public-theme .btn-secondary:hover   { background-color: color-mix(in srgb, var(--secondary) 80%, var(--border)); }
-  .public-theme .btn-secondary:active  { transform: scale(0.97); }
-  .public-theme .btn-secondary:disabled,
-  .public-theme .btn-secondary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .btn-secondary:hover   { background-color: #f9fafb; border-color: #9ca3af; }
+  .btn-secondary:active  { transform: scale(0.97); }
+  .btn-secondary:disabled,
+  .btn-secondary[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -300,7 +294,7 @@
    h:56px  px:16px  py:12px  border-radius:12px  w-full
 ═══════════════════════════════════════════════════════════════ */
 @layer components {
-  .public-theme .input-field {
+  .input-field {
     width: 100%;
     height: 56px;
     padding-left: 16px;
@@ -309,18 +303,23 @@
     padding-bottom: 12px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    background-color: var(--card);
+    background-color: #ffffff;
     font-size: 0.875rem;
     color: var(--foreground);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     appearance: none;
   }
-  .public-theme .input-field::placeholder {
+  .input-field::placeholder {
     color: var(--tx-6);
   }
-  .public-theme .input-field:focus {
+  .input-field:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+  .input-field:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--secondary);
   }
 }

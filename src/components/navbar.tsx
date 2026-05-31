@@ -1,18 +1,76 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, selectIsAuthenticated } from "@/lib/store/slices/userSlice";
-import type { AppDispatch } from "@/lib/store/store";
+import { Menu, X } from "lucide-react";
 
 const locales = [
-  { code: "en", label: "English" },
-  { code: "kr", label: "Korean" },
+  { code: "en", label: "EN" },
+  { code: "kr", label: "KR" },
 ] as const;
+
+function NavLangSwitcher({
+  active,
+  onSelect,
+}: {
+  active: string;
+  onSelect: (code: (typeof locales)[number]["code"]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = locales.find((l) => l.code === active);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-150"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.8"
+          strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+        <span className="uppercase">{current?.label}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M7 10l5 5 5-5z" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} aria-hidden="true" />
+          <ul
+            role="listbox"
+            aria-label="Select language"
+            className="absolute top-full right-0 mt-2 w-36 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 py-1 z-40"
+          >
+            {locales.map((loc) => (
+              <li key={loc.code} role="option" aria-selected={loc.code === active}>
+                <button
+                  onClick={() => { onSelect(loc.code as (typeof locales)[number]["code"]); setOpen(false); }}
+                  className={`w-full text-left px-4 py-2 text-[13px] transition-colors duration-150 ${
+                    loc.code === active
+                      ? "text-gray-950 font-semibold bg-gray-50"
+                      : "text-gray-600 hover:text-gray-950 hover:bg-gray-50"
+                  }`}
+                >
+                  <span className="uppercase">{loc.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function Header() {
   const t = useTranslations("header");
@@ -20,35 +78,7 @@ export default function Header() {
   const activeLocale = locale === "kr" ? "kr" : "en";
   const pathname = usePathname();
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const langMenuRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (!isLangMenuOpen) {
-        return;
-      }
-
-      const target = event.target as Node | null;
-      if (target && langMenuRef.current?.contains(target)) {
-        return;
-      }
-
-      setIsLangMenuOpen(false);
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [isLangMenuOpen]);
 
   const switchLocale = (nextLocale: (typeof locales)[number]["code"]) => {
     if (nextLocale === activeLocale) {
@@ -57,23 +87,12 @@ export default function Header() {
 
     router.replace(pathname, { locale: nextLocale });
     setIsMobileMenuOpen(false);
-    setIsLangMenuOpen(false);
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    router.push("/login");
-    setIsMobileMenuOpen(false);
   };
 
   const navLinks = [
     { href: "/pricing", label: t("pricing") },
     { href: "/service", label: t("service") },
   ];
-
-  const activeLocaleLabel = locales.find((loc) => loc.code === activeLocale)?.label ?? "English";
-
-  const isNavActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-sm">
@@ -96,117 +115,52 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={[
-                "text-[15px] font-semibold transition-colors duration-150",
-                isNavActive(link.href)
-                  ? "text-black"
-                  : "text-gray-900 hover:text-black",
-              ].join(" ")}
+              className="text-[15px] font-semibold text-gray-900 hover:text-black transition-colors duration-150"
             >
-              <span className="relative inline-flex items-center">
-                {link.label}
-                {isNavActive(link.href) && (
-                  <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded-full bg-black" />
-                )}
-              </span>
+              {link.label}
             </Link>
           ))}
         </nav>
 
         {/* ── Desktop Right Actions ── */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          {isAuthenticated ? (
-            <>
-              <Link
-                href="/contact"
-                className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
-              >
-                {t("contactUs")}
-              </Link>
+          {/* Contact Us */}
+          <Link
+            href="/contact"
+            className="btn-secondary"
+          >
+            {t("contactUs")}
+          </Link>
 
-              <div className="relative inline-block group">
-                <Link
-                  href="/user"
-                  className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
-                >
-                  Dashboard
-                </Link>
+          {/* Get Started Now */}
+          <Link
+            href="/signup"
+            className="btn-primary"
+          >
+            {t("getStarted")}
+          </Link>
 
-                <div className="invisible absolute left-0 top-full z-50 mt-1 w-full rounded-xl border border-gray-200 bg-white p-1 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="w-full rounded-lg px-3 py-2 text-left text-[13px] font-semibold text-gray-700 transition-colors hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/contact"
-                className="inline-flex h-10 items-center rounded-full border border-gray-300 px-5 text-[14px] font-semibold text-gray-900 hover:border-gray-900 transition-colors duration-150"
-              >
-                {t("contactUs")}
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex h-10 items-center justify-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
-              >
-                Sign in
-              </Link>
-            </>
-          )}
+          <div className="h-5 w-px bg-gray-200" aria-hidden="true" />
 
-          <div ref={langMenuRef} className="relative inline-block">
-            <button
-              type="button"
-              onClick={() => setIsLangMenuOpen((prev) => !prev)}
-              className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full border border-gray-200 pl-3 pr-2.5 text-[13px] font-semibold text-gray-900 transition-colors hover:border-gray-300"
-              aria-haspopup="listbox"
-              aria-expanded={isLangMenuOpen}
-            >
-              <span className="leading-none">{activeLocaleLabel}</span>
-              <ChevronDown size={13} className={isLangMenuOpen ? "shrink-0 rotate-180 transition-transform" : "shrink-0 transition-transform"} />
-            </button>
-
-            {isLangMenuOpen && (
-              <div className="absolute left-0 top-full z-50 mt-2 w-full rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
-                {locales.map((loc) => (
-                  <button
-                    key={loc.code}
-                    type="button"
-                    onClick={() => switchLocale(loc.code)}
-                    className={[
-                      "w-full rounded-lg px-3 py-2 text-left text-[13px] transition-colors",
-                      activeLocale === loc.code
-                        ? "font-semibold text-black"
-                        : "text-gray-600 hover:text-black",
-                    ].join(" ")}
-                  >
-                    {loc.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <NavLangSwitcher active={activeLocale} onSelect={switchLocale} />
         </div>
 
-        {/* ── Mobile Hamburger ── */}
-        <button
-          className="md:hidden ml-auto p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMobileMenuOpen}
-        >
-          {isMobileMenuOpen ? (
-            <X size={22} strokeWidth={2} />
-          ) : (
-            <Menu size={22} strokeWidth={2} />
-          )}
-        </button>
+        {/* ── Mobile: lang switcher + hamburger ── */}
+        <div className="md:hidden ml-auto flex items-center gap-1">
+          <NavLangSwitcher active={activeLocale} onSelect={switchLocale} />
+          <button
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? (
+              <X size={22} strokeWidth={2} />
+            ) : (
+              <Menu size={22} strokeWidth={2} />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* ── Mobile Menu ── */}
@@ -224,69 +178,20 @@ export default function Header() {
           ))}
 
           <div className="pt-4 flex flex-col gap-3">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  href="/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
-                >
-                  {t("contactUs")}
-                </Link>
-                <Link
-                  href="/user"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-full border border-gray-300 text-[14px] font-semibold text-gray-900"
-                >
-                  {t("contactUs")}
-                </Link>
-                <Link
-                  href="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex h-11 w-full items-center justify-center rounded-full bg-black text-[14px] font-semibold text-white transition-colors duration-150 hover:bg-gray-900"
-                >
-                  Sign in
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Language Buttons */}
-          <div className="pt-4">
-            <div className="grid grid-cols-2 gap-3">
-              {locales.map((loc) => (
-                <button
-                  key={loc.code}
-                  type="button"
-                  onClick={() => switchLocale(loc.code)}
-                  className={[
-                    "inline-flex h-10 w-full items-center justify-center rounded-full border text-[13px] font-semibold transition-colors",
-                    activeLocale === loc.code
-                      ? "border-black bg-black text-white"
-                      : "border-gray-300 bg-white text-gray-900 hover:border-gray-400",
-                  ].join(" ")}
-                >
-                  {loc.label}
-                </button>
-              ))}
-            </div>
+            <Link
+              href="/contact"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="btn-secondary w-full"
+            >
+              {t("contactUs")}
+            </Link>
+            <Link
+              href="/signup"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
+            >
+              {t("getStarted")}
+            </Link>
           </div>
         </div>
       )}

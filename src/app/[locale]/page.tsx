@@ -47,7 +47,7 @@ export default function Home() {
         <BlogSection/>
 
 
-        <Section7/>
+        {/*<Section7/>*/}
 
 
         <Section8/>
