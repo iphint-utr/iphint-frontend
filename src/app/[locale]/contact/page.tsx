@@ -1,6 +1,8 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useRouter } from '@/i18n/routing';
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 
 type ContactFormState = {
   fullName: string;
@@ -29,11 +31,70 @@ const INITIAL_FORM_STATE: ContactFormState = {
 const INQUIRY_LIMIT = 5000;
 
 export default function ContactPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState<ContactFormState>(INITIAL_FORM_STATE);
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const fullName = formData.fullName.trim();
+    const companyName = formData.companyName.trim();
+    const workEmail = formData.workEmail.trim();
+    const phoneNumber = formData.phoneNumber.trim();
+    const inquiryMessage = formData.inquiryMessage.trim();
+
+    if (!fullName || !workEmail || !inquiryMessage) {
+      setIsSubmitting(false);
+      setSubmitSuccess('');
+      setSubmitError('Please fill in Full Name, Work Email, and Inquiry Message.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError('');
+    setSubmitSuccess('');
+
+    try {
+      await apiClient.post('/contact', {
+        fullName,
+        companyName,
+        workEmail,
+        phoneNumber,
+        inquiryMessage,
+        consentEmail: formData.consentEmail,
+        consentSms: formData.consentSms,
+        consentServiceUpdates: formData.consentServiceUpdates,
+        consentEventsPromotions: formData.consentEventsPromotions,
+      });
+
+      setSubmitSuccess('Thanks for contacting us. Your inquiry was sent successfully. Redirecting to home...');
+      setFormData(INITIAL_FORM_STATE);
+
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+
+      redirectTimerRef.current = setTimeout(() => {
+        router.push('/');
+      }, 1600);
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error, 'Failed to send your inquiry. Please try again.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
@@ -48,6 +109,18 @@ export default function ContactPage() {
 
           <section className="lg:col-span-8 lg:pl-4">
             <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
+            {submitError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {submitError}
+              </div>
+            )}
+
+            {submitSuccess && (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {submitSuccess}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
               <div>
                 <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-black">
@@ -206,8 +279,8 @@ export default function ContactPage() {
             </section>
 
             <div className="flex justify-center pt-1">
-              <button type="submit" className="btn-primary h-12 w-full text-sm sm:w-auto sm:min-w-52 sm:px-8">
-                Send Inquiry
+              <button type="submit" disabled={isSubmitting} className="btn-primary h-12 w-full text-sm disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto sm:min-w-52 sm:px-8">
+                {isSubmitting ? 'Sending...' : 'Send Inquiry'}
               </button>
             </div>
             </form>

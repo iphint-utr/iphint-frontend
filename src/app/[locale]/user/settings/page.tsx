@@ -98,6 +98,7 @@ export default function SettingsPage() {
 
   const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread'>('all');
   const [notificationQuery, setNotificationQuery] = useState('');
+  const [pendingDeleteNotificationId, setPendingDeleteNotificationId] = useState<string | null>(null);
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -211,6 +212,40 @@ export default function SettingsPage() {
       showMessage('Could not delete notification.', true);
     }
   };
+
+  const confirmDeleteNotification = async () => {
+    if (!pendingDeleteNotificationId) return;
+    await handleDeleteNotification(pendingDeleteNotificationId);
+    setPendingDeleteNotificationId(null);
+  };
+
+  useEffect(() => {
+    if (!pendingDeleteNotificationId) return;
+
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      if (target.closest('[data-delete-confirm-popover]')) return;
+      if (target.closest('[data-delete-confirm-trigger]')) return;
+
+      setPendingDeleteNotificationId(null);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setPendingDeleteNotificationId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [pendingDeleteNotificationId]);
 
   const handleDeleteAllNotifications = async () => {
     try {
@@ -441,6 +476,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={notificationPrefs.emailEnabled}
               onChange={(e) => setNotificationPrefs((p) => ({ ...p, emailEnabled: e.target.checked }))}
+              className="h-4 w-4 accent-gray-900"
             />
           </label>
 
@@ -450,6 +486,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={notificationPrefs.inAppEnabled}
               onChange={(e) => setNotificationPrefs((p) => ({ ...p, inAppEnabled: e.target.checked }))}
+              className="h-4 w-4 accent-gray-900"
             />
           </label>
 
@@ -459,6 +496,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={notificationPrefs.weeklyRescanEnabled}
               onChange={(e) => setNotificationPrefs((p) => ({ ...p, weeklyRescanEnabled: e.target.checked }))}
+              className="h-4 w-4 accent-gray-900"
             />
           </label>
 
@@ -468,6 +506,7 @@ export default function SettingsPage() {
               type="checkbox"
               checked={notificationPrefs.notifyOnNewMatches}
               onChange={(e) => setNotificationPrefs((p) => ({ ...p, notifyOnNewMatches: e.target.checked }))}
+              className="h-4 w-4 accent-gray-900"
             />
           </label>
 
@@ -511,7 +550,7 @@ export default function SettingsPage() {
               type="password"
               value={passwordForm.currentPassword}
               onChange={(e) => setPasswordForm((p) => ({ ...p, currentPassword: e.target.value }))}
-              className="input-field mt-1"
+              className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
             />
           </label>
           <label className="text-sm text-gray-600">
@@ -520,7 +559,7 @@ export default function SettingsPage() {
               type="password"
               value={passwordForm.newPassword}
               onChange={(e) => setPasswordForm((p) => ({ ...p, newPassword: e.target.value }))}
-              className="input-field mt-1"
+              className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
             />
           </label>
           <label className="text-sm text-gray-600">
@@ -529,7 +568,7 @@ export default function SettingsPage() {
               type="password"
               value={passwordForm.confirmPassword}
               onChange={(e) => setPasswordForm((p) => ({ ...p, confirmPassword: e.target.value }))}
-              className="input-field mt-1"
+              className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
             />
           </label>
         </div>
@@ -537,7 +576,7 @@ export default function SettingsPage() {
         <button
           onClick={handleUpdatePassword}
           disabled={passwordSaving}
-          className="btn-primary mt-5"
+          className="mt-5 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {passwordSaving ? 'Updating...' : 'Update Password'}
         </button>
@@ -621,34 +660,65 @@ export default function SettingsPage() {
                 onClick={() => item.actionUrl && handleOpenNotification(item)}
                 className={`rounded-xl border px-4 py-3 ${item.isRead ? 'border-gray-200 bg-white' : 'border-emerald-200 bg-emerald-50/40'} ${item.actionUrl ? 'cursor-pointer transition-colors hover:border-gray-300 hover:bg-gray-50/80' : ''}`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{item.title}</p>
                     {item.message && <p className="mt-1 text-sm text-gray-600">{item.message}</p>}
                     <p className="mt-2 text-xs text-gray-400">{new Date(item.timestamp).toLocaleString()}</p>
                   </div>
-                  {!item.isRead && (
-                    <button
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleMarkRead(item._id);
-                      }}
-                      className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-50"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Mark read
-                    </button>
-                  )}
-                  <button
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleDeleteNotification(item._id);
-                    }}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Delete
-                  </button>
+                  <div className="flex shrink-0 items-center gap-2 self-center">
+                    {!item.isRead && (
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleMarkRead(item._id);
+                        }}
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-50"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        Mark read
+                      </button>
+                    )}
+                    <div className="relative">
+                      <button
+                        data-delete-confirm-trigger
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setPendingDeleteNotificationId(item._id);
+                        }}
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete
+                      </button>
+
+                      {pendingDeleteNotificationId === item._id && (
+                        <div
+                          data-delete-confirm-popover
+                          onClick={(event) => event.stopPropagation()}
+                          className="absolute bottom-full right-0 z-30 mb-1.5 w-32 rounded-lg border border-gray-200 bg-white px-2 py-1.5 shadow-lg"
+                        >
+                          <p className="text-center text-[11px] font-semibold text-black">Delete?</p>
+                          <div className="mt-1.5 flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setPendingDeleteNotificationId(null)}
+                              className="rounded-md border border-black px-2 py-0.5 text-[10px] font-medium text-black hover:bg-gray-100"
+                            >
+                              No
+                            </button>
+                            <button
+                              type="button"
+                              onClick={confirmDeleteNotification}
+                              className="rounded-md bg-black px-2 py-0.5 text-[10px] font-medium text-white hover:bg-gray-900"
+                            >
+                              Yes
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))
