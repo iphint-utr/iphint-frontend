@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { Menu, X } from "lucide-react";
@@ -19,10 +19,42 @@ function NavLangSwitcher({
   onSelect: (code: (typeof locales)[number]["code"]) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const current = locales.find((l) => l.code === active);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (target && wrapperRef.current?.contains(target)) {
+        return;
+      }
+
+      setOpen(false);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [open]);
+
   return (
-    <div className="relative">
+    <div ref={wrapperRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -45,7 +77,6 @@ function NavLangSwitcher({
 
       {open && (
         <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} aria-hidden="true" />
           <ul
             role="listbox"
             aria-label="Select language"
@@ -132,12 +163,12 @@ export default function Header() {
             {t("contactUs")}
           </Link>
 
-          {/* Get Started Now */}
+          {/* Sign in */}
           <Link
-            href="/signup"
+            href="/login"
             className="btn-primary"
           >
-            {t("getStarted")}
+            Sign in
           </Link>
 
           <div className="h-5 w-px bg-gray-200" aria-hidden="true" />
@@ -186,11 +217,11 @@ export default function Header() {
               {t("contactUs")}
             </Link>
             <Link
-              href="/signup"
+              href="/login"
               onClick={() => setIsMobileMenuOpen(false)}
               className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
             >
-              {t("getStarted")}
+              Sign in
             </Link>
           </div>
         </div>
