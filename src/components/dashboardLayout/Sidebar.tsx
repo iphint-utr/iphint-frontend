@@ -24,9 +24,11 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const pathname = usePathname();
   const user = useAppSelector((state) => state.user);
   const subscriptionSnapshot = useAppSelector((state) => state.account.subscription.data);
+  const subscriptionLoading = useAppSelector((state) => state.account.subscription.loading);
+  const hasSubscriptionPlan = !!subscriptionSnapshot?.plan;
   const planInfo = {
-    name: subscriptionSnapshot?.plan?.name || 'Starter',
-    tier: subscriptionSnapshot?.plan?.tier || 'starter',
+    name: subscriptionSnapshot?.plan?.name ?? (subscriptionLoading ? 'Loading...' : '--'),
+    tier: subscriptionSnapshot?.plan?.tier ?? null,
     subscriptionStatus: subscriptionSnapshot?.subscription?.status || null,
   };
   const menu = [
@@ -42,7 +44,9 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const displayName = user.name || 'User';
   const company = user.role || 'Organization';
   const isAdmin = user.role === 'admin';
-  const showUpgradeAction = planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired';
+  const showUpgradeAction =
+    hasSubscriptionPlan &&
+    (planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired');
 
   const isItemActive = (href: string) => {
     if (href === '/user') return pathname === '/user';
@@ -118,7 +122,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 <p className="truncate text-sm font-semibold text-gray-900">{planInfo.name}</p>
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-700">
                   <Crown className="h-3 w-3" />
-                  {planInfo.tier.toUpperCase()}
+                  {planInfo.tier ? planInfo.tier.toUpperCase() : '--'}
                 </span>
               </div>
 

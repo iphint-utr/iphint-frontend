@@ -678,6 +678,12 @@ export default function BillingPage() {
           const isWorking = savingPlan === plan.tier || checkoutPlan === plan.tier || upgradeLoading === plan.tier;
           const isPaddleUnavailable = !paddleClientToken && !isPaddleActive;
           const isDisabled = isWorking || isPaddleUnavailable || isCurrentPaidPlan;
+          const planButtonClass = [
+            'mt-5 w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+            isCurrentPaidPlan
+              ? 'border border-gray-200 bg-gray-200 text-gray-500'
+              : 'bg-gray-900 text-white hover:bg-gray-800',
+          ].join(' ');
 
           return (
             <div
@@ -695,7 +701,7 @@ export default function BillingPage() {
               )}
 
               {isCurrentTrialPlan && (
-                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-blue-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                   <Crown className="h-3 w-3" />
                   Pro Trial
                 </span>
@@ -706,7 +712,7 @@ export default function BillingPage() {
               <p className="text-xs text-gray-500">per month ({cycle === 'annual' ? 'billed annually' : 'billed monthly'})</p>
 
               {isCurrentTrialPlan && (
-                <p className="mt-2 text-xs font-medium text-blue-700">
+                <p className="mt-2 text-xs font-medium text-gray-700">
                   {currentSubscription?.trialDaysLeft != null
                     ? `${currentSubscription.trialDaysLeft} day${currentSubscription.trialDaysLeft !== 1 ? 's' : ''} left. Subscribe now to activate paid Pro immediately.`
                     : 'Trial active. Subscribe now to activate paid Pro immediately.'}
@@ -730,7 +736,7 @@ export default function BillingPage() {
                 type="button"
                 disabled={isDisabled}
                 onClick={() => handlePlanAction(plan.tier)}
-                className="btn-primary w-full mt-5"
+                className={planButtonClass}
               >
                 {isCurrentPaidPlan
                   ? 'Current plan'
