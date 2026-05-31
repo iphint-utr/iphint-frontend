@@ -12,15 +12,15 @@ const translations = {
       links: [
         { label: "연구",  href: "/research" },
         { label: "API",  href: "/api"      },
-        { label: "소개",  href: "/about"    },
+        { label: "블로그",  href: "/about"    },
       ],
     },
     col2: {
       heading: "이용약관 및 정책",
       links: [
         { label: "개인정보 보호 정책", href: "/privacy_policy"   },
-        { label: "서비스 이용약관",   href: "/terms_of_service" },
-        { label: "이용 정책",        href: "/usage_policy"  },
+        { label: "이용약관",   href: "/terms_of_service" },
+        { label: "사용정책",        href: "/usage_policy"  },
         { label: "환불 정책",        href: "/refund_policy"    },
       ],
     },
@@ -29,7 +29,7 @@ const translations = {
   },
   en: {
     col1: {
-      heading: "IPHINT",
+      heading: "IpHint",
       links: [
         { label: "Research", href: "/research" },
         { label: "API",      href: "/api"      },
@@ -117,7 +117,7 @@ function FooterLangSwitcher({
                       : "text-gray-600 hover:text-gray-950 hover:bg-gray-50"
                   }`}
                 >
-                  {lang.label}
+                  <span className="uppercase">{lang.label}</span>
                 </button>
               </li>
             ))}

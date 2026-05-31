@@ -10,6 +10,7 @@ const features = [
   {
     key: "socialMedia",
     icon: "/sec2_socialMedia.svg",
+    iconClassName: "w-10 h-10 md:w-11 md:h-11",
   },
   {
     key: "harmfulSites",
@@ -60,7 +61,7 @@ export default function Section2() {
                   alt={t(`features.${item.key}.title`)}
                   width={64}
                   height={64}
-                  className="w-14 h-14 md:w-16 md:h-16"
+                  className={item.iconClassName ?? "w-14 h-14 md:w-16 md:h-16"}
                 />
 
                 {/* Title */}
