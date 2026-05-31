@@ -1,41 +1,41 @@
 {
   "header": {
-    "pricing": "요금제",
+    "pricing": "가격",
     "service": "서비스",
     "contactUs": "문의하기",
-    "getStarted": "시작하기"
+    "getStarted": "지금시작하기"
   },
   "Landing": {
     "section1": {
-      "title": "IpHint로 아이디어와\n브랜드 성장을 보호하세요.",
-      "subtitle": "24시간 추적 시스템으로 시각 자산을 놓치지 마세요",
-      "description": "데이터만으로는 의미가 없습니다. 저희는 위험도가 높은 글로벌 사이트에서 정밀 탐지를 우선하여, 권리에 직접 영향을 주는 핵심 정보만 보고합니다.",
+      "title": "당신의 아이디어와\n브랜드의 성장을 보호하세요.",
+      "subtitle": "당신의 비주얼 자산을 쉬지않고 추적하여 알려드립니다.",
+      "description": "단순한 데이터 나열은 의미가 없습니다. 유출 위험이 높은 글로벌 핵심 사이트를 우선 정밀 탐지하여, 당신의 권리와 직결된 실질적 정보만 선별 보고합니다.",
       "primaryCta": "지금 시작하기",
-      "secondaryCta": "바로 시작",
+      "secondaryCta": "세일즈 문의",
       "imageAlt": "히어로 일러스트"
     },
     "section2": {
-      "title": "규모와 관계없이 누구나 이용할 수 있는 보안 서비스",
+      "title": "규모에 상관없이,\n누구나 쉽게 보호받을 수 있는 보안 서비스",
       "features": {
         "searchEngines": {
-          "title": "검색 엔진",
-          "description": "주요 검색 엔진 전반에서 데이터 기반 이미지 탐지를 제공합니다"
+          "title": "글로벌 검색 엔진",
+          "description": "주요 엔진별 데이터 기반 \n이미지 탐지 및 분석"
         },
         "socialMedia": {
-          "title": "소셜 미디어",
-          "description": "SNS에서 AI 기반 이미지 매칭과 도용 탐지를 제공합니다"
+          "title": "소셜네트워크",
+          "description": "SNS 내 이미지 유사도 분석을 통한\n무단 도용 탐지"
         },
         "harmfulSites": {
           "title": "유해 사이트",
-          "description": "5만 개 이상의 불법 채널을 실시간으로 추적합니다"
+          "description": "DB화된 50,000개 이상의 \n 불법 유통지 추적"
         },
         "streamingSites": {
           "title": "스트리밍 사이트",
-          "description": "영상 및 스트리밍 플랫폼을 선제적으로 모니터링합니다"
+          "description": "주요 동영상 플랫폼 및 미승인 스트리밍 채널\n정밀 모니터링"
         },
         "deepWeb": {
           "title": "딥웹",
-          "description": "폐쇄형 웹 커뮤니티에 유출된 자산을 추적합니다"
+          "description": "폐쇄형 커뮤니티 및 아카이브 사이트 내 \n유출 흔적 추적"
         }
       }
     },
@@ -44,24 +44,24 @@
       "description": "웹 전반의 유출 여부를 확인하고 결과에 맞춰 적절한 조치를 취하세요!",
       "features": {
         "deepWebDetection": {
-          "title": "딥웹 탐지",
-          "description": "일반 검색 엔진으로 찾기 어려운 성인 사이트, 유해 사이트, 스트리밍 사이트까지 폭넓게 스캔합니다."
+          "title": "글로벌 엔진 통합 검색",
+          "description": "국내 포털이 놓치기 쉬운 해외 유출 경로를 정밀하게  방대한 글로벌 데이터를 활용하여 탐지합니다."
         },
         "highAccuracy": {
-          "title": "높은 정확도",
-          "description": "AI 기반 이미지 매칭 기술로 수정된 이미지도 정확히 식별하고 유사 콘텐츠 노출을 방지합니다."
+          "title": "듀얼 AI 교차 식별",
+          "description": "서로 다른 알고리즘을 가진 두 엔진이 이미지를 분석합니다. 변형되거나 훼손된 이미지도 높은 정확도로 식별합니다."
         },
         "alertService": {
-          "title": "알림 서비스",
-          "description": "직접 검색하느라 시간을 쓰지 않아도 됩니다. 새로운 일치 항목이 발견되면 즉시 알려드려 빠르게 대응할 수 있습니다."
+          "title": "탐지 알림 서비스",
+          "description": "새로운 일치 항목이 발견되면 즉시 알림을 발송합니다. 번거로운 수동 검색 없이 유출 상황에 빠르게 대응하세요."
         },
         "secureStorage": {
-          "title": "안전한 보관",
-          "description": "업로드된 이미지는 암호화되어 안전하게 보관되며, 개인정보 보호를 최우선으로 합니다."
+          "title": "보안 표준 기반 안전 보관",
+          "description": "모든 데이터는 암호화 기술로 안전하게 관리됩니다. 사용자의 저작권과 개인정보 보호를 최우선으로 합니다."
         }
       },
       "footerQuestion": "엔터프라이즈급 데이터 레지던시가 필요하신가요?",
-      "footerCta": "영업팀에 문의"
+      "footerCta": "세일즈 문의"
     },
     "section4": {
       "title": "크리에이터와 브랜드",
@@ -92,8 +92,8 @@
       "goToSlide": "{index}번 슬라이드로 이동"
     },
     "section5": {
-      "title": "왜 우리를 신뢰할까요",
-      "subtitle": "사칭 계정 추적 시간을 5.5시간 절감했습니다.",
+      "title": "우리를 신뢰하는 이유",
+      "subtitle": "세계 각국의 인플루언서, 아티스트,크리에이터와 함께 성장합니다. 아이피힌트를 활용한 팀의 성과를 확인하세요",
       "testimonials": {
         "artist": {
           "quote": "12시간 걸리던 모니터링을 30분으로 줄였습니다.",
@@ -136,7 +136,7 @@
       }
     },
     "section7": {
-      "title": "언론 보도",
+      "title": "뉴스",
       "articles": {
         "1": {
           "source": "뉴욕타임스",
@@ -144,7 +144,7 @@
         },
         "2": {
           "source": "뉴욕타임스",
-          "title": "글로벌 위조 상품 대응: ImgMov(iphint.com) 활용 사례"
+          "title": "글로벌 위조 상품 대응: IPHINT(iphint.com) 활용 사례"
         },
         "3": {
           "source": "뉴욕타임스",
@@ -154,10 +154,10 @@
     },
     "section8": {
       "titleBeforeBrand": "",
-      "brand": "IpHint",
-      "titleAfterBrand": "와 함께 모니터링을 시작하세요",
-      "primaryCta": "바로 시작",
-      "secondaryCta": "영업팀에 문의"
+      "brand": "IpHint ",
+      "titleAfterBrand": " 모니터링 지금 시작해보세요.",
+      "primaryCta": "지금 시작하기",
+      "secondaryCta": "세일즈 문의"
     }
   },
   "Dashboard": {
@@ -202,29 +202,30 @@
   },
   "Auth": {
     "signupTitle": "회원가입",
-    "nameLabel": "이름이 무엇인가요?",
-    "namePlaceholder": "성함을 입력해주세요",
-    "businessLabel": "비즈니스 환경은 무엇인가요?",
-    "businessPlaceholder": "회사 또는 프로젝트 이름",
-    "roleLabel": "구체적인 역할은 무엇인가요?",
-    "rolePlaceholder": "예: 디자이너, 대표, 프리랜서",
-    "contactLabel": "알림 연락처",
-    "countryLabel": "주요 국가/지역",
-    "emailLabel": "보고서 수신 이메일",
+    "nameLabel": "반가워요! 성함을 알려주세요.",
+    "namePlaceholder": "실명을 입력해 주세요",
+    "businessLabel": "활동 중인 비즈니스 환경을 알려주세요.",
+    "businessPlaceholder": "소속 회사 또는 프로젝트명 입력",
+    "roleLabel": "현재 맡고 계신 구체적인 역할을 적어주세요.",
+    "rolePlaceholder": "직책/분야 입력 (예: 디자이너, CEO, 개발자, 프리랜서)",
+    "contactLabel": "침해 사실을 즉시 알려드릴 연락처입니다.",
+    "countryLabel": "현재 계신 주요 국가를 설정합니다.",
+    "emailLabel": "상세 분석 리포트를 보내드릴 주소입니다.",
     "emailPlaceholder": "업무용 또는 활성 이메일 주소",
     "passwordLabel": "비밀번호",
     "passwordPlaceholder": "비밀번호를 입력해주세요",
     "submitSignup": "7일 무료로 시작하기",
-    "loginTitle": "로그인",
-    "continueWithGoogle": "Google로 계속하기",
+    "loginTitle": "계정 로그인",
+    "continueWithGoogle": "Google 계정으로 로그인",
     "emailOnlyLabel": "이메일",
     "loginEmailPlaceholder": "이메일 주소를 입력해주세요",
-    "passwordOnlyLabel": "비밀번호",
+    "passwordOnlyLabel": "패스워드",
     "loginPasswordPlaceholder": "비밀번호를 입력해주세요",
     "forgetPassword": "비밀번호 찾기",
     "submitLogin": "로그인",
     "noAccountText": "계정이 없으신가요?",
-    "noAccountLink": "가입하기"
+    "noAccountLink": "회원가입",
+    "loginErrorGeneric": "문제가 발생했습니다. 다시 시도해 주세요."
   },
   "Admin": {
     "sidebar": {
@@ -517,7 +518,7 @@
   },
   "services": {
     "about": {
-      "title": "ImgMov 소개",
+      "title": "IPHINT 소개",
       "subtitle": "콘텐츠를 모니터링하는 가장 쉬운 방법."
     },
     "commonReality": {
