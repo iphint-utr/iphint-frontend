@@ -11,8 +11,8 @@ export default function Section6() {
   const t = useTranslations("Landing.section6");
 
   return (
-    <section className="py-20 bg-white px-6">
-      <div className="max-w-5xl mx-auto">
+    <section className="w-full py-20 bg-white">
+      <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-12">{t("title")}</h2>
         <div className="border-t border-gray-100">
           {blogPosts.map((post) => (
