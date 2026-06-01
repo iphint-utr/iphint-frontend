@@ -48,6 +48,38 @@ export default function AdminUsersPage() {
     return statusToken ? t(`common.statusLabels.${statusToken}`) : humanizeAdminValue(status);
   };
 
+  const getPlanLabel = (member: (typeof data)[number]) => {
+    const status = member.subscription?.status?.toLowerCase() || '';
+    const source = member.subscription?.grantSource?.toLowerCase() || '';
+    const isTrialing = status === 'trialing' || source === 'trial';
+    const isTrialExpired = source === 'trial' && ['expired', 'cancelled'].includes(status);
+
+    if (isTrialing) {
+      return 'Pro (Trial)';
+    }
+
+    if (isTrialExpired) {
+      return 'Starter';
+    }
+
+    if (!member.subscription) {
+      return t('users.noActiveSubscription');
+    }
+
+    return member.subscription.planName || member.subscription.tier || 'Pro';
+  };
+
+  const getBillingLabel = (member: (typeof data)[number]) => {
+    const status = member.subscription?.status?.toLowerCase() || '';
+    const source = member.subscription?.grantSource?.toLowerCase() || '';
+    const isTrialing = status === 'trialing' || source === 'trial';
+    if (isTrialing) {
+      return t('users.trialBillingCycle');
+    }
+
+    return member.subscription?.billingCycle || t('users.noActiveSubscription');
+  };
+
   const applyFilters = () => {
     startTransition(() => {
       setPage(1);
@@ -207,11 +239,20 @@ export default function AdminUsersPage() {
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div className="min-w-0 rounded-2xl border border-slate-200 bg-white px-3 py-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('users.columns.plan')}</p>
-                    <p className="mt-2 text-sm font-medium text-slate-900" title={member.subscription?.tier ?? t('users.planFallback')}>
-                      {truncateText(member.subscription?.tier ?? t('users.planFallback'), 24)}
+                    <p className="mt-2 text-sm font-medium text-slate-900" title={getPlanLabel(member)}>
+                      {truncateText(getPlanLabel(member), 24)}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500" title={member.subscription?.status ?? t('users.subscriptionUnavailable')}>
-                      {truncateText(member.subscription?.status ?? t('users.subscriptionUnavailable'), 28)}
+                    <p className="mt-1 text-xs text-slate-500" title={member.subscription?.status ? getStatusLabel(member.subscription.status) : t('users.noActiveSubscription')}>
+                      {truncateText(member.subscription?.status ? getStatusLabel(member.subscription.status) : t('users.noActiveSubscription'), 28)}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t('users.columns.source')}: {member.subscription?.grantSource ? humanizeAdminValue(member.subscription.grantSource) : t('users.noActiveSubscription')}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t('users.columns.trialEnds')}: {member.subscription?.trialEndDate ? formatAdminDate(member.subscription.trialEndDate, locale) : '-'}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t('users.columns.billingCycle')}: {getBillingLabel(member)}
                     </p>
                   </div>
                   <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
@@ -280,11 +321,20 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-4 align-top">
                       <div className="max-w-[14rem] text-sm text-slate-700">
-                        <p className="font-medium text-slate-900" title={member.subscription?.tier ?? t('users.planFallback')}>
-                          {truncateText(member.subscription?.tier ?? t('users.planFallback'), 22)}
+                        <p className="font-medium text-slate-900" title={getPlanLabel(member)}>
+                          {truncateText(getPlanLabel(member), 22)}
                         </p>
-                        <p className="mt-1 text-xs text-slate-500" title={member.subscription?.status ?? t('users.subscriptionUnavailable')}>
-                          {truncateText(member.subscription?.status ?? t('users.subscriptionUnavailable'), 26)}
+                        <p className="mt-1 text-xs text-slate-500" title={member.subscription?.status ? getStatusLabel(member.subscription.status) : t('users.noActiveSubscription')}>
+                          {truncateText(member.subscription?.status ? getStatusLabel(member.subscription.status) : t('users.noActiveSubscription'), 26)}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {t('users.columns.source')}: {member.subscription?.grantSource ? humanizeAdminValue(member.subscription.grantSource) : t('users.noActiveSubscription')}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {t('users.columns.trialEnds')}: {member.subscription?.trialEndDate ? formatAdminDate(member.subscription.trialEndDate, locale) : '-'}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {t('users.columns.billingCycle')}: {getBillingLabel(member)}
                         </p>
                       </div>
                     </td>

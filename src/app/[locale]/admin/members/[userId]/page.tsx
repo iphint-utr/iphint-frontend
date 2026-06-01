@@ -87,15 +87,42 @@ export default function AdminMemberDetailsPage() {
     return null;
   }
 
-  const isTrialSubscription =
-    data.subscription?.status?.toLowerCase() === 'trialing' ||
-    data.subscription?.grantSource?.toLowerCase() === 'trial';
-  const planBaseName = data.subscription?.planName || data.subscription?.planId;
-  const planDisplayName = planBaseName
-    ? `${planBaseName}${isTrialSubscription ? ' (Trial)' : ''}`
-    : isTrialSubscription
-      ? 'Trial'
-      : t('memberDetails.unavailable');
+  const subscriptionStatusValue = (data.subscription?.status || data.subscriptionStatus || '').toLowerCase();
+  const subscriptionSource = (data.subscription?.grantSource || '').toLowerCase();
+  const isTrialing = subscriptionStatusValue === 'trialing' || subscriptionSource === 'trial';
+  const isTrialExpired =
+    subscriptionSource === 'trial' && ['expired', 'cancelled'].includes(subscriptionStatusValue);
+  const hasSubscriptionRecord = Boolean(data.subscription);
+
+  const planDisplayName = isTrialing
+    ? 'Pro (Trial)'
+    : isTrialExpired
+      ? 'Starter'
+      : hasSubscriptionRecord
+        ? data.subscription?.planName || data.subscription?.planId || 'Pro'
+        : t('memberDetails.noActiveSubscription');
+
+  const statusDisplayValue = isTrialing
+    ? 'trialing'
+    : hasSubscriptionRecord
+      ? subscriptionStatusValue || 'pending'
+      : 'expired';
+
+  const sourceDisplayValue = hasSubscriptionRecord
+    ? subscriptionSource || 'paid'
+    : 'none';
+
+  const billingDisplay = isTrialing
+    ? t('memberDetails.trialBillingCycle')
+    : hasSubscriptionRecord
+      ? (data.subscription?.billingCycle || t('memberDetails.noActiveSubscription'))
+      : t('memberDetails.noActiveSubscription');
+
+  const trialDaysLeft =
+    data.subscription?.trialDaysLeft === null || data.subscription?.trialDaysLeft === undefined
+      ? null
+      : Number(data.subscription?.trialDaysLeft);
+  const trialEndDate = data.subscription?.trialEndDate || '';
 
   return (
     <div className="space-y-8">
@@ -337,17 +364,42 @@ export default function AdminMemberDetailsPage() {
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.status')}</span>
-                <AdminStatusBadge
-                  value={data.subscription?.status || 'inactive'}
-                  label={data.subscription?.status ? getStatusLabel(data.subscription.status) : t('memberDetails.unavailable')}
-                />
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <AdminStatusBadge value={statusDisplayValue} label={getStatusLabel(statusDisplayValue)} />
+                  {isTrialExpired ? <AdminStatusBadge value="expired" label={t('memberDetails.trialExpired')} /> : null}
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <span>{t('memberDetails.subscriptionFields.source')}</span>
+                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right">
+                  {sourceDisplayValue === 'none' ? t('memberDetails.noActiveSubscription') : humanizeAdminValue(sourceDisplayValue)}
+                </span>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.billingCycle')}</span>
-                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={data.subscription?.billingCycle || t('memberDetails.unavailable')}>
-                  {truncateText(data.subscription?.billingCycle || t('memberDetails.unavailable'), 24)}
+                <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right" title={billingDisplay}>
+                  {truncateText(billingDisplay, 24)}
                 </span>
               </div>
+              {isTrialing ? (
+                <>
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <span>{t('memberDetails.subscriptionFields.trialDaysLeft')}</span>
+                    <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right">
+                      {trialDaysLeft === null ? t('memberDetails.unavailable') : t('memberDetails.trialDaysLeftValue', { count: trialDaysLeft })}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <span>{t('memberDetails.subscriptionFields.trialEndDate')}</span>
+                    <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right">
+                      {trialEndDate ? formatAdminDate(trialEndDate, locale) : t('memberDetails.unavailable')}
+                    </span>
+                  </div>
+                  <p className="rounded-2xl border border-sky-100 bg-sky-50 px-3 py-2 text-xs text-sky-800">
+                    {t('memberDetails.trialHelperText')}
+                  </p>
+                </>
+              ) : null}
             </div>
           </AdminPanel>
 

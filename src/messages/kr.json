@@ -263,6 +263,10 @@
         "reviewed": "검토 완료",
         "underAnalysis": "분석 중",
         "approved": "승인됨",
+        "trialing": "체험 중",
+        "pastDue": "연체",
+        "paused": "일시중지",
+        "pending": "대기 중",
         "cancelled": "취소됨",
         "expired": "만료됨"
       },
@@ -337,6 +341,9 @@
         "member": "회원",
         "status": "상태",
         "plan": "요금제",
+        "source": "출처",
+        "trialEnds": "체험 종료일",
+        "billingCycle": "청구",
         "searches": "검색 수",
         "joined": "가입일",
         "actions": "작업"
@@ -344,7 +351,9 @@
       "loading": "사용자 목록을 불러오는 중입니다...",
       "empty": "현재 필터에 맞는 회원이 없습니다.",
       "planFallback": "구독 없음",
-      "subscriptionUnavailable": "구독 정보 없음"
+      "subscriptionUnavailable": "구독 정보 없음",
+      "noActiveSubscription": "Starter (활성 구독 없음)",
+      "trialBillingCycle": "체험"
     },
     "memberDetails": {
       "eyebrow": "회원 상세",
@@ -395,8 +404,16 @@
       "subscriptionFields": {
         "plan": "요금제",
         "status": "상태",
-        "billingCycle": "청구 주기"
+        "source": "출처",
+        "billingCycle": "청구 주기",
+        "trialDaysLeft": "체험 남은 일수",
+        "trialEndDate": "체험 종료일"
       },
+      "trialDaysLeftValue": "{count}일 남음",
+      "trialHelperText": "업그레이드하지 않으면 체험 종료 후 Starter로 자동 전환됩니다.",
+      "trialExpired": "체험 만료",
+      "noActiveSubscription": "Starter (활성 구독 없음)",
+      "trialBillingCycle": "체험",
       "adminActionsTitle": "관리자 작업",
       "adminActionsDescription": "정책 위반이나 운영 조치가 필요할 때 계정을 비활성화합니다.",
       "deactivateReasonLabel": "비활성화 사유",

@@ -96,7 +96,15 @@ const normalizeSubscription = (
 
   return {
     tier: String(subscription.tier ?? 'free'),
+    planName: String(subscription.planName ?? ''),
     status: String(subscription.status ?? 'unknown'),
+    grantSource: String(subscription.grantSource ?? ''),
+    billingCycle: String(subscription.billingCycle ?? ''),
+    trialEndDate: String(subscription.trialEndDate ?? ''),
+    trialDaysLeft:
+      subscription.trialDaysLeft === undefined || subscription.trialDaysLeft === null
+        ? null
+        : Number(subscription.trialDaysLeft),
   };
 };
 
@@ -152,6 +160,7 @@ const normalizeMemberDetails = (payload: unknown): AdminMemberDetails => {
     credits: Number(data.credits ?? 0),
     monitors: Number(data.monitors ?? 0),
     subscriptionId: String(data.subscriptionId ?? ''),
+    subscriptionStatus: String(data.subscriptionStatus ?? ''),
     subscription: subscription
       ? {
           planId: String(subscription.planId ?? ''),
@@ -162,6 +171,11 @@ const normalizeMemberDetails = (payload: unknown): AdminMemberDetails => {
           grantSource: String(subscription.grantSource ?? ''),
           status: String(subscription.status ?? ''),
           billingCycle: String(subscription.billingCycle ?? ''),
+          trialEndDate: String(subscription.trialEndDate ?? ''),
+          trialDaysLeft:
+            subscription.trialDaysLeft === undefined || subscription.trialDaysLeft === null
+              ? null
+              : Number(subscription.trialDaysLeft),
         }
       : null,
     searchCount: Number(data.searchCount ?? 0),

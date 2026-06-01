@@ -28,7 +28,12 @@ export interface AdminDashboardData {
 
 export interface AdminSubscriptionSummary {
   tier: string;
+  planName: string;
   status: string;
+  grantSource: string;
+  billingCycle: string;
+  trialEndDate: string;
+  trialDaysLeft: number | null;
 }
 
 export interface AdminUserListItem {
@@ -66,6 +71,8 @@ export interface AdminMemberSubscription {
   grantSource: string;
   status: string;
   billingCycle: string;
+  trialEndDate: string;
+  trialDaysLeft: number | null;
 }
 
 export interface AdminMemberDetails {
@@ -83,6 +90,7 @@ export interface AdminMemberDetails {
   credits: number;
   monitors: number;
   subscriptionId: string;
+  subscriptionStatus: string;
   subscription: AdminMemberSubscription | null;
   searchCount: number;
   searches: AdminMemberSearch[];
