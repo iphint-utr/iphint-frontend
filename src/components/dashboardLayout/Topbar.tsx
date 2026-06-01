@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, Bell, Check, Search, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import LocaleSwitcher from '@/components/layout/LocaleSwitcher';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -22,6 +23,7 @@ interface NotificationItem {
 }
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
+	const t = useTranslations('Dashboard.topbar');
 	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -32,14 +34,14 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	const menuRef = useRef<HTMLDivElement | null>(null);
 
 	const pageTitle = (() => {
-		if (!pathname) return 'Dashboard';
-		if (pathname === '/user') return 'Dashboard';
-		if (pathname.startsWith('/user/monitoring')) return 'Monitoring';
-		if (pathname.startsWith('/user/billing')) return 'Billing';
-		if (pathname.startsWith('/user/settings')) return 'Settings';
-		if (pathname.startsWith('/user/searches/')) return 'Details';
-		if (pathname.startsWith('/user/searches')) return 'Searches';
-		return 'Dashboard';
+		if (!pathname) return t('pageTitles.dashboard');
+		if (pathname === '/user') return t('pageTitles.dashboard');
+		if (pathname.startsWith('/user/monitoring')) return t('pageTitles.monitoring');
+		if (pathname.startsWith('/user/billing')) return t('pageTitles.billing');
+		if (pathname.startsWith('/user/settings')) return t('pageTitles.settings');
+		if (pathname.startsWith('/user/searches/')) return t('pageTitles.details');
+		if (pathname.startsWith('/user/searches')) return t('pageTitles.searches');
+		return t('pageTitles.dashboard');
 	})();
 
 	const loadNotifications = async (q = '') => {
@@ -139,7 +141,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 			<div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
 				<div className="flex min-w-0 items-center gap-3">
 					<button
-						aria-label="Open sidebar"
+						aria-label={t('openSidebar')}
 						onClick={onMenuClick}
 						className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 lg:hidden"
 					>
@@ -154,7 +156,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 							type="button"
 							onClick={() => setNotificationOpen((prev) => !prev)}
 							className="relative inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-							aria-label="Open notifications"
+							aria-label={t('openNotifications')}
 						>
 							<Bell size={16} />
 							{unreadCount > 0 && (
@@ -167,13 +169,13 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 						{notificationOpen && (
 							<div className="absolute right-0 top-11 z-30 w-[22rem] max-w-[calc(100vw-1rem)] rounded-xl border border-gray-200 bg-white p-3 shadow-lg sm:w-96">
 								<div className="mb-2 flex items-center justify-between">
-									<p className="text-sm font-semibold text-gray-900">Notifications</p>
+									<p className="text-sm font-semibold text-gray-900">{t('notifications')}</p>
 									<button
 										type="button"
 										onClick={markAllRead}
 										className="text-xs text-gray-600 hover:text-gray-900"
 									>
-										Mark all read
+										{t('markAllRead')}
 									</button>
 								</div>
 
@@ -182,7 +184,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 									<input
 										value={notificationQuery}
 										onChange={(e) => setNotificationQuery(e.target.value)}
-										placeholder="Search notifications"
+										placeholder={t('searchPlaceholder')}
 										className="w-full rounded-lg border border-gray-300 py-2 pl-8 pr-3 text-xs text-gray-800 outline-none focus:border-gray-400"
 									/>
 								</div>
@@ -190,7 +192,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 								<div className="max-h-80 space-y-2 overflow-y-auto pr-1">
 									{notifications.length === 0 ? (
 										<p className="rounded-lg border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-500">
-											No notifications found.
+											{t('empty')}
 										</p>
 									) : (
 										notifications.map((item) => (
@@ -218,7 +220,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 																type="button"
 																onClick={() => markRead(item._id)}
 																className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50"
-																aria-label="Mark as read"
+																aria-label={t('markAsRead')}
 															>
 																<Check className="h-3.5 w-3.5" />
 															</button>
@@ -227,7 +229,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 															type="button"
 															onClick={() => removeNotification(item._id)}
 															className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border border-red-200 bg-white text-red-600 hover:bg-red-50"
-															aria-label="Delete notification"
+															aria-label={t('deleteNotification')}
 														>
 															<Trash2 className="h-3.5 w-3.5" />
 														</button>

@@ -27,7 +27,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const subscriptionLoading = useAppSelector((state) => state.account.subscription.loading);
   const hasSubscriptionPlan = !!subscriptionSnapshot?.plan;
   const planInfo = {
-    name: subscriptionSnapshot?.plan?.name ?? (subscriptionLoading ? 'Loading...' : '--'),
+    name: subscriptionSnapshot?.plan?.name ?? (subscriptionLoading ? dashboardT('sidebar.loadingPlan') : '--'),
     tier: subscriptionSnapshot?.plan?.tier ?? null,
     subscriptionStatus: subscriptionSnapshot?.subscription?.status || null,
   };
@@ -46,8 +46,8 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const displayName =
     normalizedUserName && normalizedUserName.toLowerCase() !== 'user'
       ? normalizedUserName
-      : emailLocalPart || 'User';
-  const company = user.role || 'Organization';
+      : emailLocalPart || dashboardT('sidebar.userFallback');
+  const company = user.role || dashboardT('sidebar.organizationFallback');
   const isAdmin = user.role === 'admin';
   const showUpgradeAction =
     hasSubscriptionPlan &&
@@ -71,7 +71,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     <>
       {open && (
         <button
-          aria-label="Close sidebar overlay"
+          aria-label={dashboardT('sidebar.closeOverlay')}
           className="fixed inset-0 z-30 bg-black/20 lg:hidden"
           onClick={onClose}
         />
@@ -91,7 +91,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
               router.push('/user');
             }}
             className="flex h-16 cursor-pointer items-center border-b border-gray-200 px-4"
-            aria-label="Go to dashboard"
+            aria-label={dashboardT('sidebar.goToDashboard')}
           >
             <Image src="/logo_mo.svg" alt="IPHINT" width={102} height={28} priority className="h-7 w-auto" />
           </button>

@@ -2,10 +2,12 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
 
 export default function ResetPasswordPage() {
+  const t = useTranslations('Auth.resetPasswordPage');
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = useMemo(() => (searchParams.get('token') || '').trim(), [searchParams]);
@@ -31,27 +33,27 @@ export default function ResetPasswordPage() {
     setSuccess(null);
 
     if (!token) {
-      setError('Reset token is missing. Please request a new reset link.');
+      setError(t('missingTokenError'));
       return;
     }
 
     if (!isStrongPassword(password)) {
-      setError('Use 8-128 chars with uppercase, lowercase, number, and special character.');
+      setError(t('weakPasswordError'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError(t('mismatchError'));
       return;
     }
 
     setSubmitting(true);
     try {
       const response = await apiClient.post('/auth/reset-password', { token, password });
-      setSuccess(response.data?.message || 'Password reset successful. You can now log in.');
+      setSuccess(response.data?.message || t('success'));
       setTimeout(() => router.push('/login'), 1200);
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Unable to reset password. The link may be expired.'));
+      setError(getApiErrorMessage(err, t('error')));
     } finally {
       setSubmitting(false);
     }
@@ -60,36 +62,36 @@ export default function ResetPasswordPage() {
   return (
     <main className="min-h-screen bg-white px-6 py-16 text-gray-900 sm:px-10 lg:px-16">
       <div className="mx-auto w-full max-w-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-gray-500">Account access</p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-5xl">Reset password</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-gray-500">{t('eyebrow')}</p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
         <p className="mt-4 text-base leading-7 text-gray-600 sm:text-lg">
-          Create a new password for your account.
+          {t('description')}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
           <div>
-            <label htmlFor="password" className="mb-2 block text-sm font-medium text-black">New password</label>
+            <label htmlFor="password" className="mb-2 block text-sm font-medium text-black">{t('newPasswordLabel')}</label>
             <input
               id="password"
               type="password"
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter new password"
+              placeholder={t('newPasswordPlaceholder')}
               className="input-field"
             />
-            <p className="mt-2 text-xs text-gray-500">Use 8-128 chars with uppercase, lowercase, number, and special character.</p>
+            <p className="mt-2 text-xs text-gray-500">{t('helper')}</p>
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-black">Confirm password</label>
+            <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-black">{t('confirmPasswordLabel')}</label>
             <input
               id="confirmPassword"
               type="password"
               required
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder="Re-enter new password"
+              placeholder={t('confirmPasswordPlaceholder')}
               className="input-field"
             />
           </div>
@@ -98,10 +100,10 @@ export default function ResetPasswordPage() {
             {submitting ? (
               <>
                 <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
-                <span>Updating...</span>
+                <span>{t('submitLoading')}</span>
               </>
             ) : (
-              'Reset password'
+              t('submit')
             )}
           </button>
 
@@ -111,7 +113,7 @@ export default function ResetPasswordPage() {
 
         <div className="mt-6">
           <Link href="/login" className="rounded-full border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50">
-            Back to login
+            {t('backToLogin')}
           </Link>
         </div>
       </div>

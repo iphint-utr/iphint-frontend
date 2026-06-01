@@ -1,71 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-
-const translations = {
-  kr: {
-    col1: {
-      heading: "투스타",
-      links: [
-        { label: "연구",  href: "/research" },
-        { label: "API",  href: "/api"      },
-        { label: "블로그",  href: "/about"    },
-      ],
-    },
-    col2: {
-      heading: "이용약관 및 정책",
-      links: [
-        { label: "개인정보 보호 정책", href: "/privacy_policy"   },
-        { label: "이용약관",   href: "/terms_of_service" },
-        { label: "사용정책",        href: "/usage_policy"  },
-        { label: "환불 정책",        href: "/refund_policy"    },
-      ],
-    },
-    copyright: "©2026 IPHINT. All Rights Reserved.",
-    langLabel:  "한국어",
-  },
-  en: {
-    col1: {
-      heading: "IpHint",
-      links: [
-        { label: "Research", href: "/research" },
-        { label: "API",      href: "/api"      },
-        { label: "About",    href: "/about"    },
-      ],
-    },
-    col2: {
-      heading: "Terms & Policies",
-      links: [
-        { label: "Privacy Policy",   href: "/privacy_policy"  },
-        { label: "Terms of Service", href: "/terms_of_service" },
-        { label: "Usage Policy",     href: "/usage_policy" },
-        { label: "Refund Policy",    href: "/refund_policy"   },
-      ],
-    },
-    copyright: "©2026 IPHINT. All Rights Reserved.",
-    langLabel:  "English",
-  },
-} as const;
-
-type Locale = keyof typeof translations;
-
-const languages = [
-  { label: "한국어", value: "kr" },
-  { label: "English", value: "en" },
-];
+const localeOptions = ["kr", "en"] as const;
+type LocaleCode = (typeof localeOptions)[number];
 
 function FooterLangSwitcher({
   selected,
+  labels,
+  ariaLabel,
   onSelect,
 }: {
   selected: string;
-  onSelect: (l: string) => void;
+  labels: Array<{ label: string; value: LocaleCode }>;
+  ariaLabel: string;
+  onSelect: (l: LocaleCode) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const current = languages.find((l) => l.value === selected);
+  const current = labels.find((l) => l.value === selected);
 
   return (
     <div className="relative">
@@ -104,10 +58,10 @@ function FooterLangSwitcher({
           />
           <ul
             role="listbox"
-            aria-label="Select language"
+            aria-label={ariaLabel}
             className="absolute bottom-full right-0 mb-2 w-36 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 py-1 z-40"
           >
-            {languages.map((lang) => (
+            {labels.map((lang) => (
               <li key={lang.value} role="option" aria-selected={lang.value === selected}>
                 <button
                   onClick={() => { onSelect(lang.value); setOpen(false); }}
@@ -129,20 +83,22 @@ function FooterLangSwitcher({
 }
 
 export default function Footer() {
-  const params   = useParams();
-  const router   = useRouter();
+  const t = useTranslations("Footer");
+  const locale = useLocale() === "en" ? "en" : "kr";
+  const router = useRouter();
   const pathname = usePathname();
 
-  const locale: Locale = (params?.locale as string) === "en" ? "en" : "kr";
-  const t = translations[locale];
+  const languages = [
+    { label: t("languages.kr"), value: "kr" as LocaleCode },
+    { label: t("languages.en"), value: "en" as LocaleCode },
+  ];
 
-  const [selectedLang, setSelectedLang] = useState<string>(locale);
+  const changeLanguage = (newLocale: LocaleCode) => {
+    if (newLocale === locale) {
+      return;
+    }
 
-  const changeLanguage = (newLocale: string) => {
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    router.push(segments.join("/"));
-    setSelectedLang(newLocale);
+    router.replace(pathname, { locale: newLocale });
   };
 
   return (
@@ -154,7 +110,7 @@ export default function Footer() {
 
           {/* Logo — top-left, does not grow */}
           <div className="flex-shrink-0">
-            <Link href="/" aria-label="IPHINT home" className="block text-gray-950">
+            <Link href="/" aria-label={t("homeAria")} className="block text-gray-950">
               <div className="relative h-8 w-32">
                 <Image src="/logo_footer.svg" alt="IPHINT" fill className="object-contain object-left" />
               </div>
@@ -167,10 +123,14 @@ export default function Footer() {
             {/* Column 1 */}
             <div className="flex flex-col gap-5">
               <p className="text-[13px] text-gray-400 font-normal">
-                {t.col1.heading}
+                {t("companyHeading")}
               </p>
               <ul className="flex flex-col gap-[15px]">
-                {t.col1.links.map((link) => (
+                {[
+                  { href: "/research", label: t("links.research") },
+                  { href: "/api", label: t("links.api") },
+                  { href: "/about", label: t("links.about") },
+                ].map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -186,10 +146,15 @@ export default function Footer() {
             {/* Column 2 */}
             <div className="flex flex-col gap-5">
               <p className="text-[13px] text-gray-400 font-normal">
-                {t.col2.heading}
+                {t("policyHeading")}
               </p>
               <ul className="flex flex-col gap-[15px]">
-                {t.col2.links.map((link) => (
+                {[
+                  { href: "/privacy_policy", label: t("links.privacyPolicy") },
+                  { href: "/terms_of_service", label: t("links.termsOfService") },
+                  { href: "/usage_policy", label: t("links.usagePolicy") },
+                  { href: "/refund_policy", label: t("links.refundPolicy") },
+                ].map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -210,11 +175,13 @@ export default function Footer() {
       <div className="border-t border-gray-200">
         <div className="max-w-[1200px] mx-auto flex min-h-[56px] flex-col gap-3 px-4 py-4 sm:h-[56px] sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-0">
           <span className="text-center text-[13px] text-gray-500 sm:text-left">
-            {t.copyright}
+            {t("copyright")}
           </span>
           <div className="self-center sm:self-auto">
             <FooterLangSwitcher
-              selected={selectedLang}
+              selected={locale}
+              labels={languages}
+              ariaLabel={t("selectLanguageAria")}
               onSelect={changeLanguage}
             />
           </div>
