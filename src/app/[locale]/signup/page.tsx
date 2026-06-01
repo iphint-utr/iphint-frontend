@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, clearError, selectAuthNotice } from '../../../lib/store/slices/userSlice';
 import { AppDispatch, RootState } from '../../../lib/store/store';
 import { countries } from './countries';
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/slices/userSlice';
 
 
@@ -281,6 +282,14 @@ useEffect(() => {
             {passwordError}
           </div>
         )}
+
+        <div className="text-center text-sm sm:text-base">
+          <span className="font-medium text-gray-600">{t('hasAccountText')}{' '}</span>
+          <Link href="/login" className="group inline-flex items-center gap-1 font-semibold text-black transition-colors hover:text-gray-600">
+            {t('hasAccountLink')}
+            <ChevronRight size={18} className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
+        </div>
 
         <div className="mt-10 flex justify-center">
           <button 

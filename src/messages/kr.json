@@ -214,6 +214,8 @@
     "emailPlaceholder": "업무용 또는 활성 이메일 주소",
     "passwordLabel": "비밀번호",
     "passwordPlaceholder": "비밀번호를 입력해주세요",
+    "hasAccountText": "이미 계정이 있으신가요?",
+    "hasAccountLink": "로그인",
     "submitSignup": "7일 무료로 시작하기",
     "loginTitle": "계정 로그인",
     "continueWithGoogle": "Google 계정으로 로그인",

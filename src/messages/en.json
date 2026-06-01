@@ -53,6 +53,8 @@
     "emailPlaceholder": "Work or active email address",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Create a password",
+    "hasAccountText": "Already have an account?",
+    "hasAccountLink": "Log in",
     "submitSignup": "Start your 7-day free trial",
     "loginTitle": "Log in to your account",
     "continueWithGoogle": "Continue with Google",
