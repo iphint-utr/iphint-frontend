@@ -41,7 +41,12 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     { label: dashboardT('sidebar.settings'), href: '/user/settings', icon: Settings },
   ];
 
-  const displayName = user.name || 'User';
+  const normalizedUserName = (user.name || '').trim();
+  const emailLocalPart = (user.email || '').split('@')[0]?.trim() || '';
+  const displayName =
+    normalizedUserName && normalizedUserName.toLowerCase() !== 'user'
+      ? normalizedUserName
+      : emailLocalPart || 'User';
   const company = user.role || 'Organization';
   const isAdmin = user.role === 'admin';
   const showUpgradeAction =

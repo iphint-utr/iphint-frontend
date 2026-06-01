@@ -37,6 +37,11 @@ interface RegisterPayload {
   phoneNumber?: string;
 }
 
+interface UserProfilePatch {
+  name?: string;
+  email?: string;
+}
+
 interface UserState extends DashboardState {
   // Auth
   token: string | null;
@@ -77,6 +82,25 @@ const loadSession = (): { token: string | null; user: UserData | null } => {
     };
   } catch {
     return { token: null, user: null };
+  }
+};
+
+const patchStoredUser = (patch: UserProfilePatch): void => {
+  try {
+    const current = JSON.parse(localStorage.getItem('user') || 'null') as UserData | null;
+    if (!current) {
+      return;
+    }
+
+    const next: UserData = {
+      ...current,
+      ...(typeof patch.name === 'string' ? { name: patch.name } : {}),
+      ...(typeof patch.email === 'string' ? { email: patch.email } : {}),
+    };
+
+    localStorage.setItem('user', JSON.stringify(next));
+  } catch {
+    // Ignore localStorage corruption and let fresh auth flows re-hydrate session.
   }
 };
 
@@ -202,6 +226,18 @@ const userSlice = createSlice({
     incrementReferralCount(state) {
       state.referralCount += 1;
     },
+
+    syncUserProfile(state, action: PayloadAction<UserProfilePatch>) {
+      if (typeof action.payload.name === 'string') {
+        state.name = action.payload.name;
+      }
+
+      if (typeof action.payload.email === 'string') {
+        state.email = action.payload.email;
+      }
+
+      patchStoredUser(action.payload);
+    },
   },
 
   extraReducers: (builder) => {
@@ -295,7 +331,7 @@ const userSlice = createSlice({
   },
 });
 
-export const { logout, clearError, updateCredits, incrementReferralCount } =
+export const { logout, clearError, updateCredits, incrementReferralCount, syncUserProfile } =
   userSlice.actions;
 
 export default userSlice.reducer;

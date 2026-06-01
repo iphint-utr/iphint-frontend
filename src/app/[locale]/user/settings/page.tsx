@@ -25,6 +25,7 @@ import {
   updatePasswordSettings,
   updateProfileSettings,
 } from '@/lib/store/slices/accountSlice';
+import { syncUserProfile } from '@/lib/store/slices/userSlice';
 
 type SummaryFrequency = 'instant' | 'daily' | 'weekly';
 
@@ -156,7 +157,8 @@ export default function SettingsPage() {
 
   const handleSaveProfile = async () => {
     try {
-      await dispatch(updateProfileSettings(profile)).unwrap();
+      const updatedProfile = await dispatch(updateProfileSettings(profile)).unwrap();
+      dispatch(syncUserProfile({ name: updatedProfile.name, email: updatedProfile.email }));
       showMessage('Profile updated successfully.');
     } catch (err) {
       showMessage(typeof err === 'string' ? err : 'Could not update profile.', true);
