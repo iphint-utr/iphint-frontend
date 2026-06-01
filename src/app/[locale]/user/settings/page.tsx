@@ -2,16 +2,12 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, CheckCircle2, Mail, Palette, RefreshCcw, Search, Shield, Trash2, UserCircle2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useRouter } from '@/i18n/routing';
 import {
-  setFontFamily,
   setFontSize,
-  FONT_FAMILY_MAP,
-  FONT_FAMILY_LABELS,
-  FONT_SIZE_MAP,
   FONT_SIZE_LABELS,
-  type FontFamilyKey,
   type FontSizeKey,
 } from '@/lib/store/slices/themeSlice';
 import {
@@ -61,6 +57,7 @@ interface NotificationItem {
 export default function SettingsPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const locale = useLocale();
   const {
     profile: storedProfile,
     notificationPreferences: storedNotificationPrefs,
@@ -76,7 +73,7 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [settingsSection, setSettingsSection] = useState<'profile' | 'notifications' | 'appearance'>('profile');
-  const { fontFamily, fontSize } = useAppSelector((state) => state.theme);
+  const { fontSize } = useAppSelector((state) => state.theme);
 
   const [profile, setProfile] = useState<SettingsProfile>({
     name: '',
@@ -124,15 +121,15 @@ export default function SettingsPage() {
     setError('');
   };
 
-  const loadSettings = async () => {
+  const loadSettings = React.useCallback(async () => {
     await dispatch(fetchSettingsOverview()).unwrap();
-  };
+  }, [dispatch]);
 
-  const loadNotifications = async (status: 'all' | 'unread', q = '') => {
+  const loadNotifications = React.useCallback(async (status: 'all' | 'unread', q = '') => {
     await dispatch(
       fetchNotifications({ scope: 'settings', status, q, page: 1, limit: 20 }),
     ).unwrap();
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     setProfile(storedProfile);
@@ -148,12 +145,13 @@ export default function SettingsPage() {
         setError('');
         await Promise.all([loadSettings(), loadNotifications('all', '')]);
       } catch (err) {
-        showMessage(typeof err === 'string' ? err : 'Failed to load settings', true);
+        setError(typeof err === 'string' ? err : 'Failed to load settings');
+        setSuccess('');
       }
     };
 
     bootstrap();
-  }, [dispatch]);
+  }, [loadNotifications, loadSettings]);
 
   const handleSaveProfile = async () => {
     try {
@@ -740,25 +738,30 @@ export default function SettingsPage() {
           {/* Font Family */}
           <div>
             <p className="mb-1 text-sm font-semibold text-gray-900">Font Family</p>
-            <p className="mb-3 text-xs text-gray-500">Choose the typeface used throughout the app.</p>
+            <p className="mb-3 text-xs text-gray-500">Font family is applied automatically by language across the entire app.</p>
             <div className="flex flex-wrap gap-2">
-              {(Object.keys(FONT_FAMILY_LABELS) as FontFamilyKey[]).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => dispatch(setFontFamily(key))}
-                  style={{ fontFamily: FONT_FAMILY_MAP[key] }}
-                  className={[
-                    'rounded-lg border px-4 py-2 text-sm transition-colors',
-                    fontFamily === key
-                      ? 'border-gray-900 bg-gray-900 text-white'
-                      : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-400 hover:bg-gray-100',
-                  ].join(' ')}
-                >
-                  {FONT_FAMILY_LABELS[key]}
-                </button>
-              ))}
+              <span
+                className={[
+                  'rounded-lg border px-4 py-2 text-sm transition-colors',
+                  locale === 'en'
+                    ? 'border-gray-900 bg-gray-900 text-white'
+                    : 'border-gray-200 bg-gray-50 text-gray-700',
+                ].join(' ')}
+              >
+                Noto Sans
+              </span>
+              <span
+                className={[
+                  'rounded-lg border px-4 py-2 text-sm transition-colors',
+                  locale === 'kr'
+                    ? 'border-gray-900 bg-gray-900 text-white'
+                    : 'border-gray-200 bg-gray-50 text-gray-700',
+                ].join(' ')}
+              >
+                Pretendard
+              </span>
             </div>
+            <p className="mt-3 text-xs text-gray-500">English uses Noto Sans. Korean uses Pretendard.</p>
           </div>
 
           {/* Font Size */}
