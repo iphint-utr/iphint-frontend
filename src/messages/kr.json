@@ -353,7 +353,8 @@
       "empty": "현재 필터에 맞는 회원이 없습니다.",
       "planFallback": "구독 없음",
       "subscriptionUnavailable": "구독 정보 없음",
-      "noActiveSubscription": "Starter (활성 구독 없음)",
+      "noActiveSubscription": "활성 요금제 없음",
+      "noActivePlan": "활성 요금제 없음",
       "trialBillingCycle": "체험"
     },
     "memberDetails": {
@@ -411,9 +412,10 @@
         "trialEndDate": "체험 종료일"
       },
       "trialDaysLeftValue": "{count}일 남음",
-      "trialHelperText": "업그레이드하지 않으면 체험 종료 후 Starter로 자동 전환됩니다.",
+      "trialHelperText": "유료 요금제로 업그레이드하지 않으면 체험이 종료됩니다.",
       "trialExpired": "체험 만료",
-      "noActiveSubscription": "Starter (활성 구독 없음)",
+      "noActiveSubscription": "활성 요금제 없음",
+      "noActivePlan": "활성 요금제 없음",
       "trialBillingCycle": "체험",
       "adminActionsTitle": "관리자 작업",
       "adminActionsDescription": "정책 위반이나 운영 조치가 필요할 때 계정을 비활성화합니다.",

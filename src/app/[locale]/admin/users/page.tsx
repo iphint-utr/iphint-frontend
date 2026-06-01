@@ -59,11 +59,11 @@ export default function AdminUsersPage() {
     }
 
     if (isTrialExpired) {
-      return 'Starter';
+      return t('users.noActivePlan');
     }
 
     if (!member.subscription) {
-      return t('users.noActiveSubscription');
+      return t('users.noActivePlan');
     }
 
     return member.subscription.planName || member.subscription.tier || 'Pro';
@@ -77,7 +77,15 @@ export default function AdminUsersPage() {
       return t('users.trialBillingCycle');
     }
 
-    return member.subscription?.billingCycle || t('users.noActiveSubscription');
+    return member.subscription?.billingCycle || t('users.noActivePlan');
+  };
+
+  const getSourceLabel = (member: (typeof data)[number]) => {
+    if (!member.subscription?.grantSource) {
+      return t('users.noActivePlan');
+    }
+
+    return humanizeAdminValue(member.subscription.grantSource);
   };
 
   const applyFilters = () => {
@@ -246,7 +254,7 @@ export default function AdminUsersPage() {
                       {truncateText(member.subscription?.status ? getStatusLabel(member.subscription.status) : t('users.noActiveSubscription'), 28)}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {t('users.columns.source')}: {member.subscription?.grantSource ? humanizeAdminValue(member.subscription.grantSource) : t('users.noActiveSubscription')}
+                      {t('users.columns.source')}: {getSourceLabel(member)}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
                       {t('users.columns.trialEnds')}: {member.subscription?.trialEndDate ? formatAdminDate(member.subscription.trialEndDate, locale) : '-'}
@@ -328,7 +336,7 @@ export default function AdminUsersPage() {
                           {truncateText(member.subscription?.status ? getStatusLabel(member.subscription.status) : t('users.noActiveSubscription'), 26)}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">
-                          {t('users.columns.source')}: {member.subscription?.grantSource ? humanizeAdminValue(member.subscription.grantSource) : t('users.noActiveSubscription')}
+                          {t('users.columns.source')}: {getSourceLabel(member)}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">
                           {t('users.columns.trialEnds')}: {member.subscription?.trialEndDate ? formatAdminDate(member.subscription.trialEndDate, locale) : '-'}
