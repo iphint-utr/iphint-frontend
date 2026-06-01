@@ -3,24 +3,29 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 
-export default function Section1() {
+type Section1Props = {
+  locale: "en" | "kr";
+};
+
+export default function Section1({ locale }: Section1Props) {
   const t = useTranslations("Landing.section1");
+  const heroImageSrc = locale === "kr" ? "/sec1_svg_kr.svg" : "/sec1_svg_en.svg";
 
   return (
     <section className="w-full py-16 md:py-24">
-      <div className=" max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className=" max-w-7xl mx-auto  grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* LEFT CONTENT */}
-        <div className="space-y-6">
-          <h1 className="whitespace-pre-line text-2xl md:text-3xl lg:text-3xl font-semibold text-black leading-tight">
+        <div className="space-y-6 ">
+          <h1 className="typo-t1 whitespace-pre-line text-black">
             {t("title")}
           </h1>
 
-          <h2 className="text-lg md:text-xl font-semibold text-black">
+          <h2 className="typo-t4 text-black">
             {t("subtitle")}
           </h2>
 
-          <p className="text-gray-600 max-w-xl">
+          <p className="typo-t6-r max-w-xl text-gray-600">
             {t("description")}
           </p>
 
@@ -40,15 +45,21 @@ export default function Section1() {
         </div>
 
         {/* RIGHT SVG */}
-        <div className="flex justify-center lg:justify-end">
-          <Image
-            src="/sec1_svg.svg"
-            alt={t("imageAlt")}
-            width={500}
-            height={500}
-            priority
-            className="w-[80%] md:w-[70%] lg:w-full h-auto"
-          />
+        <div className="flex justify-center lg:justify-center">
+          <div className="relative flex w-full max-w-[520px] items-center justify-center overflow-hidden rounded-[32px]">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#d7dbe0_2px,_transparent_2px)] [background-size:22px_22px]"
+            />
+            <Image
+              src={heroImageSrc}
+              alt={t("imageAlt")}
+              width={520}
+              height={520}
+              priority
+              className="relative z-10 h-auto w-full max-w-[520px] object-contain"
+            />
+          </div>
         </div>
       </div>
     </section>

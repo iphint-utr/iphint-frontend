@@ -67,6 +67,8 @@
   /* ── Brand ── */
   --brand: #000000;
   --brand-light: #eff1f5;
+  --font-google-sans: "Google Sans", "GoogleSans", var(--font-inter), system-ui, sans-serif;
+  --font-iphint: "IpHint", var(--font-plus-jakarta), var(--font-inter), system-ui, sans-serif;
 
   /* ── Semantic status ── */
   --danger: #D61111;
@@ -343,5 +345,187 @@
     opacity: 0.6;
     cursor: not-allowed;
     background-color: var(--secondary);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY SCALE
+   ───────────────────────────────────────────────────────────────
+   Product text styles from the provided typography spec.
+═══════════════════════════════════════════════════════════════ */
+@layer components {
+  .typo-t1,
+  .typo-t2,
+  .typo-t3,
+  .typo-t4,
+  .typo-t4-r,
+  .typo-t5,
+  .typo-t5-sb,
+  .typo-t6-r,
+  .typo-t7,
+  .typo-t7-r,
+  .typo-b1-b,
+  .typo-b1-r,
+  .typo-b2-b,
+  .typo-b2-r,
+  .typo-caption,
+  .typo-button-l,
+  .typo-button-m,
+  .typo-button-s,
+  .typo-text-button-l {
+    font-style: normal;
+    text-rendering: optimizeLegibility;
+  }
+
+  .typo-t1 {
+    font-family: var(--font-google-sans);
+    font-weight: 700;
+    font-size: 3.75rem;
+    line-height: 4.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .typo-t2 {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 3rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t3 {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 2.25rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t4 {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t4-r {
+    font-family: var(--font-iphint);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t5 {
+    font-family: var(--font-iphint);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t5-sb {
+    font-family: var(--font-iphint);
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t6-r {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t7 {
+    font-family: var(--font-iphint);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t7-r {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    letter-spacing: 0;
+  }
+
+  .typo-b1-b {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+  }
+
+  .typo-b1-r {
+    font-family: var(--font-iphint);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+  }
+
+  .typo-b2-b {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    letter-spacing: 0;
+  }
+
+  .typo-b2-r {
+    font-family: var(--font-iphint);
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    letter-spacing: 0;
+  }
+
+  .typo-caption {
+    font-family: var(--font-iphint);
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    letter-spacing: 0;
+  }
+
+  .typo-button-l {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    letter-spacing: 0;
+  }
+
+  .typo-button-m {
+    font-family: var(--font-iphint);
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    letter-spacing: 0;
+  }
+
+  .typo-button-s {
+    font-family: var(--font-iphint);
+    font-weight: 600;
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    letter-spacing: 0;
+  }
+
+  .typo-text-button-l {
+    font-family: var(--font-iphint);
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    letter-spacing: 0;
   }
 }

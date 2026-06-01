@@ -10,7 +10,9 @@ const features = [
   {
     key: "socialMedia",
     icon: "/sec2_socialMedia.svg",
-    iconClassName: "w-10 h-10 md:w-11 md:h-11",
+    iconWidth: 80,
+    iconHeight: 80,
+    iconClassName: "h-[80px] w-[80px] object-contain",
   },
   {
     key: "harmfulSites",
@@ -34,7 +36,7 @@ export default function Section2() {
       <div className="max-w-full mx-auto px-4 sm:px-6">
         
         {/* Rounded Container */}
-        <div className="bg-[#f3f3f3] rounded-[32px] px-6 md:px-12 py-12 md:py-16">
+        <div className="bg-[#F8F8F8] rounded-[32px] px-6 md:px-12 py-12 md:py-16">
           
           {/* Heading */}
           <h2 className="text-center text-xl md:text-2xl lg:text-3xl font-semibold text-black mb-12">
@@ -56,13 +58,15 @@ export default function Section2() {
               <div key={i} className="flex flex-col items-center space-y-4">
                 
                 {/* Icon */}
-                <Image
-                  src={item.icon}
-                  alt={t(`features.${item.key}.title`)}
-                  width={64}
-                  height={64}
-                  className={item.iconClassName ?? "w-14 h-14 md:w-16 md:h-16"}
-                />
+                <div className="flex h-[120px] w-[120px] items-center justify-center">
+                  <Image
+                    src={item.icon}
+                    alt={t(`features.${item.key}.title`)}
+                    width={item.iconWidth ?? 120}
+                    height={item.iconHeight ?? 120}
+                    className={item.iconClassName ?? "h-[120px] w-[120px] object-contain"}
+                  />
+                </div>
 
                 {/* Title */}
                 <h3 className="font-semibold text-base md:text-lg">
