@@ -373,6 +373,7 @@ html[lang='kr'] {
   .typo-t4-r,
   .typo-t5,
   .typo-t5-sb,
+  .typo-t6,
   .typo-t6-r,
   .typo-t7,
   .typo-t7-r,
@@ -442,6 +443,14 @@ html[lang='kr'] {
     font-weight: 600;
     font-size: 1.25rem;
     line-height: 1.75rem;
+    letter-spacing: 0;
+  }
+
+  .typo-t6 {
+    font-family: var(--font-iphint);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5rem;
     letter-spacing: 0;
   }
 

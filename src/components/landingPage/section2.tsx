@@ -2,7 +2,15 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
-const features = [
+type Feature = {
+  key: string;
+  icon: string;
+  iconWidth?: number;
+  iconHeight?: number;
+  iconClassName?: string;
+};
+
+const features: Feature[] = [
   {
     key: "searchEngines",
     icon: "/sec2_searchEngines.svg",
@@ -10,9 +18,6 @@ const features = [
   {
     key: "socialMedia",
     icon: "/sec2_socialMedia.svg",
-    iconWidth: 80,
-    iconHeight: 80,
-    iconClassName: "h-[80px] w-[80px] object-contain",
   },
   {
     key: "harmfulSites",
@@ -39,7 +44,7 @@ export default function Section2() {
         <div className="bg-[#F8F8F8] rounded-[32px] px-6 md:px-12 py-12 md:py-16">
           
           {/* Heading */}
-          <h2 className="text-center text-xl md:text-2xl lg:text-3xl font-semibold text-black mb-12">
+          <h2 className="mb-12 text-center text-black typo-t6 md:[font-family:var(--font-iphint)] md:text-[1.75rem] md:leading-[2.25rem] md:font-bold">
             {t("title")}
           </h2>
 
@@ -52,29 +57,34 @@ export default function Section2() {
             lg:grid-cols-5 
             gap-y-10 
             gap-x-6 
-            text-center
           ">
             {features.map((item, i) => (
-              <div key={i} className="flex flex-col items-center space-y-4">
+              <div
+                key={i}
+                className={[
+                  "flex flex-col items-center space-y-4 text-center",
+                  features.length % 2 === 1 && i === features.length - 1 ? "col-span-2 md:col-span-1" : "",
+                ].join(" ")}
+              >
                 
                 {/* Icon */}
-                <div className="flex h-[120px] w-[120px] items-center justify-center">
+                <div className="flex h-[62px] w-[62px] items-center justify-center md:h-[120px] md:w-[120px]">
                   <Image
                     src={item.icon}
                     alt={t(`features.${item.key}.title`)}
                     width={item.iconWidth ?? 120}
                     height={item.iconHeight ?? 120}
-                    className={item.iconClassName ?? "h-[120px] w-[120px] object-contain"}
+                    className={item.iconClassName ?? "h-[62px] w-[62px] object-contain md:h-[120px] md:w-[120px]"}
                   />
                 </div>
 
                 {/* Title */}
-                <h3 className="font-semibold text-base md:text-lg">
+                <h3 className="typo-t7 text-black font-bold md:[font-family:var(--font-iphint)] md:text-[1.25rem] md:leading-[1.875rem] ">
                   {t(`features.${item.key}.title`)}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-gray-600 max-w-[180px]">
+                <p className="max-w-[180px] text-gray-600 typo-caption md:[font-family:var(--font-iphint)] md:text-[1rem] md:leading-[1.5rem] md:font-bold">
                   {t(`features.${item.key}.description`)}
                 </p>
 
