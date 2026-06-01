@@ -13,10 +13,10 @@ export default function Section1({ locale }: Section1Props) {
 
   return (
     <section className="w-full py-16 md:py-24">
-      <div className=" max-w-7xl mx-auto  grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-6 xl:gap-8">
         
         {/* LEFT CONTENT */}
-        <div className="space-y-6 ">
+        <div className="space-y-6 lg:pr-4">
           <h1 className="typo-t1 whitespace-pre-line text-black">
             {t("title")}
           </h1>
@@ -45,7 +45,7 @@ export default function Section1({ locale }: Section1Props) {
         </div>
 
         {/* RIGHT SVG */}
-        <div className="flex justify-center lg:justify-center">
+        <div className="flex justify-center lg:justify-end">
           <div className="relative flex w-full max-w-[520px] items-center justify-center overflow-hidden rounded-[32px]">
             <div
               aria-hidden="true"
