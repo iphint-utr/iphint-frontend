@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
 
@@ -31,6 +32,7 @@ const INITIAL_FORM_STATE: ContactFormState = {
 const INQUIRY_LIMIT = 5000;
 
 export default function ContactPage() {
+  const t = useTranslations('Contact');
   const router = useRouter();
   const [formData, setFormData] = useState<ContactFormState>(INITIAL_FORM_STATE);
   const [submitError, setSubmitError] = useState('');
@@ -50,7 +52,7 @@ export default function ContactPage() {
     if (!fullName || !workEmail || !inquiryMessage) {
       setIsSubmitting(false);
       setSubmitSuccess('');
-      setSubmitError('Please fill in Full Name, Work Email, and Inquiry Message.');
+      setSubmitError(t('submitErrorRequired'));
       return;
     }
 
@@ -71,7 +73,7 @@ export default function ContactPage() {
         consentEventsPromotions: formData.consentEventsPromotions,
       });
 
-      setSubmitSuccess('Thanks for contacting us. Your inquiry was sent successfully. Redirecting to home...');
+      setSubmitSuccess(t('submitSuccess'));
       setFormData(INITIAL_FORM_STATE);
 
       if (redirectTimerRef.current) {
@@ -82,7 +84,7 @@ export default function ContactPage() {
         router.push('/');
       }, 1600);
     } catch (error) {
-      setSubmitError(getApiErrorMessage(error, 'Failed to send your inquiry. Please try again.'));
+      setSubmitError(getApiErrorMessage(error, t('submitError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -101,9 +103,9 @@ export default function ContactPage() {
       <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
         <div className="grid grid-cols-1 gap-8 lg:min-h-[68vh] lg:grid-cols-12 lg:items-center lg:gap-16">
           <section className="lg:col-span-4 lg:self-start lg:pt-8">
-            <h1 className="text-3xl font-bold text-black sm:text-4xl">Contact</h1>
+            <h1 className="text-3xl font-bold text-black sm:text-4xl">{t('title')}</h1>
             <p className="mt-3 max-w-md text-sm text-gray-600 sm:text-base">
-              We will prepare a customized plan and get back to you shortly!
+              {t('description')}
             </p>
           </section>
 
@@ -124,13 +126,13 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
               <div>
                 <label htmlFor="fullName" className="mb-2 block text-sm font-semibold text-black">
-                  Full Name
+                  {t('labels.fullName')}
                 </label>
                 <input
                   id="fullName"
                   name="fullName"
                   type="text"
-                  placeholder="Example: John Doe"
+                  placeholder={t('placeholders.fullName')}
                   className="input-field"
                   value={formData.fullName}
                   onChange={(event) => setFormData((prev) => ({ ...prev, fullName: event.target.value }))}
@@ -139,13 +141,13 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="companyName" className="mb-2 block text-sm font-semibold text-black">
-                  Company Name
+                  {t('labels.companyName')}
                 </label>
                 <input
                   id="companyName"
                   name="companyName"
                   type="text"
-                  placeholder="Example: UTRBOX Inc."
+                  placeholder={t('placeholders.companyName')}
                   className="input-field"
                   value={formData.companyName}
                   onChange={(event) => setFormData((prev) => ({ ...prev, companyName: event.target.value }))}
@@ -154,13 +156,13 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="workEmail" className="mb-2 block text-sm font-semibold text-black">
-                  Work Email
+                  {t('labels.workEmail')}
                 </label>
                 <input
                   id="workEmail"
                   name="workEmail"
                   type="email"
-                  placeholder="Example: john@company.com"
+                  placeholder={t('placeholders.workEmail')}
                   className="input-field"
                   value={formData.workEmail}
                   onChange={(event) => setFormData((prev) => ({ ...prev, workEmail: event.target.value }))}
@@ -169,13 +171,13 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="phoneNumber" className="mb-2 block text-sm font-semibold text-black">
-                  Phone Number
+                  {t('labels.phoneNumber')}
                 </label>
                 <input
                   id="phoneNumber"
                   name="phoneNumber"
                   type="tel"
-                  placeholder="Example: +82 10-1234-5678"
+                  placeholder={t('placeholders.phoneNumber')}
                   className="input-field"
                   value={formData.phoneNumber}
                   onChange={(event) => setFormData((prev) => ({ ...prev, phoneNumber: event.target.value }))}
@@ -186,15 +188,15 @@ export default function ContactPage() {
             <div>
               <div className="mb-2 flex items-center justify-between gap-3">
                 <label htmlFor="inquiryMessage" className="block text-sm font-semibold text-black">
-                  Inquiry Message
+                  {t('labels.inquiryMessage')}
                 </label>
-                <span className="text-xs text-gray-500">Max 5000 characters</span>
+                <span className="text-xs text-gray-500">{t('inquiryLimit')}</span>
               </div>
               <textarea
                 id="inquiryMessage"
                 name="inquiryMessage"
                 maxLength={INQUIRY_LIMIT}
-                placeholder="Example: We need a customized monitoring plan for 50+ assets and monthly compliance reports."
+                placeholder={t('placeholders.inquiryMessage')}
                 className="min-h-32 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:ring-2 focus:ring-black sm:min-h-36"
                 value={formData.inquiryMessage}
                 onChange={(event) =>
@@ -205,12 +207,12 @@ export default function ContactPage() {
                 }
               />
               <p className="mt-2 text-right text-xs text-gray-500">
-                {formData.inquiryMessage.length}/{INQUIRY_LIMIT}
+                {t('characterCount', { count: formData.inquiryMessage.length, limit: INQUIRY_LIMIT })}
               </p>
             </div>
 
             <section className="rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
-              <h2 className="text-sm font-semibold text-black">Marketing Consent (Optional)</h2>
+              <h2 className="text-sm font-semibold text-black">{t('marketingConsentTitle')}</h2>
               <div className="mt-3 h-px w-full bg-gray-200" />
 
               <ul className="mt-4 space-y-3">
@@ -222,7 +224,7 @@ export default function ContactPage() {
                       onChange={(event) => setFormData((prev) => ({ ...prev, consentEmail: event.target.checked }))}
                       className="mt-0.5 h-5 w-5 rounded border-gray-400 accent-black"
                     />
-                    I agree to receive marketing emails.
+                    {t('consentEmail')}
                   </label>
                 </li>
 
@@ -234,7 +236,7 @@ export default function ContactPage() {
                       onChange={(event) => setFormData((prev) => ({ ...prev, consentSms: event.target.checked }))}
                       className="mt-0.5 h-5 w-5 rounded border-gray-400 accent-black"
                     />
-                    I agree to receive SMS/text notifications.
+                    {t('consentSms')}
                   </label>
                 </li>
 
@@ -251,7 +253,7 @@ export default function ContactPage() {
                       }
                       className="mt-0.5 h-5 w-5 rounded border-gray-400 accent-black"
                     />
-                    I agree to receive service update notifications.
+                    {t('consentServiceUpdates')}
                   </label>
                 </li>
 
@@ -268,19 +270,19 @@ export default function ContactPage() {
                       }
                       className="mt-0.5 h-5 w-5 rounded border-gray-400 accent-black"
                     />
-                    I agree to receive event and promotion notifications.
+                    {t('consentEventsPromotions')}
                   </label>
                 </li>
               </ul>
 
               <p className="mt-4 text-xs text-gray-500">
-                Consent is optional and can be withdrawn at any time.
+                {t('consentHelp')}
               </p>
             </section>
 
             <div className="flex justify-center pt-1">
               <button type="submit" disabled={isSubmitting} className="btn-primary h-12 w-full text-sm disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto sm:min-w-52 sm:px-8">
-                {isSubmitting ? 'Sending...' : 'Send Inquiry'}
+                {isSubmitting ? t('submitLoading') : t('submit')}
               </button>
             </div>
             </form>

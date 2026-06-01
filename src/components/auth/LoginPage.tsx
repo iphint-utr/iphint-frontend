@@ -16,6 +16,7 @@ import { AppDispatch } from '@/lib/store/store';
 import { Link, useRouter } from '@/i18n/routing';
 
 export default function LoginPage() {
+  const t = useTranslations('Auth');
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const authLoading = useSelector(selectAuthLoading);
@@ -49,10 +50,10 @@ export default function LoginPage() {
     const verify = async () => {
       try {
         await apiClient.get('/auth/verify-email', { params: { token: verifyToken } });
-        setVerificationMessage('Email verified successfully. You can now log in.');
+        setVerificationMessage(t('verificationSuccess'));
         setVerificationFailed(false);
       } catch (err) {
-        setVerificationMessage(getApiErrorMessage(err, 'Verification link is invalid or expired.'));
+        setVerificationMessage(getApiErrorMessage(err, t('verificationError')));
         setVerificationFailed(true);
       } finally {
         if (typeof window !== 'undefined' && window.history?.replaceState) {
@@ -64,15 +65,14 @@ export default function LoginPage() {
     };
 
     verify();
-  }, [searchParams]);
+  }, [searchParams, t]);
 
-  const t = useTranslations('Auth');
   const dispatch = useDispatch<AppDispatch>();
   const loading = authLoading;
 
   const oauthError =
     !isAuthenticated && !hasSessionToken && searchParams.get('error') === 'google_auth_failed'
-      ? 'Google sign-in failed. Please try again or use email and password.'
+      ? t('oauthError')
       : null;
   const error = authError || oauthError;
   const activeError = validationError || error;
@@ -105,18 +105,18 @@ export default function LoginPage() {
     const password = formData.password;
 
     if (!normalizedEmail) {
-      setValidationError('Please enter your email address.');
+      setValidationError(t('validationEmailRequired'));
       return;
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(normalizedEmail)) {
-      setValidationError('Please enter a valid email address.');
+      setValidationError(t('validationEmailInvalid'));
       return;
     }
 
     if (!password) {
-      setValidationError('Please enter your password.');
+      setValidationError(t('validationPasswordRequired'));
       return;
     }
 
@@ -137,7 +137,7 @@ export default function LoginPage() {
   const handleResendVerification = async () => {
     const email = formData.email.trim();
     if (!email) {
-      setResendMessage('Enter your email address first, then resend verification.');
+      setResendMessage(t('resendEmailFirst'));
       setResendFailed(true);
       return;
     }
@@ -151,11 +151,11 @@ export default function LoginPage() {
       const message =
         typeof response.data?.message === 'string' && response.data.message.trim()
           ? response.data.message
-          : 'Verification email sent. Please check your inbox.';
+          : t('resendSuccess');
       setResendMessage(message);
       setResendFailed(false);
     } catch (err) {
-      setResendMessage(getApiErrorMessage(err, 'Failed to resend verification email. Please try again.'));
+      setResendMessage(getApiErrorMessage(err, t('resendError')));
       setResendFailed(true);
     } finally {
       setResendLoading(false);
@@ -242,7 +242,7 @@ export default function LoginPage() {
                     disabled={resendLoading}
                     className="rounded-lg border border-black px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {resendLoading ? 'Sending verification...' : 'Resend verification email'}
+                    {resendLoading ? t('resendLoading') : t('resendAction')}
                   </button>
                 </div>
               )}
@@ -260,7 +260,7 @@ export default function LoginPage() {
                       className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
                       aria-hidden="true"
                     />
-                    <span>Processing...</span>
+                    <span>{t('processing')}</span>
                   </>
                 ) : (
                   t('submitLogin')

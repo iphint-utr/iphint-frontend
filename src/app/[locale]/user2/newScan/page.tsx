@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -30,6 +31,7 @@ import {
 import { fetchSubscriptionSnapshot } from '@/lib/store/slices/accountSlice';
 
 export default function ScanPage() {
+  const t = useTranslations('Dashboard.scan');
   const dispatch = useAppDispatch();
   const { results, loading, error, searchId, folders, currentFolderId, foldersLoading } = useAppSelector((state) => state.scan);
   const planSnapshot = useAppSelector((state) => state.account.subscription.data);
@@ -46,7 +48,7 @@ export default function ScanPage() {
   const hasShownNearLimitPromptRef = useRef(false);
 
   const isLimitError = typeof error === 'string' && /upload limit|plan_upload_limit_reached/i.test(error);
-  const errorMessage = typeof error === 'string' ? error : 'Search request failed.';
+  const errorMessage = typeof error === 'string' ? error : t('errorMessage');
 
   const openPlanPrompt = (mode: 'upgrade' | 'renew' | 'near_limit') => {
     setPlanPromptMode(mode);
@@ -164,7 +166,7 @@ export default function ScanPage() {
       setNewFolderName('');
       if (searchId && action.payload?._id) {
         dispatch(assignSearchFolder({ searchId, folderId: action.payload._id }));
-        setFolderNotice(`Saved to "${createdFolderName}"`);
+        setFolderNotice(t('savedToNotice', { name: createdFolderName }));
       }
       setFolderPanelOpen(false);
     }
@@ -177,10 +179,10 @@ export default function ScanPage() {
       if (folderId) {
         const selectedFolder = folders.find((folder) => folder._id === folderId);
         if (selectedFolder?.name) {
-          setFolderNotice(`Saved to "${selectedFolder.name}"`);
+          setFolderNotice(t('savedToNotice', { name: selectedFolder.name }));
         }
       } else {
-        setFolderNotice('Removed from folder');
+        setFolderNotice(t('removedFromFolder'));
       }
     }
     setFolderPanelOpen(false);
@@ -197,11 +199,14 @@ export default function ScanPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Header Section */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Image Scan</h1>
-        <p className="text-gray-500">Upload an image or paste a URL to search for matches across the web.</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-500">{t('description')}</p>
         {planSnapshot?.usage?.imageUploadLimit ? (
           <p className="mt-2 text-xs text-gray-500">
-            Plan usage: {planSnapshot?.usage?.imagesUsedThisMonth}/{planSnapshot?.usage?.imageUploadLimit} uploads this month.
+            {t('planUsage', {
+              used: planSnapshot?.usage?.imagesUsedThisMonth || 0,
+              limit: planSnapshot?.usage?.imageUploadLimit || 0,
+            })}
           </p>
         ) : null}
       </div>
@@ -220,8 +225,8 @@ export default function ScanPage() {
             <div className="bg-gray-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
               <Upload className="w-6 h-6 text-gray-600" />
             </div>
-            <p className="text-sm font-medium text-gray-900">Click to upload or drag and drop</p>
-            <p className="text-xs text-gray-500 mt-1">PNG, JPG, or WEBP up to 10MB</p>
+            <p className="text-sm font-medium text-gray-900">{t('dropzoneTitle')}</p>
+            <p className="text-xs text-gray-500 mt-1">{t('dropzoneHint')}</p>
           </div>
 
           <div className="relative">
@@ -229,7 +234,7 @@ export default function ScanPage() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">OR</span>
+              <span className="px-2 bg-white text-gray-500">{t('or')}</span>
             </div>
           </div>
 
@@ -242,7 +247,7 @@ export default function ScanPage() {
               <input
                 type="url"
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-gray-500 focus:border-gray-500 text-sm"
-                placeholder="Paste image URL here..."
+                placeholder={t('urlPlaceholder')}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 disabled={loading}
@@ -254,7 +259,7 @@ export default function ScanPage() {
               className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              Search Image
+              {t('searchButton')}
             </button>
           </form>
 
@@ -262,10 +267,10 @@ export default function ScanPage() {
           {preview && (
             <div className="p-4 border border-gray-200 rounded-xl">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Search Source</span>
-                <button onClick={handleReset} className="text-xs text-red-500 hover:underline">Clear</button>
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('searchSource')}</span>
+                <button onClick={handleReset} className="text-xs text-red-500 hover:underline">{t('clear')}</button>
               </div>
-              <img src={preview} alt="Preview" className="w-full h-48 object-contain rounded-lg bg-gray-50" />
+              <img src={preview} alt={t('previewImageAlt')} className="w-full h-48 object-contain rounded-lg bg-gray-50" />
             </div>
           )}
         </div>
@@ -278,11 +283,11 @@ export default function ScanPage() {
                 <AlertCircle className="mt-0.5 h-5 w-5 text-red-600" />
                 <div>
                   <p className="text-sm font-semibold text-red-700">
-                    {isLimitError ? 'Monthly upload quota reached' : 'Search request failed'}
+                    {isLimitError ? t('limitTitle') : t('errorTitle')}
                   </p>
                   <p className="mt-1 text-sm text-red-700">
                     {isLimitError
-                      ? `You have reached your monthly upload limit for the ${planSnapshot?.plan?.name || 'current'} plan. Upgrade to continue scanning without interruption.`
+                      ? t('limitMessage', { planName: planSnapshot?.plan?.name || t('currentPlanFallback') })
                       : errorMessage}
                   </p>
                   {isLimitError && (
@@ -291,7 +296,7 @@ export default function ScanPage() {
                       onClick={() => (window.location.href = '/user/billing')}
                       className="mt-3 rounded-md bg-red-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-800"
                     >
-                      Upgrade plan
+                      {t('upgradePlan')}
                     </button>
                   )}
                 </div>
@@ -301,9 +306,9 @@ export default function ScanPage() {
 
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <h2 className="font-semibold text-gray-900 text-lg">Search Results</h2>
+              <h2 className="font-semibold text-gray-900 text-lg">{t('resultsTitle')}</h2>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                {results.length} Found
+                {t('resultsFound', { count: results.length })}
               </span>
             </div>
 
@@ -316,7 +321,7 @@ export default function ScanPage() {
                     className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-100"
                   >
                     <FolderPlus className="h-4 w-4" />
-                    {selectedFolderName ? `Saved: ${selectedFolderName}` : 'Save this search to a folder'}
+                    {selectedFolderName ? t('savedToFolder', { name: selectedFolderName }) : t('saveToFolder')}
                   </button>
 
                   {folderNotice && (
@@ -326,13 +331,13 @@ export default function ScanPage() {
                   {folderPanelOpen && (
                     <div className="w-full rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
                       {!searchId ? (
-                        <p className="text-xs text-gray-500">Run a search first, then save it to a folder.</p>
+                        <p className="text-xs text-gray-500">{t('runSearchFirst')}</p>
                       ) : (
                         <>
-                          <p className="text-xs font-medium text-gray-500">Choose existing folder</p>
+                          <p className="text-xs font-medium text-gray-500">{t('chooseFolder')}</p>
 
                           {foldersLoading ? (
-                            <p className="mt-2 text-xs text-gray-500">Loading folders...</p>
+                            <p className="mt-2 text-xs text-gray-500">{t('loadingFolders')}</p>
                           ) : folders.length > 0 ? (
                             <div className="mt-2 flex flex-wrap gap-2">
                               <button
@@ -340,7 +345,7 @@ export default function ScanPage() {
                                 onClick={() => handleFolderChange('')}
                                 className="inline-flex h-8 cursor-pointer items-center rounded-md border border-gray-200 bg-white px-2.5 text-xs text-gray-600 hover:bg-gray-50"
                               >
-                                No folder
+                                {t('noFolder')}
                               </button>
                               {folders.map((folder) => (
                                 <button
@@ -360,14 +365,14 @@ export default function ScanPage() {
                               ))}
                             </div>
                           ) : (
-                            <p className="mt-2 text-xs text-gray-500">No folders yet. Create one below.</p>
+                            <p className="mt-2 text-xs text-gray-500">{t('noFolders')}</p>
                           )}
 
                           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
                             <input
                               value={newFolderName}
                               onChange={(event) => setNewFolderName(event.target.value)}
-                              placeholder="Create new folder"
+                              placeholder={t('createFolderPlaceholder')}
                               className="h-8 min-w-0 w-full flex-1 rounded-md border border-gray-300 bg-white px-2.5 text-xs text-gray-700 outline-none placeholder:text-gray-400 focus:border-gray-400 sm:min-w-48"
                             />
 
@@ -378,7 +383,7 @@ export default function ScanPage() {
                               className="inline-flex h-8 w-full cursor-pointer items-center justify-center gap-1 rounded-md border border-gray-300 bg-white px-2.5 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                             >
                               <FolderPlus className="h-3.5 w-3.5" />
-                              Create
+                              {t('createFolder')}
                             </button>
                           </div>
                         </>
@@ -397,7 +402,7 @@ export default function ScanPage() {
                     ].join(' ')}
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
-                    Grid
+                    {t('grid')}
                   </button>
                   <button
                     type="button"
@@ -408,7 +413,7 @@ export default function ScanPage() {
                     ].join(' ')}
                   >
                     <List className="h-3.5 w-3.5" />
-                    List
+                    {t('list')}
                   </button>
                 </div>
               </div>
@@ -419,10 +424,10 @@ export default function ScanPage() {
               <table className="min-w-[760px] w-full table-fixed border-collapse text-left">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="w-24 px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Image</th>
-                    <th className="w-[45%] px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Details</th>
-                    <th className="w-32 px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Engine</th>
-                    <th className="w-32 px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Action</th>
+                    <th className="w-24 px-6 py-3 text-xs font-semibold text-gray-500 uppercase">{t('headers.image')}</th>
+                    <th className="w-[45%] px-6 py-3 text-xs font-semibold text-gray-500 uppercase">{t('headers.details')}</th>
+                    <th className="w-32 px-6 py-3 text-xs font-semibold text-gray-500 uppercase">{t('headers.engine')}</th>
+                    <th className="w-32 px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">{t('headers.action')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -431,14 +436,14 @@ export default function ScanPage() {
                       <td colSpan={4} className="bg-amber-50 px-6 py-2 text-xs text-amber-800">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span>
-                            {lockedResultsCount} result{lockedResultsCount === 1 ? '' : 's'} hidden by your current plan. Upgrade membership to unlock full thumbnails and source links.
+                            {t('lockedResults', { count: lockedResultsCount })}
                           </span>
                           <button
                             type="button"
                             onClick={() => (window.location.href = '/user/billing')}
                             className="rounded-md bg-amber-700 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-amber-800"
                           >
-                            Upgrade plan
+                            {t('upgradePlan')}
                           </button>
                         </div>
                       </td>
@@ -448,7 +453,7 @@ export default function ScanPage() {
                     <tr>
                       <td colSpan={4} className="px-6 py-12 text-center">
                         <RefreshCw className="w-8 h-8 text-gray-500 animate-spin mx-auto mb-3" />
-                        <p className="text-gray-500 text-sm">Searching for matches...</p>
+                        <p className="text-gray-500 text-sm">{t('searching')}</p>
                       </td>
                     </tr>
                   ) : results.length > 0 ? (
@@ -461,11 +466,11 @@ export default function ScanPage() {
                               onClick={() => setPreviewResultIndex(index)}
                               disabled={result.isLocked}
                               className="cursor-pointer rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
-                              aria-label="Preview result image"
+                              aria-label={t('previewAria')}
                             >
                               <img 
                                 src={result.image} 
-                                alt="Result" 
+                                alt={t('resultImageAlt')} 
                                 className={[
                                   'w-16 h-16 object-cover rounded-md border border-gray-200 shadow-sm',
                                   result.isLocked ? 'blur-sm opacity-70' : '',
@@ -479,19 +484,19 @@ export default function ScanPage() {
                           )}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="mb-1 line-clamp-2 text-sm font-medium text-gray-900" title={result.details?.title || 'No title'}>
-                            {result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'No title')}
+                          <div className="mb-1 line-clamp-2 text-sm font-medium text-gray-900" title={result.details?.title || t('noTitle')}>
+                            {result.isLocked ? t('upgradeToView') : (result.details?.title || t('noTitle'))}
                           </div>
                           <div className="text-xs text-gray-500 flex items-center gap-1">
-                            <span className="bg-gray-100 px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold text-[10px]">Source</span>
-                            <span className="truncate" title={result.isLocked ? 'Upgrade required' : (result.details?.source || 'Website')}>
-                              {result.isLocked ? 'Hidden - upgrade required' : (result.details?.source || 'Website')}
+                            <span className="bg-gray-100 px-1.5 py-0.5 rounded uppercase tracking-tighter font-bold text-[10px]">{t('sourceBadge')}</span>
+                            <span className="truncate" title={result.isLocked ? t('upgradeRequired') : (result.details?.source || t('website'))}>
+                              {result.isLocked ? t('hiddenSource') : (result.details?.source || t('website'))}
                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700 border border-gray-100">
-                            Reverse Search
+                            {t('engineLabel')}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -503,7 +508,7 @@ export default function ScanPage() {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-gray-600 hover:text-gray-800 text-sm font-medium"
                             >
-                              Visit Site <ExternalLink className="w-3.5 h-3.5" />
+                              {t('visitSite')} <ExternalLink className="w-3.5 h-3.5" />
                             </a>
                             ) : (
                               <button
@@ -511,7 +516,7 @@ export default function ScanPage() {
                                 onClick={() => (window.location.href = '/user/billing')}
                                 className="rounded-md bg-amber-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-800"
                               >
-                                Upgrade now
+                                {t('upgradeNow')}
                               </button>
                             )
                           )}
@@ -522,8 +527,8 @@ export default function ScanPage() {
                     <tr>
                       <td colSpan={4} className="px-6 py-20 text-center text-gray-400">
                         <Search className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                        <p className="text-sm">No scan results to display.</p>
-                        <p className="text-xs mt-1">Start by uploading an image on the left.</p>
+                        <p className="text-sm">{t('emptyTitle')}</p>
+                        <p className="text-xs mt-1">{t('emptyDescription')}</p>
                       </td>
                     </tr>
                   )}
@@ -535,7 +540,7 @@ export default function ScanPage() {
                 {loading && results.length === 0 ? (
                   <div className="py-14 text-center">
                     <RefreshCw className="w-8 h-8 text-gray-500 animate-spin mx-auto mb-3" />
-                    <p className="text-gray-500 text-sm">Searching for matches...</p>
+                    <p className="text-gray-500 text-sm">{t('searching')}</p>
                   </div>
                 ) : results.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -550,7 +555,7 @@ export default function ScanPage() {
                           {result.image ? (
                             <img
                               src={result.image}
-                              alt="Result"
+                              alt={t('resultImageAlt')}
                               className={[
                                 'h-40 w-full object-cover',
                                 result.isLocked ? 'blur-sm opacity-70' : '',
@@ -564,10 +569,10 @@ export default function ScanPage() {
                         </button>
                         <div className="mt-3">
                           <p className="line-clamp-2 text-sm font-medium text-gray-900">
-                            {result.isLocked ? 'Upgrade plan to view this result' : (result.details?.title || 'No title')}
+                            {result.isLocked ? t('upgradeToView') : (result.details?.title || t('noTitle'))}
                           </p>
                           <p className="mt-1 text-xs text-gray-500">
-                            {result.isLocked ? 'Source hidden until plan upgrade' : (result.details?.source || 'Website')}
+                            {result.isLocked ? t('hiddenSource') : (result.details?.source || t('website'))}
                           </p>
                         </div>
                         {result.details?.link && !result.isLocked && (
@@ -577,7 +582,7 @@ export default function ScanPage() {
                             rel="noopener noreferrer"
                             className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-gray-900"
                           >
-                            Visit Site <ExternalLink className="h-3.5 w-3.5" />
+                            {t('visitSite')} <ExternalLink className="h-3.5 w-3.5" />
                           </a>
                         )}
                         {result.isLocked && (
@@ -586,7 +591,7 @@ export default function ScanPage() {
                             onClick={() => (window.location.href = '/user/billing')}
                             className="mt-3 rounded-md bg-amber-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-800"
                           >
-                            Upgrade now
+                            {t('upgradeNow')}
                           </button>
                         )}
                       </div>
@@ -595,8 +600,8 @@ export default function ScanPage() {
                 ) : (
                   <div className="py-20 text-center text-gray-400">
                     <Search className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                    <p className="text-sm">No scan results to display.</p>
-                    <p className="text-xs mt-1">Start by uploading an image on the left.</p>
+                    <p className="text-sm">{t('emptyTitle')}</p>
+                    <p className="text-xs mt-1">{t('emptyDescription')}</p>
                   </div>
                 )}
               </div>
@@ -618,7 +623,7 @@ export default function ScanPage() {
               type="button"
               onClick={closePreviewModal}
               className="absolute right-3 top-3 cursor-pointer rounded-md border border-gray-200 bg-white p-1 text-gray-600 hover:bg-gray-50"
-              aria-label="Close image preview"
+              aria-label={t('closePreviewAria')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -626,16 +631,16 @@ export default function ScanPage() {
             <div className="p-5">
               <img
                 src={previewResult.image}
-                alt={previewResult.details?.title || 'preview image'}
+                alt={previewResult.details?.title || t('previewImageAlt')}
                 className="w-full max-h-[70vh] object-contain rounded-lg border border-gray-200 bg-gray-50"
               />
 
               <div className="mt-4 space-y-1">
                 <p className="text-sm font-semibold text-gray-900">
-                  {previewResult.details?.title || 'Untitled result'}
+                  {previewResult.details?.title || t('untitledResult')}
                 </p>
                 <p className="text-xs text-gray-600">
-                  Source: {previewResult.details?.source || 'Website'}
+                  {t('sourceLabel', { source: previewResult.details?.source || t('website') })}
                 </p>
               </div>
             </div>
@@ -651,17 +656,17 @@ export default function ScanPage() {
             </div>
             <h3 className="text-center text-lg font-semibold text-gray-900">
               {planPromptMode === 'renew'
-                ? 'Your subscription needs renewal'
+                ? t('planPrompt.renewTitle')
                 : planPromptMode === 'near_limit'
-                  ? 'You are close to your monthly limit'
-                  : 'You have reached your upload limit'}
+                  ? t('planPrompt.nearLimitTitle')
+                  : t('planPrompt.limitTitle')}
             </h3>
             <p className="mt-2 text-center text-sm text-gray-500">
               {planPromptMode === 'renew'
-                ? 'Renew your plan to keep uninterrupted access to image scans and reports.'
+                ? t('planPrompt.renewDescription')
                 : planPromptMode === 'near_limit'
-                  ? 'You are approaching your monthly upload cap. Upgrading now helps avoid workflow interruption.'
-                  : 'Upgrade your plan to continue uploading and scanning images this month.'}
+                  ? t('planPrompt.nearLimitDescription')
+                  : t('planPrompt.limitDescription')}
             </p>
             <div className="mt-5 flex gap-2">
               <button
@@ -669,14 +674,14 @@ export default function ScanPage() {
                 onClick={() => setPlanPromptOpen(false)}
                 className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                Maybe later
+                {t('planPrompt.maybeLater')}
               </button>
               <button
                 type="button"
                 onClick={() => (window.location.href = '/user/billing')}
                 className="flex-1 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
-                {planPromptMode === 'renew' ? 'Renew plan' : 'Upgrade plan'}
+                {planPromptMode === 'renew' ? t('planPrompt.renewPlan') : t('planPrompt.upgradePlan')}
               </button>
             </div>
           </div>

@@ -60,11 +60,11 @@ useEffect(() => {
   const hasPasswordInput = formData.password.length > 0;
 
   const passwordRequirementItems = [
-    { key: 'minLength', label: '8+ chars', met: passwordChecks.minLength },
-    { key: 'upper', label: 'Upper', met: passwordChecks.upper },
-    { key: 'lower', label: 'Lower', met: passwordChecks.lower },
-    { key: 'number', label: 'Number', met: passwordChecks.number },
-    { key: 'special', label: 'Special', met: passwordChecks.special },
+    { key: 'minLength', label: t('passwordChecks.minLength'), met: passwordChecks.minLength },
+    { key: 'upper', label: t('passwordChecks.upper'), met: passwordChecks.upper },
+    { key: 'lower', label: t('passwordChecks.lower'), met: passwordChecks.lower },
+    { key: 'number', label: t('passwordChecks.number'), met: passwordChecks.number },
+    { key: 'special', label: t('passwordChecks.special'), met: passwordChecks.special },
   ] as const;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -77,12 +77,12 @@ useEffect(() => {
     e.preventDefault();
 
     if (!isPasswordStrong) {
-      setPasswordError('Password does not meet all requirements.');
+      setPasswordError(t('passwordRequirementsError'));
       return;
     }
 
     if (!passwordsMatch) {
-      setPasswordError('Password and confirm password do not match.');
+      setPasswordError(t('passwordMismatchError'));
       return;
     }
 
@@ -158,7 +158,7 @@ useEffect(() => {
                 ))}
               </select>
               <input 
-                name="phoneNumber" type="tel" placeholder="010-0000-0000" 
+                name="phoneNumber" type="tel" placeholder={t('phonePlaceholder')} 
                 value={formData.phoneNumber} onChange={handleChange}
                 className="w-full px-4 py-3 outline-none placeholder-gray-300 text-sm" 
               />
@@ -173,7 +173,7 @@ useEffect(() => {
                 name="country" value={formData.country} onChange={handleChange}
                 className="input-field cursor-pointer"
               >
-                <option value="KR">대한민국 KR</option>
+                <option value="KR">{t('defaultCountry')}</option>
                 <option disabled>──────────</option>
                 {countries.map((country) => (
                   <option key={country.code} value={country.code}>
@@ -231,19 +231,19 @@ useEffect(() => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm sm:text-base font-semibold text-black mb-2">Confirm Password</label>
+            <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('confirmPasswordLabel')}</label>
             <input
               name="confirmPassword"
               type="password"
               required
-              placeholder="Re-enter your password"
+              placeholder={t('confirmPasswordPlaceholder')}
               value={formData.confirmPassword}
               onChange={handleChange}
               className="input-field"
             />
             {formData.confirmPassword.length > 0 && (
               <p className={passwordsMatch ? 'mt-2 text-xs text-emerald-700' : 'mt-2 text-xs text-red-600'}>
-                {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                {passwordsMatch ? t('passwordsMatch') : t('passwordsDoNotMatch')}
               </p>
             )}
           </div>
@@ -303,7 +303,7 @@ useEffect(() => {
                   className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
                   aria-hidden="true"
                 />
-                <span>Processing...</span>
+                <span>{t('processing')}</span>
               </>
             ) : t('submitSignup')}
           </button>
@@ -315,6 +315,8 @@ useEffect(() => {
 
 // 3. Export Default Component wrapped in Suspense
 export default function SignupPage() {
+  const t = useTranslations('Auth');
+
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
       <div className="grid min-h-screen lg:grid-cols-2">
@@ -325,7 +327,7 @@ export default function SignupPage() {
         />
 
         <div className="flex items-start justify-center px-6 sm:px-10 py-10 lg:py-12 w-full">
-          <Suspense fallback={<div className="w-full text-center">Loading...</div>}>
+          <Suspense fallback={<div className="w-full text-center">{t('loading')}</div>}>
             <SignupForm />
           </Suspense>
         </div>

@@ -14,9 +14,11 @@ const locales = [
 function NavLangSwitcher({
   active,
   onSelect,
+  ariaLabel,
 }: {
   active: string;
   onSelect: (code: (typeof locales)[number]["code"]) => void;
+  ariaLabel: string;
 }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -79,7 +81,7 @@ function NavLangSwitcher({
         <>
           <ul
             role="listbox"
-            aria-label="Select language"
+            aria-label={ariaLabel}
             className="absolute top-full right-0 mt-2 w-36 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 py-1 z-40"
           >
             {locales.map((loc) => (
@@ -132,7 +134,7 @@ export default function Header() {
         <Link
           href="/"
           className="inline-flex shrink-0 items-center"
-          aria-label="IPHINT home"
+          aria-label={t('homeAria')}
         >
           <Image src="/logo_mo.svg" alt="IPHINT" width={102} height={28} priority className="block h-7 w-auto" />
         </Link>
@@ -140,7 +142,7 @@ export default function Header() {
         {/* ── Desktop Nav ── */}
         <nav
           className="hidden md:flex items-center gap-8 ml-10"
-          aria-label="Main navigation"
+          aria-label={t('navigationAria')}
         >
           {navLinks.map((link) => (
             <Link
@@ -168,21 +170,21 @@ export default function Header() {
             href="/login"
             className="btn-primary"
           >
-            Sign in
+            {t('signIn')}
           </Link>
 
           <div className="h-5 w-px bg-gray-200" aria-hidden="true" />
 
-          <NavLangSwitcher active={activeLocale} onSelect={switchLocale} />
+          <NavLangSwitcher active={activeLocale} onSelect={switchLocale} ariaLabel={t('selectLanguageAria')} />
         </div>
 
         {/* ── Mobile: lang switcher + hamburger ── */}
         <div className="md:hidden ml-auto flex items-center gap-1">
-          <NavLangSwitcher active={activeLocale} onSelect={switchLocale} />
+          <NavLangSwitcher active={activeLocale} onSelect={switchLocale} ariaLabel={t('selectLanguageAria')} />
           <button
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={isMobileMenuOpen ? t('closeMenu') : t('openMenu')}
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
@@ -221,7 +223,7 @@ export default function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="inline-flex h-11 w-full items-center justify-center rounded-full bg-gray-950 text-[14px] font-semibold text-white"
             >
-              Sign in
+              {t('signIn')}
             </Link>
           </div>
         </div>

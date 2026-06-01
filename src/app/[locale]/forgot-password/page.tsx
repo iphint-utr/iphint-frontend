@@ -3,8 +3,10 @@
 import { FormEvent, useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations('Auth.forgotPasswordPage');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -18,9 +20,9 @@ export default function ForgotPasswordPage() {
 
     try {
       const response = await apiClient.post('/auth/forgot-password', { email });
-      setSuccess(response.data?.message || 'If your email exists, a reset link has been sent.');
+      setSuccess(response.data?.message || t('success'));
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not send reset link. Please try again.'));
+      setError(getApiErrorMessage(err, t('error')));
     } finally {
       setSubmitting(false);
     }
@@ -29,22 +31,22 @@ export default function ForgotPasswordPage() {
   return (
     <main className="min-h-screen bg-white px-6 py-16 text-gray-900 sm:px-10 lg:px-16">
       <div className="mx-auto w-full max-w-xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-gray-500">Account access</p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-5xl">Forgot password</h1>
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-gray-500">{t('eyebrow')}</p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-5xl">{t('title')}</h1>
         <p className="mt-4 text-base leading-7 text-gray-600 sm:text-lg">
-          Enter your account email and we will send you a secure reset link.
+          {t('description')}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
           <div>
-            <label htmlFor="email" className="mb-2 block text-sm font-medium text-black">Email</label>
+            <label htmlFor="email" className="mb-2 block text-sm font-medium text-black">{t('emailLabel')}</label>
             <input
               id="email"
               type="email"
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="Enter your email"
+              placeholder={t('emailPlaceholder')}
               className="input-field"
             />
           </div>
@@ -53,10 +55,10 @@ export default function ForgotPasswordPage() {
             {submitting ? (
               <>
                 <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
-                <span>Sending...</span>
+                <span>{t('submitLoading')}</span>
               </>
             ) : (
-              'Send reset link'
+              t('submit')
             )}
           </button>
 
@@ -66,10 +68,10 @@ export default function ForgotPasswordPage() {
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/login" className="rounded-full bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800">
-            Back to login
+            {t('backToLogin')}
           </Link>
           <Link href="/signup" className="rounded-full border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50">
-            Create an account
+            {t('createAccount')}
           </Link>
         </div>
       </div>
