@@ -191,7 +191,8 @@
       "empty": "No members matched the current filters.",
       "planFallback": "No subscription",
       "subscriptionUnavailable": "Subscription details unavailable",
-      "noActiveSubscription": "Starter (No active subscription)",
+      "noActiveSubscription": "No active plan",
+      "noActivePlan": "No active plan",
       "trialBillingCycle": "Trial"
     },
     "memberDetails": {
@@ -249,9 +250,10 @@
         "trialEndDate": "Trial end date"
       },
       "trialDaysLeftValue": "{count} days left",
-      "trialHelperText": "Auto-downgrades to Starter after trial ends unless upgraded.",
+      "trialHelperText": "Trial ends unless upgraded to a paid plan.",
       "trialExpired": "Trial expired",
-      "noActiveSubscription": "Starter (No active subscription)",
+      "noActiveSubscription": "No active plan",
+      "noActivePlan": "No active plan",
       "trialBillingCycle": "Trial",
       "adminActionsTitle": "Admin actions",
       "adminActionsDescription": "Deactivate the member account when moderation or policy action is required.",

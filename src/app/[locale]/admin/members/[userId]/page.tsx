@@ -97,10 +97,10 @@ export default function AdminMemberDetailsPage() {
   const planDisplayName = isTrialing
     ? 'Pro (Trial)'
     : isTrialExpired
-      ? 'Starter'
+      ? t('memberDetails.noActivePlan')
       : hasSubscriptionRecord
         ? data.subscription?.planName || data.subscription?.planId || 'Pro'
-        : t('memberDetails.noActiveSubscription');
+        : t('memberDetails.noActivePlan');
 
   const statusDisplayValue = isTrialing
     ? 'trialing'
@@ -115,8 +115,8 @@ export default function AdminMemberDetailsPage() {
   const billingDisplay = isTrialing
     ? t('memberDetails.trialBillingCycle')
     : hasSubscriptionRecord
-      ? (data.subscription?.billingCycle || t('memberDetails.noActiveSubscription'))
-      : t('memberDetails.noActiveSubscription');
+      ? (data.subscription?.billingCycle || t('memberDetails.noActivePlan'))
+      : t('memberDetails.noActivePlan');
 
   const trialDaysLeft =
     data.subscription?.trialDaysLeft === null || data.subscription?.trialDaysLeft === undefined
@@ -372,7 +372,7 @@ export default function AdminMemberDetailsPage() {
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span>{t('memberDetails.subscriptionFields.source')}</span>
                 <span className="w-full font-medium text-left text-slate-900 sm:w-auto sm:text-right">
-                  {sourceDisplayValue === 'none' ? t('memberDetails.noActiveSubscription') : humanizeAdminValue(sourceDisplayValue)}
+                  {sourceDisplayValue === 'none' ? t('memberDetails.noActivePlan') : humanizeAdminValue(sourceDisplayValue)}
                 </span>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
