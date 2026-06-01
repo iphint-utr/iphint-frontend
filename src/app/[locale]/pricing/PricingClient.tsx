@@ -16,7 +16,7 @@ import {
 } from '../../../lib/store/slices/pricingSlice'
 import type { Translations, PlanId, Plan } from './pricing'
 import { ChevronRight } from 'lucide-react'
-import { detectCountryCodeByIp, formatPriceByCountry, isKoreanCountry } from '@/lib/currency'
+import { detectCountryCodeByIp, formatPriceByCountry } from '@/lib/currency'
 
 function CheckIconLg() {
   return (
@@ -82,7 +82,8 @@ function PlanCard({
         relative flex flex-col rounded-2xl transition-all duration-300 border sm:mb-6
         ${isPopular
           ? 'shadow-2xl scale-[1.02] z-10'
-          : 'bg-white shadow-md hover:shadow-xl hover:-translate-y-1'}
+          : 'shadow-sm hover:shadow-md'
+        }
       `}
       style={isPopular ? { background: 'white' } : {}}
     >
@@ -213,8 +214,6 @@ export default function PricingClient({
   const isAnnual        = useSelector(selectIsAnnual)
   const [countryCode, setCountryCode] = useState('US')
 
-  const isKorean = isKoreanCountry(countryCode)
-
   const formatPrice = (usd: number) => formatPriceByCountry(usd, countryCode)
 
   useEffect(() => {
@@ -342,10 +341,7 @@ export default function PricingClient({
       {/* ── Feature Comparison ── */}
       <section className="max-w-5xl mx-auto px-2 pb-14">
         <div className="text-center mb-10">
-          <h2
-            className="text-3xl font-black text-gray-900"
-            style={{ fontFamily: "'Georgia', serif" }}
-          >
+          <h2 className="text-3xl font-black text-gray-900">
             {t.comparison.title}
           </h2>
           <div
@@ -404,10 +400,7 @@ export default function PricingClient({
       {/* ── FAQ ── */}
       <section className="max-w-2xl mx-auto px-4 pb-32">
         <div className="text-center mb-10">
-          <h2
-            className="text-3xl font-black text-gray-900"
-            style={{ fontFamily: "'Georgia', serif" }}
-          >
+          <h2 className="text-3xl font-black text-gray-900">
             {t.faq.title}
           </h2>
           <div

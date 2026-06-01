@@ -1,6 +1,10 @@
 ﻿import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans, Roboto } from "next/font/google";
+import { Noto_Sans } from "next/font/google";
 import "./globals.css";
+import "@fontsource/pretendard/400.css";
+import "@fontsource/pretendard/500.css";
+import "@fontsource/pretendard/600.css";
+import "@fontsource/pretendard/700.css";
 import StoreProvider from "./StoreProvider";
 import { isLocale } from "@/lib/i18n";
 import { ReactNode } from "react";
@@ -11,20 +15,11 @@ import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
 import FontProvider from '@/components/layout/FontProvider';
 import { notFound } from "next/navigation";
 
-const inter = Inter({
+const notoSans = Noto_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-});
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-roboto",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -54,7 +49,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${plusJakarta.variable} ${roboto.variable}`}>
+    <html lang={locale} suppressHydrationWarning className={notoSans.variable}>
       <body className="antialiased bg-white" suppressHydrationWarning>
         <ExtensionAttrSuppressor />
         <NextIntlClientProvider locale={locale} messages={messages}>
