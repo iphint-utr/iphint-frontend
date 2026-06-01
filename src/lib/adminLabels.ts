@@ -28,6 +28,14 @@ export const getAdminStatusToken = (value: string) => {
       return 'underAnalysis';
     case 'approved':
       return 'approved';
+    case 'trialing':
+      return 'trialing';
+    case 'pastdue':
+      return 'pastDue';
+    case 'paused':
+      return 'paused';
+    case 'pending':
+      return 'pending';
     case 'cancelled':
       return 'cancelled';
     case 'expired':

@@ -4,9 +4,11 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 const toneMap = {
-  success: 'border-slate-900 bg-slate-900 text-white',
-  warning: 'border-slate-300 bg-slate-200 text-slate-900',
-  danger: 'border-slate-700 bg-slate-700 text-white',
+  success: 'border-emerald-600 bg-emerald-600 text-white',
+  warning: 'border-amber-500 bg-amber-100 text-amber-800',
+  danger: 'border-rose-600 bg-rose-600 text-white',
+  trial: 'border-sky-500 bg-sky-100 text-sky-800',
+  muted: 'border-slate-300 bg-slate-200 text-slate-700',
   neutral: 'border-slate-200 bg-slate-50 text-slate-600',
   info: 'border-slate-300 bg-white text-slate-900',
 } as const;
@@ -19,12 +21,20 @@ const getTone = (value: string) => {
     return 'success';
   }
 
-  if (['processing', 'underanalysis', 'reviewpending', 'pending'].includes(compactValue)) {
+  if (compactValue === 'trialing') {
+    return 'trial';
+  }
+
+  if (['processing', 'underanalysis', 'reviewpending', 'pending', 'pastdue'].includes(compactValue)) {
     return 'warning';
   }
 
-  if (['failed', 'inactive', 'cancelled', 'expired'].includes(compactValue)) {
+  if (['failed', 'inactive'].includes(compactValue)) {
     return 'danger';
+  }
+
+  if (['cancelled', 'expired', 'paused'].includes(compactValue)) {
+    return 'muted';
   }
 
   if (['admin', 'pro'].includes(compactValue)) {

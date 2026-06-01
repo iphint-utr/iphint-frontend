@@ -102,6 +102,10 @@
         "reviewed": "Reviewed",
         "underAnalysis": "Under analysis",
         "approved": "Approved",
+        "trialing": "Trialing",
+        "pastDue": "Past due",
+        "paused": "Paused",
+        "pending": "Pending",
         "cancelled": "Cancelled",
         "expired": "Expired"
       },
@@ -176,6 +180,9 @@
         "member": "Member",
         "status": "Status",
         "plan": "Plan",
+        "source": "Source",
+        "trialEnds": "Trial ends",
+        "billingCycle": "Billing",
         "searches": "Searches",
         "joined": "Joined",
         "actions": "Actions"
@@ -183,7 +190,9 @@
       "loading": "Loading users...",
       "empty": "No members matched the current filters.",
       "planFallback": "No subscription",
-      "subscriptionUnavailable": "Subscription details unavailable"
+      "subscriptionUnavailable": "Subscription details unavailable",
+      "noActiveSubscription": "Starter (No active subscription)",
+      "trialBillingCycle": "Trial"
     },
     "memberDetails": {
       "eyebrow": "Member Detail",
@@ -234,8 +243,16 @@
       "subscriptionFields": {
         "plan": "Plan",
         "status": "Status",
-        "billingCycle": "Billing cycle"
+        "source": "Source",
+        "billingCycle": "Billing cycle",
+        "trialDaysLeft": "Trial days left",
+        "trialEndDate": "Trial end date"
       },
+      "trialDaysLeftValue": "{count} days left",
+      "trialHelperText": "Auto-downgrades to Starter after trial ends unless upgraded.",
+      "trialExpired": "Trial expired",
+      "noActiveSubscription": "Starter (No active subscription)",
+      "trialBillingCycle": "Trial",
       "adminActionsTitle": "Admin actions",
       "adminActionsDescription": "Deactivate the member account when moderation or policy action is required.",
       "deactivateReasonLabel": "Deactivation reason",
