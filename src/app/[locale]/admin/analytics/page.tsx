@@ -191,7 +191,7 @@ export default function AdminAnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} unit="%" />
-                    <Tooltip formatter={(value: number) => `${value}%`} />
+                    <Tooltip formatter={(value) => `${Number(Array.isArray(value) ? value[0] : value ?? 0)}%`} />
                     <Legend />
                     <Line type="monotone" dataKey="growthRate" stroke="#0284c7" strokeWidth={2} dot={false} name={t('legends.growthRate')} />
                   </LineChart>
