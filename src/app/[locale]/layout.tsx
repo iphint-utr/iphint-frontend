@@ -14,6 +14,7 @@ import AppLayoutRouter from '@/components/layout/AppLayoutRouter';
 import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
 import FontProvider from '@/components/layout/FontProvider';
 import ContactSalesModal from '@/components/contact/ContactSalesModal';
+import WebsiteAnalytics from '@/components/analytics/WebsiteAnalytics';
 import { notFound } from "next/navigation";
 
 const notoSans = Noto_Sans({
@@ -56,6 +57,7 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <StoreProvider>
             <FontProvider />
+            <WebsiteAnalytics />
             <AppLayoutRouter>{children}</AppLayoutRouter>
             <ContactSalesModal />
           </StoreProvider>

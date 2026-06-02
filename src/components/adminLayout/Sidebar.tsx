@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useDispatch } from 'react-redux';
-import { BarChart3, LayoutDashboard, LogOut, Search, Users } from 'lucide-react';
+import { BarChart3, ChartArea, LayoutDashboard, LogOut, Search, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { AppDispatch } from '@/lib/store/store';
@@ -30,6 +30,7 @@ export default function AdminSidebar({
 		{ label: t('sidebar.dashboard'), href: '/admin', icon: LayoutDashboard },
 		{ label: t('sidebar.users'), href: '/admin/users', icon: Users },
 		{ label: t('sidebar.searches'), href: '/admin/searches', icon: Search },
+		{ label: t('sidebar.analytics'), href: '/admin/analytics', icon: ChartArea },
 		{ label: t('sidebar.apiUsage'), href: '/admin/api-usage', icon: BarChart3 },
 	];
 

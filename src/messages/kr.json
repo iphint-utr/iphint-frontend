@@ -485,6 +485,7 @@
       "dashboard": "대시보드",
       "users": "사용자 관리",
       "searches": "검색 목록",
+      "analytics": "분석",
       "apiUsage": "API 사용량",
       "secureAccess": "보안 관리자 접근",
       "secureAccessHint": "관리자 전용 권한으로 보호된 경로입니다."
@@ -531,7 +532,8 @@
       },
       "goToAdmin": "관리자 콘솔 열기",
       "goToUserDashboard": "사용자 대시보드로 이동",
-      "logout": "로그아웃"
+      "logout": "로그아웃",
+      "generatedAt": "생성 시각"
     },
     "dashboard": {
       "eyebrow": "관리자 개요",
@@ -788,6 +790,97 @@
       "methodologyDescription": "사용 가능한 관리자 API를 기반으로 이 페이지를 계산하는 방식입니다.",
       "methodologyCopy": "문서화된 관리자 API에는 전용 사용량 분석 엔드포인트가 없기 때문에, 이 페이지는 관리자 대시보드 응답과 최근 검색 {count}건을 결합해 계산합니다.",
       "generatedAt": "생성 시각"
+    },
+    "analytics": {
+      "title": "웹사이트 분석",
+      "description": "Google Analytics 4 기반으로 공개 웹사이트 트래픽과 참여도를 분석합니다.",
+      "loading": "웹사이트 분석 데이터를 불러오는 중입니다...",
+      "filters": {
+        "last7Days": "최근 7일",
+        "last30Days": "최근 30일",
+        "last90Days": "최근 90일"
+      },
+      "metrics": {
+        "totalVisitors": "총 방문자",
+        "uniqueVisitors": "순 방문자",
+        "activeVisitors": "활성 방문자",
+        "pageViews": "페이지 조회수",
+        "sessions": "세션",
+        "engagementRate": "참여율",
+        "bounceRate": "이탈률",
+        "averageSessionDuration": "평균 세션 시간"
+      },
+      "hints": {
+        "totalVisitors": "선택한 기간 동안의 전체 방문자 수입니다.",
+        "uniqueVisitors": "선택 기간 내 첫 방문 사용자 수입니다.",
+        "activeVisitors": "가능한 경우 GA4 실시간 활성 방문자 수를 표시합니다.",
+        "pageViews": "공개 페이지에서 추적된 전체 조회수입니다.",
+        "sessions": "선택 기간 동안 시작된 전체 세션 수입니다.",
+        "engagementRate": "GA4 기준 참여 세션 비율입니다.",
+        "bounceRate": "의미 있는 상호작용이 없는 세션 비율입니다.",
+        "averageSessionDuration": "전체 세션의 평균 지속 시간입니다."
+      },
+      "charts": {
+        "dailyVisitorsTitle": "일별 방문자 및 세션",
+        "dailyVisitorsDescription": "시간에 따른 방문자와 세션 추이입니다.",
+        "trafficGrowthTitle": "트래픽 성장",
+        "trafficGrowthDescription": "일별 방문자 성장률 추이입니다.",
+        "trafficSourcesTitle": "트래픽 소스",
+        "trafficSourcesDescription": "유입 채널별 세션 비중입니다.",
+        "deviceUsageTitle": "디바이스 사용",
+        "deviceUsageDescription": "디바이스 유형별 세션 분포입니다.",
+        "topCountriesTitle": "상위 국가",
+        "topCountriesDescription": "가장 많은 방문 트래픽을 만든 국가입니다.",
+        "topCitiesTitle": "상위 도시",
+        "topCitiesDescription": "가장 많은 방문 트래픽을 만든 도시입니다.",
+        "browserUsageTitle": "브라우저 분석",
+        "browserUsageDescription": "주요 브라우저별 세션 분포입니다.",
+        "topPagesTitle": "상위 페이지",
+        "topPagesDescription": "선택한 기간 동안 가장 많이 조회된 페이지입니다."
+      },
+      "sourceCategories": {
+        "organicSearch": "오가닉 검색",
+        "direct": "직접 유입",
+        "social": "소셜",
+        "referral": "리퍼럴"
+      },
+      "deviceCategories": {
+        "mobile": "모바일",
+        "desktop": "데스크톱",
+        "tablet": "태블릿"
+      },
+      "browserCategories": {
+        "chrome": "Chrome",
+        "safari": "Safari",
+        "edge": "Edge",
+        "firefox": "Firefox"
+      },
+      "panels": {
+        "topContentTitle": "상위 콘텐츠",
+        "topContentDescription": "사용자가 가장 오래 머문 콘텐츠/페이지입니다.",
+        "landingPagesTitle": "상위 랜딩 페이지",
+        "landingPagesDescription": "참여도가 높은 유입 시작 페이지입니다.",
+        "audienceBreakdownTitle": "오디언스 분석",
+        "audienceBreakdownDescription": "브라우저, 운영체제, 리퍼러 기준 오디언스 분포입니다."
+      },
+      "table": {
+        "views": "조회수",
+        "sessions": "세션",
+        "engagement": "참여율",
+        "bounce": "이탈률",
+        "duration": "평균 시간"
+      },
+      "audience": {
+        "browsers": "브라우저",
+        "operatingSystems": "운영체제",
+        "referrers": "리퍼러"
+      },
+      "empty": "선택한 기간에 표시할 웹사이트 분석 데이터가 없습니다.",
+      "legends": {
+        "visitors": "방문자",
+        "sessions": "세션",
+        "growthRate": "성장률"
+      }
     }
   },
   "services": {
