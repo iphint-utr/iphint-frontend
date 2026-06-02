@@ -99,7 +99,7 @@ export default function Footer() {
       return;
     }
 
-    router.replace(pathname, { locale: newLocale });
+    router.replace(pathname, { locale: newLocale, scroll: false });
   };
 
   return (

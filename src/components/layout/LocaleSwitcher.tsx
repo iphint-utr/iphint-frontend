@@ -20,7 +20,7 @@ export default function LocaleSwitcher() {
       return;
     }
 
-    router.replace(pathname, { locale: nextLocale });
+    router.replace(pathname, { locale: nextLocale, scroll: false });
   };
 
   return (
