@@ -8,6 +8,8 @@ const accentStyles = {
   emerald: 'bg-slate-100 text-slate-900 ring-1 ring-slate-200',
   amber: 'bg-slate-200 text-slate-900 ring-1 ring-slate-300',
   slate: 'bg-white text-slate-900 ring-1 ring-slate-200',
+  rose: 'bg-rose-100 text-rose-900 ring-1 ring-rose-200',
+  indigo: 'bg-indigo-100 text-indigo-900 ring-1 ring-indigo-200',
 } as const;
 
 export default function AdminMetricCard({
