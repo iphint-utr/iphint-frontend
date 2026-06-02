@@ -27,6 +27,27 @@ import { fetchAdminWebsiteAnalytics } from '@/lib/store/slices/adminSlice';
 import type { AdminAnalyticsDateRange } from '@/types/admin';
 
 const SOURCE_COLORS = ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
+const BRAND_LINE = '#0f172a';
+
+const SOURCE_PRESETS = [
+  { key: 'organicSearch', matcher: /organic search/i },
+  { key: 'direct', matcher: /^direct$/i },
+  { key: 'social', matcher: /social/i },
+  { key: 'referral', matcher: /referral/i },
+] as const;
+
+const DEVICE_PRESETS = [
+  { key: 'mobile', matcher: /^mobile$/i },
+  { key: 'desktop', matcher: /^desktop$/i },
+  { key: 'tablet', matcher: /^tablet$/i },
+] as const;
+
+const BROWSER_PRESETS = [
+  { key: 'chrome', matcher: /chrome/i },
+  { key: 'safari', matcher: /safari/i },
+  { key: 'edge', matcher: /edge/i },
+  { key: 'firefox', matcher: /firefox/i },
+] as const;
 
 const toReadableDuration = (seconds: number): string => {
   const total = Math.max(0, Math.round(seconds));
@@ -39,6 +60,24 @@ const toReadableDuration = (seconds: number): string => {
 };
 
 const formatPercent = (value: number): string => `${Number(value || 0).toFixed(1)}%`;
+
+const EmptyPanelState = ({ label }: { label: string }) => (
+  <div className="flex h-70 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-400">
+    {label}
+  </div>
+);
+
+const AnalyticsMetricSkeleton = () => (
+  <div className="animate-pulse rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+    <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-700" />
+    <div className="mt-4 h-8 w-28 rounded bg-slate-200 dark:bg-slate-700" />
+    <div className="mt-4 h-4 w-full rounded bg-slate-100 dark:bg-slate-800" />
+  </div>
+);
+
+const AnalyticsPanelSkeleton = ({ heightClassName = 'h-80' }: { heightClassName?: string }) => (
+  <div className={`animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800 ${heightClassName}`} />
+);
 
 export default function AdminAnalyticsPage() {
   const t = useTranslations('Admin.analytics');
@@ -54,32 +93,88 @@ export default function AdminAnalyticsPage() {
   }, [analyticsState.data, analyticsState.range, dispatch]);
 
   const analytics = analyticsState.data;
+  const showInitialLoading = analyticsState.loading && !analytics;
 
   const growthSeries = useMemo(() => {
-    if (!analytics?.trafficGrowth?.length) {
+    if (!analytics?.dailyTraffic?.length) {
       return [];
     }
 
-    return analytics.trafficGrowth.map((point, index, list) => {
-      const previous = index > 0 ? list[index - 1].visitors : point.visitors;
-      const growthRate = previous > 0 ? ((point.visitors - previous) / previous) * 100 : 0;
-
+    return analytics.dailyTraffic.map((point) => {
       return {
         date: point.date,
-        growthRate: Number(growthRate.toFixed(2)),
+        visitors: point.visitors,
+        sessions: point.sessions,
+        activeUsers: point.activeUsers,
       };
     });
-  }, [analytics?.trafficGrowth]);
+  }, [analytics?.dailyTraffic]);
 
-  const deviceChartData = analytics?.deviceUsage?.map((item) => ({
-    name: item.label,
-    value: item.sessions,
-  })) || [];
+  const sourceChartData = useMemo(() => {
+    const base = analytics?.trafficSources || [];
+    const grouped = SOURCE_PRESETS.map((preset) => ({
+      name: t(`sourceCategories.${preset.key}`),
+      value: base
+        .filter((item) => preset.matcher.test(item.label || ''))
+        .reduce((sum, item) => sum + (item.sessions || 0), 0),
+    }));
 
-  const sourceChartData = analytics?.trafficSources?.map((item) => ({
-    name: item.label,
-    value: item.sessions,
-  })) || [];
+    const hasAnyPresetData = grouped.some((item) => item.value > 0);
+    if (hasAnyPresetData) {
+      return grouped;
+    }
+
+    return base.slice(0, 4).map((item) => ({
+      name: item.label,
+      value: item.sessions,
+    }));
+  }, [analytics?.trafficSources, t]);
+
+  const deviceChartData = useMemo(() => {
+    const base = analytics?.deviceUsage || [];
+    const grouped = DEVICE_PRESETS.map((preset) => ({
+      name: t(`deviceCategories.${preset.key}`),
+      value: base
+        .filter((item) => preset.matcher.test(item.label || ''))
+        .reduce((sum, item) => sum + (item.sessions || 0), 0),
+    }));
+
+    const hasAnyPresetData = grouped.some((item) => item.value > 0);
+    if (hasAnyPresetData) {
+      return grouped;
+    }
+
+    return base.slice(0, 3).map((item) => ({
+      name: item.label,
+      value: item.sessions,
+    }));
+  }, [analytics?.deviceUsage, t]);
+
+  const browserChartData = useMemo(() => {
+    const base = analytics?.browserUsage || [];
+    const grouped = BROWSER_PRESETS.map((preset) => ({
+      name: t(`browserCategories.${preset.key}`),
+      sessions: base
+        .filter((item) => preset.matcher.test(item.label || ''))
+        .reduce((sum, item) => sum + (item.sessions || 0), 0),
+    }));
+
+    const hasAnyPresetData = grouped.some((item) => item.sessions > 0);
+    if (hasAnyPresetData) {
+      return grouped;
+    }
+
+    return base.slice(0, 4).map((item) => ({
+      name: item.label,
+      sessions: item.sessions,
+    }));
+  }, [analytics?.browserUsage, t]);
+
+  const topEngagementPages = useMemo(() => {
+    return [...(analytics?.topContent || [])]
+      .sort((left, right) => right.engagementRate - left.engagementRate)
+      .slice(0, 6);
+  }, [analytics?.topContent]);
 
   const handleRangeChange = (range: AdminAnalyticsDateRange) => {
     dispatch(fetchAdminWebsiteAnalytics({ range }));
@@ -91,7 +186,7 @@ export default function AdminAnalyticsPage() {
         title={t('title')}
         description={t('description')}
         actions={
-          <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
+          <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
             {(['7d', '30d', '90d'] as AdminAnalyticsDateRange[]).map((range) => {
               const active = analyticsState.range === range;
               return (
@@ -101,7 +196,9 @@ export default function AdminAnalyticsPage() {
                   onClick={() => handleRangeChange(range)}
                   className={[
                     'rounded-xl px-3 py-1.5 text-sm font-medium transition-colors',
-                    active ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-50',
+                    active
+                      ? 'bg-slate-950 text-white dark:bg-slate-100 dark:text-slate-950'
+                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800',
                   ].join(' ')}
                 >
                   {range === '7d' ? t('filters.last7Days') : range === '30d' ? t('filters.last30Days') : t('filters.last90Days')}
@@ -112,13 +209,27 @@ export default function AdminAnalyticsPage() {
         }
       />
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-6">
+      {showInitialLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <AnalyticsMetricSkeleton key={`metric-skeleton-${index}`} />
+          ))}
+        </div>
+      ) : (
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <AdminMetricCard
           title={t('metrics.totalVisitors')}
           value={formatAdminNumber(analytics?.summary.totalVisitors ?? 0, locale)}
           hint={t('hints.totalVisitors')}
           icon={<Users className="h-5 w-5" />}
           accent="teal"
+        />
+        <AdminMetricCard
+          title={t('metrics.uniqueVisitors')}
+          value={formatAdminNumber(analytics?.summary.uniqueVisitors ?? 0, locale)}
+          hint={t('hints.uniqueVisitors')}
+          icon={<Users className="h-5 w-5" />}
+          accent="slate"
         />
         <AdminMetricCard
           title={t('metrics.activeVisitors')}
@@ -133,6 +244,13 @@ export default function AdminAnalyticsPage() {
           hint={t('hints.pageViews')}
           icon={<Eye className="h-5 w-5" />}
           accent="slate"
+        />
+        <AdminMetricCard
+          title={t('metrics.sessions')}
+          value={formatAdminNumber(analytics?.summary.sessions ?? 0, locale)}
+          hint={t('hints.sessions')}
+          icon={<Activity className="h-5 w-5" />}
+          accent="teal"
         />
         <AdminMetricCard
           title={t('metrics.engagementRate')}
@@ -156,53 +274,64 @@ export default function AdminAnalyticsPage() {
           accent="indigo"
         />
       </div>
+      )}
 
-      {analyticsState.loading && !analytics ? (
-        <div className="rounded-3xl border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">
-          {t('loading')}
-        </div>
-      ) : analyticsState.error && !analytics ? (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700">
-          {analyticsState.error}
-        </div>
-      ) : (
+      {showInitialLoading ? (
         <>
           <div className="grid gap-6 xl:grid-cols-2">
             <AdminPanel title={t('charts.dailyVisitorsTitle')} description={t('charts.dailyVisitorsDescription')}>
-              <div className="h-[320px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={analytics?.dailyTraffic || []} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="visitors" stroke="#0f172a" strokeWidth={2} dot={false} name={t('legends.visitors')} />
-                    <Line type="monotone" dataKey="sessions" stroke="#64748b" strokeWidth={2} dot={false} name={t('legends.sessions')} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              <AnalyticsPanelSkeleton />
             </AdminPanel>
-
-            <AdminPanel title={t('charts.trafficGrowthTitle')} description={t('charts.trafficGrowthDescription')}>
-              <div className="h-[320px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={growthSeries} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} unit="%" />
-                    <Tooltip formatter={(value) => `${Number(Array.isArray(value) ? value[0] : value ?? 0)}%`} />
-                    <Legend />
-                    <Line type="monotone" dataKey="growthRate" stroke="#0284c7" strokeWidth={2} dot={false} name={t('legends.growthRate')} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+            <AdminPanel title={t('charts.trafficSourcesTitle')} description={t('charts.trafficSourcesDescription')}>
+              <AnalyticsPanelSkeleton />
             </AdminPanel>
           </div>
 
           <div className="grid gap-6 xl:grid-cols-2">
+            <AdminPanel title={t('charts.deviceUsageTitle')} description={t('charts.deviceUsageDescription')}>
+              <AnalyticsPanelSkeleton />
+            </AdminPanel>
+            <AdminPanel title={t('charts.topCountriesTitle')} description={t('charts.topCountriesDescription')}>
+              <AnalyticsPanelSkeleton />
+            </AdminPanel>
+          </div>
+        </>
+      ) : analyticsState.error && !analytics ? (
+        <div className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-900/30 dark:text-rose-200">
+          {analyticsState.error}
+        </div>
+      ) : analytics ? (
+        <>
+          {analyticsState.error ? (
+            <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+              {analyticsState.error}
+            </div>
+          ) : null}
+
+          <div className="grid gap-6 xl:grid-cols-2">
+            <AdminPanel title={t('charts.dailyVisitorsTitle')} description={t('charts.dailyVisitorsDescription')}>
+              {growthSeries.length ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={growthSeries} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
+                    <Legend />
+                    <Line type="monotone" dataKey="visitors" stroke={BRAND_LINE} strokeWidth={2.2} dot={false} name={t('legends.visitors')} />
+                    <Line type="monotone" dataKey="sessions" stroke="#64748b" strokeWidth={2} dot={false} name={t('legends.sessions')} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
+            </AdminPanel>
+
             <AdminPanel title={t('charts.trafficSourcesTitle')} description={t('charts.trafficSourcesDescription')}>
-              <div className="h-[320px]">
+              {sourceChartData.length ? (
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={sourceChartData} dataKey="value" nameKey="name" outerRadius={110} innerRadius={55}>
@@ -210,15 +339,21 @@ export default function AdminAnalyticsPage() {
                         <Cell key={entry.name} fill={SOURCE_COLORS[index % SOURCE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
             </AdminPanel>
+          </div>
 
+          <div className="grid gap-6 xl:grid-cols-2">
             <AdminPanel title={t('charts.deviceUsageTitle')} description={t('charts.deviceUsageDescription')}>
-              <div className="h-[320px]">
+              {deviceChartData.length ? (
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={deviceChartData} dataKey="value" nameKey="name" outerRadius={110} innerRadius={55}>
@@ -226,52 +361,103 @@ export default function AdminAnalyticsPage() {
                         <Cell key={entry.name} fill={SOURCE_COLORS[index % SOURCE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
+            </AdminPanel>
+
+            <AdminPanel title={t('charts.topCountriesTitle')} description={t('charts.topCountriesDescription')}>
+              {(analytics?.topCountries || []).length ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.topCountries} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
+                    <Bar dataKey="value" fill={BRAND_LINE} radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
             </AdminPanel>
           </div>
 
           <div className="grid gap-6 xl:grid-cols-2">
-            <AdminPanel title={t('charts.topCountriesTitle')} description={t('charts.topCountriesDescription')}>
-              <div className="h-[320px]">
+            <AdminPanel title={t('charts.topCitiesTitle')} description={t('charts.topCitiesDescription')}>
+              {(analytics?.topCities || []).length ? (
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics?.topCountries || []} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
+                  <BarChart data={analytics.topCities} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#0f172a" radius={[6, 6, 0, 0]} />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
+                    <Bar dataKey="value" fill="#334155" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
             </AdminPanel>
 
-            <AdminPanel title={t('charts.topPagesTitle')} description={t('charts.topPagesDescription')}>
-              <div className="h-[320px]">
+            <AdminPanel title={t('charts.browserUsageTitle')} description={t('charts.browserUsageDescription')}>
+              {browserChartData.length ? (
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics?.topPages || []} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
+                  <BarChart data={browserChartData} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
+                    <Bar dataKey="sessions" fill="#475569" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
+            </AdminPanel>
+          </div>
+
+          <div className="grid gap-6 xl:grid-cols-2">
+            <AdminPanel title={t('charts.topPagesTitle')} description={t('charts.topPagesDescription')}>
+              {(analytics?.topPages || []).length ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.topPages} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="path" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip />
+                    <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
                     <Bar dataKey="views" fill="#334155" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
             </AdminPanel>
-          </div>
 
-          <div className="grid gap-6 xl:grid-cols-2">
             <AdminPanel title={t('panels.topContentTitle')} description={t('panels.topContentDescription')}>
+              {topEngagementPages.length ? (
               <div className="space-y-3">
-                {(analytics?.topContent || []).map((item, index) => (
-                  <div key={`${item.path}-${index}`} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                    <p className="truncate text-sm font-semibold text-slate-950" title={item.title || item.path}>{item.title || item.path}</p>
-                    <p className="mt-1 truncate text-xs text-slate-500" title={item.path}>{item.path}</p>
-                    <div className="mt-2 grid grid-cols-3 gap-3 text-xs text-slate-600">
+                {topEngagementPages.map((item, index) => (
+                  <div
+                    key={`${item.path}-${index}`}
+                    className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/40 dark:hover:bg-slate-800"
+                  >
+                    <p className="truncate text-sm font-semibold text-slate-950 dark:text-slate-100" title={item.title || item.path}>{item.title || item.path}</p>
+                    <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400" title={item.path}>{item.path}</p>
+                    <div className="mt-2 grid grid-cols-3 gap-3 text-xs text-slate-600 dark:text-slate-300">
                       <span>{t('table.views')}: {formatAdminNumber(item.views, locale)}</span>
                       <span>{t('table.engagement')}: {formatPercent(item.engagementRate)}</span>
                       <span>{t('table.duration')}: {toReadableDuration(item.avgEngagementSeconds)}</span>
@@ -279,14 +465,23 @@ export default function AdminAnalyticsPage() {
                   </div>
                 ))}
               </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
             </AdminPanel>
+          </div>
 
+          <div className="grid gap-6 xl:grid-cols-2">
             <AdminPanel title={t('panels.landingPagesTitle')} description={t('panels.landingPagesDescription')}>
+              {(analytics?.topLandingPages || []).length ? (
               <div className="space-y-3">
-                {(analytics?.topLandingPages || []).map((item, index) => (
-                  <div key={`${item.landingPage}-${index}`} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                    <p className="truncate text-sm font-semibold text-slate-950" title={item.landingPage}>{item.landingPage}</p>
-                    <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-slate-600 sm:grid-cols-4">
+                {(analytics.topLandingPages || []).map((item, index) => (
+                  <div
+                    key={`${item.landingPage}-${index}`}
+                    className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/40 dark:hover:bg-slate-800"
+                  >
+                    <p className="truncate text-sm font-semibold text-slate-950 dark:text-slate-100" title={item.landingPage}>{item.landingPage}</p>
+                    <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-slate-600 dark:text-slate-300 sm:grid-cols-4">
                       <span>{t('table.sessions')}: {formatAdminNumber(item.sessions, locale)}</span>
                       <span>{t('table.engagement')}: {formatPercent(item.engagementRate)}</span>
                       <span>{t('table.bounce')}: {formatPercent(item.bounceRate)}</span>
@@ -295,17 +490,19 @@ export default function AdminAnalyticsPage() {
                   </div>
                 ))}
               </div>
+              ) : (
+                <EmptyPanelState label={t('empty')} />
+              )}
             </AdminPanel>
-          </div>
 
-          <AdminPanel title={t('panels.audienceBreakdownTitle')} description={t('panels.audienceBreakdownDescription')}>
-            <div className="grid gap-4 md:grid-cols-3">
+            <AdminPanel title={t('panels.audienceBreakdownTitle')} description={t('panels.audienceBreakdownDescription')}>
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('audience.browsers')}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('audience.operatingSystems')}</p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                  {(analytics?.browserUsage || []).slice(0, 6).map((item) => (
+                  {(analytics.operatingSystemUsage || []).slice(0, 6).map((item) => (
                     <li key={item.label} className="flex items-center justify-between gap-3">
-                      <span className="truncate">{item.label}</span>
+                      <span className="truncate dark:text-slate-200">{item.label}</span>
                       <span className="font-semibold">{formatAdminNumber(item.sessions, locale)}</span>
                     </li>
                   ))}
@@ -313,35 +510,28 @@ export default function AdminAnalyticsPage() {
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('audience.operatingSystems')}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('audience.referrers')}</p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                  {(analytics?.operatingSystemUsage || []).slice(0, 6).map((item) => (
+                  {(analytics.referrers || []).slice(0, 6).map((item) => (
                     <li key={item.label} className="flex items-center justify-between gap-3">
-                      <span className="truncate">{item.label}</span>
-                      <span className="font-semibold">{formatAdminNumber(item.sessions, locale)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('audience.referrers')}</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                  {(analytics?.referrers || []).slice(0, 6).map((item) => (
-                    <li key={item.label} className="flex items-center justify-between gap-3">
-                      <span className="truncate" title={item.label}>{item.label}</span>
+                      <span className="truncate dark:text-slate-200" title={item.label}>{item.label}</span>
                       <span className="font-semibold">{formatAdminNumber(item.sessions, locale)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
-          </AdminPanel>
+            </AdminPanel>
+          </div>
         </>
+      ) : (
+        <div className="rounded-3xl border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+          {t('empty')}
+        </div>
       )}
 
       {analytics?.generatedAt ? (
-        <p className="text-right text-xs text-slate-500">{common('generatedAt')}: {new Date(analytics.generatedAt).toLocaleString()}</p>
+        <p className="text-right text-xs text-slate-500 dark:text-slate-400">{common('generatedAt')}: {new Date(analytics.generatedAt).toLocaleString()}</p>
       ) : null}
     </div>
   );

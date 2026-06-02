@@ -311,7 +311,8 @@
       },
       "goToAdmin": "Open Admin Console",
       "goToUserDashboard": "Go to User Dashboard",
-      "logout": "Logout"
+      "logout": "Logout",
+      "generatedAt": "Generated at"
     },
     "dashboard": {
       "eyebrow": "Admin Overview",
@@ -580,16 +581,20 @@
       },
       "metrics": {
         "totalVisitors": "Total visitors",
+        "uniqueVisitors": "Unique visitors",
         "activeVisitors": "Active visitors",
         "pageViews": "Page views",
+        "sessions": "Sessions",
         "engagementRate": "Engagement rate",
         "bounceRate": "Bounce rate",
         "averageSessionDuration": "Avg. session duration"
       },
       "hints": {
         "totalVisitors": "All visitors in the selected date range.",
+        "uniqueVisitors": "First-time users captured in the selected period.",
         "activeVisitors": "Live active visitors from GA4 realtime where available.",
         "pageViews": "Total tracked page views for public pages.",
+        "sessions": "Total sessions initiated in the selected date range.",
         "engagementRate": "Sessions considered engaged by GA4.",
         "bounceRate": "Sessions with no meaningful engagement event.",
         "averageSessionDuration": "Average duration of all sessions."
@@ -605,8 +610,29 @@
         "deviceUsageDescription": "Session distribution across device categories.",
         "topCountriesTitle": "Top countries",
         "topCountriesDescription": "Countries generating the highest visitor traffic.",
+        "topCitiesTitle": "Top cities",
+        "topCitiesDescription": "Cities generating the highest visitor traffic.",
+        "browserUsageTitle": "Browser analytics",
+        "browserUsageDescription": "Session distribution across major browsers.",
         "topPagesTitle": "Top pages",
         "topPagesDescription": "Most viewed pages across the selected period."
+      },
+      "sourceCategories": {
+        "organicSearch": "Organic Search",
+        "direct": "Direct",
+        "social": "Social",
+        "referral": "Referral"
+      },
+      "deviceCategories": {
+        "mobile": "Mobile",
+        "desktop": "Desktop",
+        "tablet": "Tablet"
+      },
+      "browserCategories": {
+        "chrome": "Chrome",
+        "safari": "Safari",
+        "edge": "Edge",
+        "firefox": "Firefox"
       },
       "panels": {
         "topContentTitle": "Most viewed content",
@@ -628,6 +654,7 @@
         "operatingSystems": "Operating systems",
         "referrers": "Referrers"
       },
+      "empty": "No website analytics data available for this period.",
       "legends": {
         "visitors": "Visitors",
         "sessions": "Sessions",
