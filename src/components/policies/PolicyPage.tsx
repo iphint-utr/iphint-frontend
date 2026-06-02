@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/routing";
+import { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
@@ -76,7 +77,7 @@ function BulletList({ items }: { items: string[] }) {
           key={`${item}-${index}`}
           className="relative text-slate-600 leading-relaxed before:absolute before:-left-5 before:text-slate-400 before:content-['•']"
         >
-          {item}
+          {renderTextWithIpHintWordmark(item)}
         </li>
       ))}
     </ul>
@@ -148,7 +149,7 @@ export default function PolicyPage({
             </Link>
 
             <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
-              {pageTitles[activeDocument.lang]}
+              {renderTextWithIpHintWordmark(pageTitles[activeDocument.lang])}
             </h1>
             <div className="flex flex-col gap-1 font-medium text-slate-500">
               <p>{activeChromeCopy.versionSummary}</p>
@@ -180,9 +181,9 @@ export default function PolicyPage({
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
                 {activeChromeCopy.selectedVersion}
               </p>
-              <h2 className="mt-3 text-2xl font-bold text-slate-900">{activeDocument.title}</h2>
+              <h2 className="mt-3 text-2xl font-bold text-slate-900">{renderTextWithIpHintWordmark(activeDocument.title)}</h2>
               <div className="mt-3 flex flex-col gap-1 font-medium text-slate-500">
-                <p>{activeDocument.company}</p>
+                <p>{renderTextWithIpHintWordmark(activeDocument.company)}</p>
                 <p>{activeDocument.effectiveDate}</p>
               </div>
             </div>
@@ -191,13 +192,13 @@ export default function PolicyPage({
           <div className="flex flex-col gap-12" lang={activeDocument.lang}>
             {activeDocument.sections.map((section) => (
               <div key={section.id} id={section.id} className="scroll-mt-24">
-                <h2 className="mb-4 text-xl font-bold md:text-2xl">{section.title}</h2>
+                <h2 className="mb-4 text-xl font-bold md:text-2xl">{renderTextWithIpHintWordmark(section.title)}</h2>
 
                 {section.paragraphs && (
                   <div className="flex flex-col gap-4">
                     {section.paragraphs.map((paragraph, index) => (
                       <p key={`${section.id}-paragraph-${index}`} className="text-slate-600 leading-relaxed">
-                        {paragraph}
+                        {renderTextWithIpHintWordmark(paragraph)}
                       </p>
                     ))}
                   </div>
@@ -207,10 +208,10 @@ export default function PolicyPage({
                   <div className="mt-6 flex flex-col gap-6 border-l-2 border-slate-100 pl-4 md:pl-6">
                     {section.subSections.map((subSection, index) => (
                       <div key={`${section.id}-sub-${index}`}>
-                        <h3 className="mb-1 font-semibold text-slate-800">{subSection.subtitle}</h3>
+                        <h3 className="mb-1 font-semibold text-slate-800">{renderTextWithIpHintWordmark(subSection.subtitle)}</h3>
 
                         {subSection.text && (
-                          <p className="text-slate-600 leading-relaxed">{subSection.text}</p>
+                          <p className="text-slate-600 leading-relaxed">{renderTextWithIpHintWordmark(subSection.text)}</p>
                         )}
 
                         {subSection.paragraphs && (
@@ -220,7 +221,7 @@ export default function PolicyPage({
                                 key={`${section.id}-sub-${index}-paragraph-${paragraphIndex}`}
                                 className="text-slate-600 leading-relaxed"
                               >
-                                {paragraph}
+                                {renderTextWithIpHintWordmark(paragraph)}
                               </p>
                             ))}
                           </div>
@@ -243,10 +244,10 @@ export default function PolicyPage({
                     )}
                     {section.callout.href ? (
                       <a href={section.callout.href} className="font-semibold text-blue-600 hover:underline">
-                        {section.callout.value}
+                        {renderTextWithIpHintWordmark(section.callout.value)}
                       </a>
                     ) : (
-                      <p className="font-semibold text-slate-900">{section.callout.value}</p>
+                      <p className="font-semibold text-slate-900">{renderTextWithIpHintWordmark(section.callout.value)}</p>
                     )}
                   </div>
                 )}
@@ -255,7 +256,7 @@ export default function PolicyPage({
                   <div className="mt-4 flex flex-col gap-4">
                     {section.footerParagraphs.map((paragraph, index) => (
                       <p key={`${section.id}-footer-${index}`} className="text-slate-600 leading-relaxed">
-                        {paragraph}
+                        {renderTextWithIpHintWordmark(paragraph)}
                       </p>
                     ))}
                   </div>
@@ -264,22 +265,22 @@ export default function PolicyPage({
             ))}
 
             <div id={activeDocument.support.id} className="scroll-mt-24 mt-2 border-t border-gray-100 pt-10">
-              <h2 className="mb-4 text-xl font-bold md:text-2xl">{activeDocument.support.title}</h2>
+              <h2 className="mb-4 text-xl font-bold md:text-2xl">{renderTextWithIpHintWordmark(activeDocument.support.title)}</h2>
 
               {activeDocument.support.description && (
-                <p className="mb-6 text-slate-600 leading-relaxed">{activeDocument.support.description}</p>
+                <p className="mb-6 text-slate-600 leading-relaxed">{renderTextWithIpHintWordmark(activeDocument.support.description)}</p>
               )}
 
               <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-slate-50 p-6 text-sm text-slate-700 md:text-base">
                 {activeDocument.support.details.map((detail) => (
                   <p key={`${detail.label}-${detail.value}`}>
-                    <strong className="mb-1 block text-slate-900">{detail.label}:</strong>{" "}
+                    <strong className="mb-1 block text-slate-900">{renderTextWithIpHintWordmark(detail.label)}:</strong>{" "}
                     {detail.href ? (
                       <a href={detail.href} className="text-blue-600 hover:underline">
-                        {detail.value}
+                        {renderTextWithIpHintWordmark(detail.value)}
                       </a>
                     ) : (
-                      detail.value
+                      renderTextWithIpHintWordmark(detail.value)
                     )}
                   </p>
                 ))}

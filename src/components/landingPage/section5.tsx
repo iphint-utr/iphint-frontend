@@ -1,20 +1,26 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, type WheelEvent } from "react";
 import { useTranslations } from "next-intl";
+import { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 
 const testimonials = [
   {
     key: "artist",
+    imageSrc: "/section5/img1.png",
   },
   {
     key: "ceo",
+    imageSrc: "/section5/img2.png",
   },
   {
     key: "influencer",
+    imageSrc: "/section5/img3.png",
   },
   {
     key: "artist",
+    imageSrc: "/section5/img4.png",
   },
 ];
 
@@ -56,9 +62,9 @@ export default function Section5() {
       <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-12">
         {/* Header */}
         <div className="mb-10 text-center sm:mb-14 lg:mb-16">
-          <h2 className="mb-3 text-3xl font-bold md:text-4xl">{t("title")}</h2>
+          <h2 className="mb-3 text-3xl font-bold md:text-4xl">{renderTextWithIpHintWordmark(t("title"))}</h2>
           <p className="mx-auto max-w-xl text-sm font-semibold leading-relaxed text-slate-600 sm:text-base">
-            {t("subtitle")}
+            {renderTextWithIpHintWordmark(t("subtitle"))}
           </p>
         </div>
 
@@ -80,21 +86,23 @@ export default function Section5() {
                       <path d="M5.5 0C2.46243 0 0 2.46243 0 5.5V11H7V5.5C7 4.67157 6.32843 4 5.5 4H4V0H5.5ZM19.5 0C16.4624 0 14 2.46243 14 5.5V11H21V5.5C21 4.67157 20.3284 4 19.5 4H18V0H19.5Z" fill="black"/>
                     </svg>
                   </div>
-                  <h3 className="mb-3 text-lg font-bold leading-tight sm:text-xl">{t(`testimonials.${item.key}.quote`)}</h3>
-                  <p className="mb-6 text-sm leading-relaxed text-slate-600 sm:text-base md:mb-10">{t(`testimonials.${item.key}.content`)}</p>
+                  <h3 className="mb-3 text-lg font-bold leading-tight sm:text-xl">{renderTextWithIpHintWordmark(t(`testimonials.${item.key}.quote`))}</h3>
+                  <p className="mb-6 text-sm leading-relaxed text-slate-600 sm:text-base md:mb-10">{renderTextWithIpHintWordmark(t(`testimonials.${item.key}.content`))}</p>
                 </div>
 
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                    {/* Fallback to initials or icon if image doesn't exist */}
-                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-400">
-                      IMG
-                    </div>
-                    {/* Replace with <Image /> when you have the local files */}
+                    <Image
+                      src={item.imageSrc}
+                      alt={t(`testimonials.${item.key}.author`)}
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-bold">{t(`testimonials.${item.key}.author`)}</p>
-                    <p className="text-xs text-slate-500">{t(`testimonials.${item.key}.subtext`)}</p>
+                    <p className="text-sm font-bold">{renderTextWithIpHintWordmark(t(`testimonials.${item.key}.author`))}</p>
+                    <p className="text-xs text-slate-500">{renderTextWithIpHintWordmark(t(`testimonials.${item.key}.subtext`))}</p>
                   </div>
                 </div>
               </article>
