@@ -640,7 +640,18 @@
         "landingPagesTitle": "Top landing pages",
         "landingPagesDescription": "Entry pages with strongest engagement and session quality.",
         "audienceBreakdownTitle": "Audience analytics",
-        "audienceBreakdownDescription": "Breakdown by browser, operating system, and top referrers."
+        "audienceBreakdownDescription": "Breakdown by browser, operating system, and top referrers.",
+        "liveActiveVisitorsTitle": "Live active users",
+        "liveActiveVisitorsDescription": "Realtime active users snapshot by location, device, browser, and currently active pages."
+      },
+      "realtime": {
+        "totalActiveUsers": "Active users now",
+        "locationCountries": "Top countries",
+        "locationCities": "Top cities",
+        "devices": "Devices",
+        "browsers": "Browsers",
+        "activePages": "Active pages",
+        "noActiveUsers": "No realtime active users right now."
       },
       "table": {
         "views": "Views",

@@ -27,13 +27,39 @@ import { fetchAdminWebsiteAnalytics } from '@/lib/store/slices/adminSlice';
 import type { AdminAnalyticsDateRange } from '@/types/admin';
 
 const SOURCE_COLORS = ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
-const BRAND_LINE = '#0f172a';
+const GA_COLORS = {
+  visitors: '#1a73e8',
+  sessions: '#34a853',
+  countries: '#1a73e8',
+  cities: '#5e97f6',
+  browsers: '#4285f4',
+} as const;
+
+const SOURCE_COLOR_MAP: Record<string, string> = {
+  'Organic Search': '#34a853',
+  Direct: '#4285f4',
+  Referral: '#fbbc04',
+  Social: '#ea4335',
+};
+
+const DEVICE_COLOR_MAP: Record<string, string> = {
+  Desktop: '#1a73e8',
+  Mobile: '#34a853',
+  Tablet: '#fbbc04',
+};
+
+const BROWSER_COLOR_MAP: Record<string, string> = {
+  Chrome: '#34a853',
+  Safari: '#1a73e8',
+  Edge: '#00acc1',
+  Firefox: '#fb8c00',
+};
 
 const SOURCE_PRESETS = [
-  { key: 'organicSearch', matcher: /organic search/i },
-  { key: 'direct', matcher: /^direct$/i },
-  { key: 'social', matcher: /social/i },
-  { key: 'referral', matcher: /referral/i },
+  { key: 'organicSearch', matcher: /(organic search|organic)/i },
+  { key: 'direct', matcher: /^(direct|\(direct\))$/i },
+  { key: 'social', matcher: /(social|organic social|paid social)/i },
+  { key: 'referral', matcher: /(referral|affiliate)/i },
 ] as const;
 
 const DEVICE_PRESETS = [
@@ -112,12 +138,16 @@ export default function AdminAnalyticsPage() {
 
   const sourceChartData = useMemo(() => {
     const base = analytics?.trafficSources || [];
-    const grouped = SOURCE_PRESETS.map((preset) => ({
-      name: t(`sourceCategories.${preset.key}`),
-      value: base
-        .filter((item) => preset.matcher.test(item.label || ''))
-        .reduce((sum, item) => sum + (item.sessions || 0), 0),
-    }));
+    const grouped = SOURCE_PRESETS.map((preset) => {
+      const name = t(`sourceCategories.${preset.key}`);
+      return {
+        name,
+        value: base
+          .filter((item) => preset.matcher.test(item.label || ''))
+          .reduce((sum, item) => sum + (item.sessions || 0), 0),
+        color: SOURCE_COLOR_MAP[name] || SOURCE_COLORS[0],
+      };
+    });
 
     const hasAnyPresetData = grouped.some((item) => item.value > 0);
     if (hasAnyPresetData) {
@@ -127,17 +157,22 @@ export default function AdminAnalyticsPage() {
     return base.slice(0, 4).map((item) => ({
       name: item.label,
       value: item.sessions,
+      color: SOURCE_COLOR_MAP[item.label] || SOURCE_COLORS[0],
     }));
   }, [analytics?.trafficSources, t]);
 
   const deviceChartData = useMemo(() => {
     const base = analytics?.deviceUsage || [];
-    const grouped = DEVICE_PRESETS.map((preset) => ({
-      name: t(`deviceCategories.${preset.key}`),
-      value: base
-        .filter((item) => preset.matcher.test(item.label || ''))
-        .reduce((sum, item) => sum + (item.sessions || 0), 0),
-    }));
+    const grouped = DEVICE_PRESETS.map((preset) => {
+      const name = t(`deviceCategories.${preset.key}`);
+      return {
+        name,
+        value: base
+          .filter((item) => preset.matcher.test(item.label || ''))
+          .reduce((sum, item) => sum + (item.sessions || 0), 0),
+        color: DEVICE_COLOR_MAP[name] || SOURCE_COLORS[1],
+      };
+    });
 
     const hasAnyPresetData = grouped.some((item) => item.value > 0);
     if (hasAnyPresetData) {
@@ -147,17 +182,22 @@ export default function AdminAnalyticsPage() {
     return base.slice(0, 3).map((item) => ({
       name: item.label,
       value: item.sessions,
+      color: DEVICE_COLOR_MAP[item.label] || SOURCE_COLORS[1],
     }));
   }, [analytics?.deviceUsage, t]);
 
   const browserChartData = useMemo(() => {
     const base = analytics?.browserUsage || [];
-    const grouped = BROWSER_PRESETS.map((preset) => ({
-      name: t(`browserCategories.${preset.key}`),
-      sessions: base
-        .filter((item) => preset.matcher.test(item.label || ''))
-        .reduce((sum, item) => sum + (item.sessions || 0), 0),
-    }));
+    const grouped = BROWSER_PRESETS.map((preset) => {
+      const name = t(`browserCategories.${preset.key}`);
+      return {
+        name,
+        sessions: base
+          .filter((item) => preset.matcher.test(item.label || ''))
+          .reduce((sum, item) => sum + (item.sessions || 0), 0),
+        color: BROWSER_COLOR_MAP[name] || SOURCE_COLORS[2],
+      };
+    });
 
     const hasAnyPresetData = grouped.some((item) => item.sessions > 0);
     if (hasAnyPresetData) {
@@ -167,6 +207,7 @@ export default function AdminAnalyticsPage() {
     return base.slice(0, 4).map((item) => ({
       name: item.label,
       sessions: item.sessions,
+      color: BROWSER_COLOR_MAP[item.label] || SOURCE_COLORS[2],
     }));
   }, [analytics?.browserUsage, t]);
 
@@ -175,6 +216,8 @@ export default function AdminAnalyticsPage() {
       .sort((left, right) => right.engagementRate - left.engagementRate)
       .slice(0, 6);
   }, [analytics?.topContent]);
+
+  const realtime = analytics?.realtime;
 
   const handleRangeChange = (range: AdminAnalyticsDateRange) => {
     dispatch(fetchAdminWebsiteAnalytics({ range }));
@@ -277,6 +320,69 @@ export default function AdminAnalyticsPage() {
       )}
 
       {showInitialLoading ? (
+        <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
+          <AnalyticsPanelSkeleton heightClassName="h-56" />
+        </AdminPanel>
+      ) : realtime ? (
+        <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
+          <div className="grid gap-4 lg:grid-cols-5">
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('realtime.totalActiveUsers')}</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-100">
+                {formatAdminNumber(realtime.totalActiveUsers || analytics.summary.activeVisitors || 0, locale)}
+              </p>
+            </div>
+
+            {[{
+              key: 'topCountries',
+              title: t('realtime.locationCountries'),
+              items: realtime.topCountries,
+            }, {
+              key: 'topCities',
+              title: t('realtime.locationCities'),
+              items: realtime.topCities,
+            }, {
+              key: 'devices',
+              title: t('realtime.devices'),
+              items: realtime.devices,
+            }, {
+              key: 'browsers',
+              title: t('realtime.browsers'),
+              items: realtime.browsers,
+            }].map((section) => (
+              <div key={section.key} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{section.title}</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-700 dark:text-slate-200">
+                  {section.items?.length ? section.items.slice(0, 5).map((item) => (
+                    <li key={item.label} className="flex items-center justify-between gap-2">
+                      <span className="truncate" title={item.label}>{item.label}</span>
+                      <span className="font-semibold">{formatAdminNumber(item.activeUsers, locale)}</span>
+                    </li>
+                  )) : (
+                    <li className="text-xs text-slate-500 dark:text-slate-400">{t('realtime.noActiveUsers')}</li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('realtime.activePages')}</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {realtime.activePages?.length ? realtime.activePages.slice(0, 8).map((item) => (
+                <div key={item.path} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+                  <span className="truncate" title={item.path}>{item.path}</span>
+                  <span className="shrink-0 font-semibold">{formatAdminNumber(item.activeUsers, locale)}</span>
+                </div>
+              )) : (
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('realtime.noActiveUsers')}</p>
+              )}
+            </div>
+          </div>
+        </AdminPanel>
+      ) : null}
+
+      {showInitialLoading ? (
         <>
           <div className="grid gap-6 xl:grid-cols-2">
             <AdminPanel title={t('charts.dailyVisitorsTitle')} description={t('charts.dailyVisitorsDescription')}>
@@ -319,8 +425,8 @@ export default function AdminAnalyticsPage() {
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
                     <Legend />
-                    <Line type="monotone" dataKey="visitors" stroke={BRAND_LINE} strokeWidth={2.2} dot={false} name={t('legends.visitors')} />
-                    <Line type="monotone" dataKey="sessions" stroke="#64748b" strokeWidth={2} dot={false} name={t('legends.sessions')} />
+                    <Line type="monotone" dataKey="visitors" stroke={GA_COLORS.visitors} strokeWidth={2.4} dot={false} name={t('legends.visitors')} />
+                    <Line type="monotone" dataKey="sessions" stroke={GA_COLORS.sessions} strokeWidth={2.2} dot={false} name={t('legends.sessions')} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -336,7 +442,7 @@ export default function AdminAnalyticsPage() {
                   <PieChart>
                     <Pie data={sourceChartData} dataKey="value" nameKey="name" outerRadius={110} innerRadius={55}>
                       {sourceChartData.map((entry, index) => (
-                        <Cell key={entry.name} fill={SOURCE_COLORS[index % SOURCE_COLORS.length]} />
+                        <Cell key={entry.name} fill={entry.color || SOURCE_COLORS[index % SOURCE_COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
@@ -358,7 +464,7 @@ export default function AdminAnalyticsPage() {
                   <PieChart>
                     <Pie data={deviceChartData} dataKey="value" nameKey="name" outerRadius={110} innerRadius={55}>
                       {deviceChartData.map((entry, index) => (
-                        <Cell key={entry.name} fill={SOURCE_COLORS[index % SOURCE_COLORS.length]} />
+                        <Cell key={entry.name} fill={entry.color || SOURCE_COLORS[index % SOURCE_COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
@@ -380,7 +486,7 @@ export default function AdminAnalyticsPage() {
                     <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
-                    <Bar dataKey="value" fill={BRAND_LINE} radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="value" fill={GA_COLORS.countries} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -400,7 +506,7 @@ export default function AdminAnalyticsPage() {
                     <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
-                    <Bar dataKey="value" fill="#334155" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="value" fill={GA_COLORS.cities} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -418,7 +524,11 @@ export default function AdminAnalyticsPage() {
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
-                    <Bar dataKey="sessions" fill="#475569" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="sessions" fill={GA_COLORS.browsers} radius={[6, 6, 0, 0]}>
+                      {browserChartData.map((entry, index) => (
+                        <Cell key={`${entry.name}-${index}`} fill={entry.color || GA_COLORS.browsers} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>

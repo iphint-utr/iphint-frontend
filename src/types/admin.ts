@@ -252,6 +252,25 @@ export interface AdminAnalyticsLandingPagePoint {
   avgEngagementSeconds: number;
 }
 
+export interface AdminAnalyticsRealtimePoint {
+  label: string;
+  activeUsers: number;
+}
+
+export interface AdminAnalyticsRealtimePagePoint {
+  path: string;
+  activeUsers: number;
+}
+
+export interface AdminAnalyticsRealtimeSnapshot {
+  totalActiveUsers: number;
+  topCountries: AdminAnalyticsRealtimePoint[];
+  topCities: AdminAnalyticsRealtimePoint[];
+  devices: AdminAnalyticsRealtimePoint[];
+  browsers: AdminAnalyticsRealtimePoint[];
+  activePages: AdminAnalyticsRealtimePagePoint[];
+}
+
 export interface AdminAnalyticsSummary {
   totalVisitors: number;
   uniqueVisitors: number;
@@ -279,4 +298,5 @@ export interface AdminWebsiteAnalytics {
   topPages: AdminAnalyticsPagePoint[];
   topContent: AdminAnalyticsPagePoint[];
   topLandingPages: AdminAnalyticsLandingPagePoint[];
+  realtime: AdminAnalyticsRealtimeSnapshot;
 }

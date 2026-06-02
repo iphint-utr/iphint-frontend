@@ -861,7 +861,18 @@
         "landingPagesTitle": "상위 랜딩 페이지",
         "landingPagesDescription": "참여도가 높은 유입 시작 페이지입니다.",
         "audienceBreakdownTitle": "오디언스 분석",
-        "audienceBreakdownDescription": "브라우저, 운영체제, 리퍼러 기준 오디언스 분포입니다."
+        "audienceBreakdownDescription": "브라우저, 운영체제, 리퍼러 기준 오디언스 분포입니다.",
+        "liveActiveVisitorsTitle": "실시간 활성 사용자",
+        "liveActiveVisitorsDescription": "위치, 디바이스, 브라우저, 현재 활성 페이지 기준 실시간 사용자 스냅샷입니다."
+      },
+      "realtime": {
+        "totalActiveUsers": "현재 활성 사용자",
+        "locationCountries": "상위 국가",
+        "locationCities": "상위 도시",
+        "devices": "디바이스",
+        "browsers": "브라우저",
+        "activePages": "활성 페이지",
+        "noActiveUsers": "현재 실시간 활성 사용자가 없습니다."
       },
       "table": {
         "views": "조회수",
