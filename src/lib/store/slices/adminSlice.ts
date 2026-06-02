@@ -3,6 +3,7 @@ import axios from 'axios';
 import { apiClient } from '@/lib/api';
 import type {
   AdminApiUsageSummary,
+  AdminAnalyticsDateRange,
   AdminDashboardData,
   AdminDeactivateUserPayload,
   AdminDeactivateUserResult,
@@ -23,6 +24,7 @@ import type {
   AdminUserSearchesResponse,
   AdminUsersQuery,
   AdminUsersResponse,
+  AdminWebsiteAnalytics,
 } from '@/types/admin';
 
 const defaultPagination: AdminPagination = {
@@ -325,6 +327,11 @@ const deriveApiUsage = (
   };
 };
 
+const normalizeWebsiteAnalytics = (payload: unknown): AdminWebsiteAnalytics => {
+  const data = unwrapData<AdminWebsiteAnalytics>(payload);
+  return data as AdminWebsiteAnalytics;
+};
+
 export const fetchAdminDashboard = createAsyncThunk<AdminDashboardData, void, { rejectValue: string }>(
   'admin/fetchDashboard',
   async (_, { rejectWithValue }) => {
@@ -453,6 +460,23 @@ export const fetchAdminApiUsage = createAsyncThunk<AdminApiUsageSummary, { limit
   },
 );
 
+export const fetchAdminWebsiteAnalytics = createAsyncThunk<
+  AdminWebsiteAnalytics,
+  { range: AdminAnalyticsDateRange },
+  { rejectValue: string }
+>(
+  'admin/fetchWebsiteAnalytics',
+  async ({ range }, { rejectWithValue }) => {
+    try {
+      const params = createQueryParams({ range });
+      const response = await apiClient.get(`/admin/analytics?${params.toString()}`);
+      return normalizeWebsiteAnalytics(response.data);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch website analytics'));
+    }
+  },
+);
+
 interface AdminState {
   dashboard: {
     data: AdminDashboardData | null;
@@ -491,6 +515,12 @@ interface AdminState {
   };
   apiUsage: {
     data: AdminApiUsageSummary | null;
+    loading: boolean;
+    error: string | null;
+  };
+  analytics: {
+    range: AdminAnalyticsDateRange;
+    data: AdminWebsiteAnalytics | null;
     loading: boolean;
     error: string | null;
   };
@@ -538,6 +568,12 @@ const initialState: AdminState = {
     error: null,
   },
   apiUsage: {
+    data: null,
+    loading: false,
+    error: null,
+  },
+  analytics: {
+    range: '30d',
     data: null,
     loading: false,
     error: null,
@@ -693,6 +729,19 @@ const adminSlice = createSlice({
       .addCase(fetchAdminApiUsage.rejected, (state, action) => {
         state.apiUsage.loading = false;
         state.apiUsage.error = action.payload ?? 'Failed to fetch API usage insights';
+      })
+      .addCase(fetchAdminWebsiteAnalytics.pending, (state, action) => {
+        state.analytics.loading = true;
+        state.analytics.error = null;
+        state.analytics.range = action.meta.arg.range;
+      })
+      .addCase(fetchAdminWebsiteAnalytics.fulfilled, (state, action) => {
+        state.analytics.loading = false;
+        state.analytics.data = action.payload;
+      })
+      .addCase(fetchAdminWebsiteAnalytics.rejected, (state, action) => {
+        state.analytics.loading = false;
+        state.analytics.error = action.payload ?? 'Failed to fetch website analytics';
       });
   },
 });

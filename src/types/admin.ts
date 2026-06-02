@@ -205,3 +205,78 @@ export interface AdminApiUsageSummary {
   topUploaders: AdminUsageTopUploader[];
   statusBreakdown: AdminUsageStatusItem[];
 }
+
+export type AdminAnalyticsDateRange = '7d' | '30d' | '90d';
+
+export interface AdminAnalyticsTimeseriesPoint {
+  date: string;
+  visitors: number;
+  activeUsers: number;
+  pageViews: number;
+  sessions: number;
+}
+
+export interface AdminAnalyticsGeoPoint {
+  label: string;
+  value: number;
+}
+
+export interface AdminAnalyticsSourcePoint {
+  label: string;
+  sessions: number;
+  users: number;
+  engagementRate: number;
+  bounceRate: number;
+}
+
+export interface AdminAnalyticsTechnologyPoint {
+  label: string;
+  sessions: number;
+  users: number;
+}
+
+export interface AdminAnalyticsPagePoint {
+  path: string;
+  title: string;
+  views: number;
+  avgEngagementSeconds: number;
+  engagementRate: number;
+  bounceRate: number;
+}
+
+export interface AdminAnalyticsLandingPagePoint {
+  landingPage: string;
+  sessions: number;
+  engagementRate: number;
+  bounceRate: number;
+  avgEngagementSeconds: number;
+}
+
+export interface AdminAnalyticsSummary {
+  totalVisitors: number;
+  uniqueVisitors: number;
+  activeVisitors: number;
+  pageViews: number;
+  sessions: number;
+  engagementRate: number;
+  bounceRate: number;
+  averageSessionDurationSeconds: number;
+}
+
+export interface AdminWebsiteAnalytics {
+  range: AdminAnalyticsDateRange;
+  generatedAt: string;
+  summary: AdminAnalyticsSummary;
+  dailyTraffic: AdminAnalyticsTimeseriesPoint[];
+  trafficGrowth: AdminAnalyticsTimeseriesPoint[];
+  topCountries: AdminAnalyticsGeoPoint[];
+  topCities: AdminAnalyticsGeoPoint[];
+  trafficSources: AdminAnalyticsSourcePoint[];
+  referrers: AdminAnalyticsSourcePoint[];
+  deviceUsage: AdminAnalyticsTechnologyPoint[];
+  browserUsage: AdminAnalyticsTechnologyPoint[];
+  operatingSystemUsage: AdminAnalyticsTechnologyPoint[];
+  topPages: AdminAnalyticsPagePoint[];
+  topContent: AdminAnalyticsPagePoint[];
+  topLandingPages: AdminAnalyticsLandingPagePoint[];
+}

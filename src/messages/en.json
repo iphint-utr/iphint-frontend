@@ -264,6 +264,7 @@
       "dashboard": "Dashboard",
       "users": "User Management",
       "searches": "Searches",
+      "analytics": "Analytics",
       "apiUsage": "API Usage",
       "secureAccess": "Secure Admin Access",
       "secureAccessHint": "Protected routes with admin-only access."
@@ -567,6 +568,71 @@
       "methodologyDescription": "How this page is calculated using the available admin API surface.",
       "methodologyCopy": "Usage metrics combine the admin dashboard response with the latest {count} search records because the documented admin API does not expose a dedicated usage analytics endpoint.",
       "generatedAt": "Generated at"
+    },
+    "analytics": {
+      "title": "Website analytics",
+      "description": "Traffic intelligence powered by Google Analytics 4 for public website behavior and engagement.",
+      "loading": "Loading website analytics...",
+      "filters": {
+        "last7Days": "Last 7 days",
+        "last30Days": "Last 30 days",
+        "last90Days": "Last 90 days"
+      },
+      "metrics": {
+        "totalVisitors": "Total visitors",
+        "activeVisitors": "Active visitors",
+        "pageViews": "Page views",
+        "engagementRate": "Engagement rate",
+        "bounceRate": "Bounce rate",
+        "averageSessionDuration": "Avg. session duration"
+      },
+      "hints": {
+        "totalVisitors": "All visitors in the selected date range.",
+        "activeVisitors": "Live active visitors from GA4 realtime where available.",
+        "pageViews": "Total tracked page views for public pages.",
+        "engagementRate": "Sessions considered engaged by GA4.",
+        "bounceRate": "Sessions with no meaningful engagement event.",
+        "averageSessionDuration": "Average duration of all sessions."
+      },
+      "charts": {
+        "dailyVisitorsTitle": "Daily visitors and sessions",
+        "dailyVisitorsDescription": "Trend of visitors and sessions over time.",
+        "trafficGrowthTitle": "Traffic growth",
+        "trafficGrowthDescription": "Day-over-day visitor growth trend.",
+        "trafficSourcesTitle": "Traffic sources",
+        "trafficSourcesDescription": "Acquisition channel split by session volume.",
+        "deviceUsageTitle": "Device usage",
+        "deviceUsageDescription": "Session distribution across device categories.",
+        "topCountriesTitle": "Top countries",
+        "topCountriesDescription": "Countries generating the highest visitor traffic.",
+        "topPagesTitle": "Top pages",
+        "topPagesDescription": "Most viewed pages across the selected period."
+      },
+      "panels": {
+        "topContentTitle": "Most viewed content",
+        "topContentDescription": "Content/pages where users spend the most time.",
+        "landingPagesTitle": "Top landing pages",
+        "landingPagesDescription": "Entry pages with strongest engagement and session quality.",
+        "audienceBreakdownTitle": "Audience analytics",
+        "audienceBreakdownDescription": "Breakdown by browser, operating system, and top referrers."
+      },
+      "table": {
+        "views": "Views",
+        "sessions": "Sessions",
+        "engagement": "Engagement",
+        "bounce": "Bounce",
+        "duration": "Avg duration"
+      },
+      "audience": {
+        "browsers": "Browsers",
+        "operatingSystems": "Operating systems",
+        "referrers": "Referrers"
+      },
+      "legends": {
+        "visitors": "Visitors",
+        "sessions": "Sessions",
+        "growthRate": "Growth rate"
+      }
     }
   },
   "Landing": {
