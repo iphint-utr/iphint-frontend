@@ -14,9 +14,12 @@ import Footer from '@/components/footer';
 const publicChromePaths = new Set([
   '/',
   '/contact',
+  '/forgot-password',
   '/login',
   '/register',
+  '/reset-password',
   '/signup',
+  '/signup/verification-request',
   '/service',
   '/pricing',
   '/privacy_policy',

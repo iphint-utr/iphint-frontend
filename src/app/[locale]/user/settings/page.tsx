@@ -469,6 +469,10 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold">Notifications & Weekly Monitoring</h2>
         </div>
 
+        <p className="mb-4 text-sm text-gray-500">
+          Monitoring re-scan runs automatically every 7 days for uploaded images.
+        </p>
+
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700">
             Email notifications

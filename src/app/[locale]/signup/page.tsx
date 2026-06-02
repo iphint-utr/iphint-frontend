@@ -5,31 +5,33 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser, clearError, selectAuthNotice } from '../../../lib/store/slices/userSlice';
+import { registerUser, clearError } from '../../../lib/store/slices/userSlice';
 import { AppDispatch, RootState } from '../../../lib/store/store';
 import { countries } from './countries';
 import { Link, useRouter } from '@/i18n/routing';
 import { selectIsAuthenticated, selectAuthLoading } from '../../../lib/store/slices/userSlice';
 
-
-
 // We separate the form logic to safely use useSearchParams inside a Suspense boundary
 function SignupForm() {
   const t = useTranslations('Auth');
   const searchParams = useSearchParams();
-  const referralCode = searchParams.get('refCode') || searchParams.get('ref') || searchParams.get('referralCode') || '';
+  const referralCode =
+    searchParams.get('refCode') ||
+    searchParams.get('ref') ||
+    searchParams.get('referralCode') ||
+    '';
   const dispatch = useDispatch<AppDispatch>();
   const { authError } = useSelector((state: RootState) => state.user);
-  const authNotice = useSelector(selectAuthNotice);
-const router = useRouter();
-const isAuthenticated = useSelector(selectIsAuthenticated);
-const authLoading = useSelector(selectAuthLoading);
+  const router = useRouter();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const authLoading = useSelector(selectAuthLoading);
 
-useEffect(() => {
-  if (!authLoading && isAuthenticated) {
-    router.push('/user');
-  }
-}, [isAuthenticated, authLoading, router]);
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/user');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
   const [formData, setFormData] = useState({
     name: '',
     companyName: '',
@@ -73,7 +75,7 @@ useEffect(() => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isPasswordStrong) {
@@ -87,8 +89,8 @@ useEffect(() => {
     }
 
     const fullPhone = `${formData.phoneCode}${formData.phoneNumber}`;
-    
-    // 2. Explicitly package the referral code into the body sent to the Thunk/Axios
+
+    // Referral is tracked from signup URL params and sent to backend from here.
     const submitData = {
       name: formData.name,
       companyName: formData.companyName,
@@ -97,84 +99,101 @@ useEffect(() => {
       phoneNumber: fullPhone,
       email: formData.email,
       password: formData.password,
-      referralCode // Passed directly to backend
+      referralCode,
     };
-    
-    dispatch(registerUser(submitData));
 
+    const action = await dispatch(registerUser(submitData));
+    if (registerUser.fulfilled.match(action) && !action.payload.token) {
+      const noticeMessage = action.payload.message || '';
+      const target = `/signup/verification-request?email=${encodeURIComponent(formData.email)}&message=${encodeURIComponent(noticeMessage)}`;
+      router.push(target);
+    }
   };
 
-  const uniqueDialCodes = Array.from(new Set(countries.map(c => c.dial)))
-    .map(dial => countries.find(c => c.dial === dial))
+  const uniqueDialCodes = Array.from(new Set(countries.map((c) => c.dial)))
+    .map((dial) => countries.find((c) => c.dial === dial))
     .sort((a, b) => (a!.dial > b!.dial ? 1 : -1));
 
   return (
     <div className="w-full">
       <h1 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-10 text-black">{t('signupTitle')}</h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          
-          {/* Name */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('nameLabel')}</label>
-            <input 
-              name="name" type="text" required placeholder={t('namePlaceholder')} 
-              value={formData.name} onChange={handleChange}
-              className="input-field" 
+            <input
+              name="name"
+              type="text"
+              required
+              placeholder={t('namePlaceholder')}
+              value={formData.name}
+              onChange={handleChange}
+              className="input-field"
             />
           </div>
 
-          {/* Business Environment */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('businessLabel')}</label>
-            <input 
-              name="companyName" type="text" placeholder={t('businessPlaceholder')} 
-              value={formData.companyName} onChange={handleChange}
-              className="input-field" 
+            <input
+              name="companyName"
+              type="text"
+              placeholder={t('businessPlaceholder')}
+              value={formData.companyName}
+              onChange={handleChange}
+              className="input-field"
             />
           </div>
 
-          {/* Specific Role */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('roleLabel')}</label>
-            <input 
-              name="specificRole" type="text" placeholder={t('rolePlaceholder')} 
-              value={formData.specificRole} onChange={handleChange}
-              className="input-field" 
+            <input
+              name="specificRole"
+              type="text"
+              placeholder={t('rolePlaceholder')}
+              value={formData.specificRole}
+              onChange={handleChange}
+              className="input-field"
             />
           </div>
 
-          {/* Alert Contact Info */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('contactLabel')}</label>
             <div className="flex border border-gray-300 rounded-[12px] overflow-hidden focus-within:ring-2 focus-within:ring-black transition-all bg-white h-14">
-              <select 
-                name="phoneCode" value={formData.phoneCode} onChange={handleChange} 
+              <select
+                name="phoneCode"
+                value={formData.phoneCode}
+                onChange={handleChange}
                 className="px-4 py-3 bg-transparent border-r border-gray-300 outline-none cursor-pointer min-w-[80px] text-sm appearance-none"
               >
                 {uniqueDialCodes.map((country, idx) => (
-                  <option key={idx} value={country!.dial}>{country!.dial}</option>
+                  <option key={idx} value={country!.dial}>
+                    {country!.dial}
+                  </option>
                 ))}
               </select>
-              <input 
-                name="phoneNumber" type="tel" placeholder={t('phonePlaceholder')} 
-                value={formData.phoneNumber} onChange={handleChange}
-                className="w-full px-4 py-3 outline-none placeholder-gray-300 text-sm" 
+              <input
+                name="phoneNumber"
+                type="tel"
+                placeholder={t('phonePlaceholder')}
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                className="w-full px-4 py-3 outline-none placeholder-gray-300 text-sm"
               />
             </div>
           </div>
 
-          {/* Country */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('countryLabel')}</label>
             <div className="relative">
-              <select 
-                name="country" value={formData.country} onChange={handleChange}
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
                 className="input-field cursor-pointer"
               >
                 <option value="KR">{t('defaultCountry')}</option>
-                <option disabled>──────────</option>
+                <option disabled>----------</option>
                 {countries.map((country) => (
                   <option key={country.code} value={country.code}>
                     {country.name} {country.code}
@@ -183,29 +202,35 @@ useEffect(() => {
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
                 <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             </div>
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('emailLabel')}</label>
-            <input 
-              name="email" type="email" required placeholder={t('emailPlaceholder')} 
-              value={formData.email} onChange={handleChange}
-              className="input-field" 
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder={t('emailPlaceholder')}
+              value={formData.email}
+              onChange={handleChange}
+              className="input-field"
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('passwordLabel')}</label>
-            <input 
-              name="password" type="password" required placeholder={t('passwordPlaceholder')} 
-              value={formData.password} onChange={handleChange}
-              className="input-field" 
+            <input
+              name="password"
+              type="password"
+              required
+              placeholder={t('passwordPlaceholder')}
+              value={formData.password}
+              onChange={handleChange}
+              className="input-field"
             />
             <div className="mt-2" aria-live="polite">
               <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px]">
@@ -225,11 +250,9 @@ useEffect(() => {
                   </span>
                 ))}
               </div>
-
             </div>
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('confirmPasswordLabel')}</label>
             <input
@@ -247,44 +270,34 @@ useEffect(() => {
               </p>
             )}
           </div>
-
         </div>
 
-        {/* Hidden Referral Code input (Optional: for visual confirmation in DOM) */}
         <input type="hidden" name="referralCode" value={referralCode} />
 
         {authError && (
           <div className="text-red-600 bg-red-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="#EF4444"/>
-              <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="12" r="10" fill="#EF4444" />
+              <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
             </svg>
             {authError}
-          </div>
-        )}
-
-        {authNotice && (
-          <div className="text-green-700 bg-green-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="#16A34A"/>
-              <path d="M8 12.5L10.5 15L16 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            {authNotice}
           </div>
         )}
 
         {passwordError && (
           <div className="text-red-600 bg-red-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="#EF4444"/>
-              <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="12" r="10" fill="#EF4444" />
+              <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
             </svg>
             {passwordError}
           </div>
         )}
 
         <div className="text-center text-sm sm:text-base">
-          <span className="font-medium text-gray-600">{t('hasAccountText')}{' '}</span>
+          <span className="font-medium text-gray-600">
+            {t('hasAccountText')} {' '}
+          </span>
           <Link href="/login" className="group inline-flex items-center gap-1 font-semibold text-black transition-colors hover:text-gray-600">
             {t('hasAccountLink')}
             <ChevronRight size={18} className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -292,11 +305,7 @@ useEffect(() => {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <button 
-            type="submit" 
-            disabled={authLoading}
-            className="btn-primary"
-          >
+          <button type="submit" disabled={authLoading} className="btn-primary">
             {authLoading ? (
               <>
                 <span
@@ -305,7 +314,9 @@ useEffect(() => {
                 />
                 <span>{t('processing')}</span>
               </>
-            ) : t('submitSignup')}
+            ) : (
+              t('submitSignup')
+            )}
           </button>
         </div>
       </form>
@@ -313,7 +324,6 @@ useEffect(() => {
   );
 }
 
-// 3. Export Default Component wrapped in Suspense
 export default function SignupPage() {
   const t = useTranslations('Auth');
 

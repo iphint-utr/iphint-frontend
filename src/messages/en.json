@@ -229,6 +229,16 @@
       "backToLogin": "Back to login",
       "createAccount": "Create an account"
     },
+    "verificationRequestPage": {
+      "eyebrow": "Account setup",
+      "title": "Verify your email",
+      "description": "Check your inbox and activate your account to use your trial.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "submit": "Resend verification email",
+      "backToLogin": "Back to login",
+      "backToSignup": "Back to signup"
+    },
     "resetPasswordPage": {
       "eyebrow": "Account access",
       "title": "Reset password",
