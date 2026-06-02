@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import IpHintWordmark, { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 const localeOptions = ["kr", "en"] as const;
 type LocaleCode = (typeof localeOptions)[number];
 
@@ -98,7 +99,7 @@ export default function Footer() {
       return;
     }
 
-    router.replace(pathname, { locale: newLocale });
+    router.replace(pathname, { locale: newLocale, scroll: false });
   };
 
   return (
@@ -123,7 +124,11 @@ export default function Footer() {
             {/* Column 1 */}
             <div className="flex flex-col gap-5">
               <p className="text-[13px] text-gray-400 font-normal">
-                {t("companyHeading")}
+                <IpHintWordmark
+                  className="[font-family:var(--font-google-sans)]"
+                  size="13px"
+                  color="rgb(156 163 175)"
+                />
               </p>
               <ul className="flex flex-col gap-[15px]">
                 {[
@@ -175,7 +180,7 @@ export default function Footer() {
       <div className="border-t border-gray-200">
         <div className="max-w-[1200px] mx-auto flex min-h-[56px] flex-col gap-3 px-4 py-4 sm:h-[56px] sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-0">
           <span className="text-center text-[13px] text-gray-500 sm:text-left">
-            {t("copyright")}
+            {renderTextWithIpHintWordmark(t("copyright"))}
           </span>
           <div className="self-center sm:self-auto">
             <FooterLangSwitcher

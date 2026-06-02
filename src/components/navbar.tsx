@@ -118,7 +118,7 @@ export default function Header() {
       return;
     }
 
-    router.replace(pathname, { locale: nextLocale });
+    router.replace(pathname, { locale: nextLocale, scroll: false });
     setIsMobileMenuOpen(false);
   };
 

@@ -6,6 +6,7 @@ import monitoringReducer from './slices/monitoringSlice';
 import adminReducer from './slices/adminSlice';
 import accountReducer from './slices/accountSlice';
 import themeReducer from './slices/themeSlice';
+import contactModalReducer from './slices/contactModalSlice';
 
 export const makeStore = () => {
   return configureStore({
@@ -17,6 +18,7 @@ export const makeStore = () => {
       admin: adminReducer,
       account: accountReducer,
       theme: themeReducer,
+      contactModal: contactModalReducer,
     },
   });
 };

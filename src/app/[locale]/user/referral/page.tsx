@@ -35,11 +35,21 @@ export default function ReferralPage() {
         ta.value = url;
         ta.style.position = 'fixed';
         ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
+        const body = document.body;
+
+        if (!body) {
+          throw new Error('Document body is unavailable for clipboard fallback.');
+        }
+
+        body.appendChild(ta);
+
+        try {
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+        } finally {
+          ta.remove();
+        }
       }
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);

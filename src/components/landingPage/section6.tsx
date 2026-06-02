@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 
 const blogPosts = [
   { id: 1 },
@@ -13,7 +14,7 @@ export default function Section6() {
   return (
     <section className="w-full py-20 bg-white">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-12">{t("title")}</h2>
+        <h2 className="text-4xl font-bold text-center mb-12">{renderTextWithIpHintWordmark(t("title"))}</h2>
         <div className="border-t border-gray-100">
           {blogPosts.map((post) => (
             <a
@@ -22,7 +23,7 @@ export default function Section6() {
               className="group flex items-center justify-between py-8 border-b border-gray-100 hover:bg-slate-50 transition-colors px-4"
             >
               <h3 className="text-lg font-semibold text-slate-900 pr-8 leading-snug">
-                {t(`posts.${post.id}.title`)}
+                {renderTextWithIpHintWordmark(t(`posts.${post.id}.title`))}
               </h3>
 
               <svg

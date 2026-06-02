@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 
 const SLIDES = [
   { key: "artist",    file: "/sec4_main.svg" },
@@ -105,10 +106,10 @@ export default function Section4() {
         {/* Header */}
         <div className="text-center flex flex-col gap-4">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            {t("title")}
+            {renderTextWithIpHintWordmark(t("title"))}
           </h2>
           <p className="text-sm md:text-base font-medium text-slate-700 max-w-3xl mx-auto leading-relaxed">
-            {t("description")}
+            {renderTextWithIpHintWordmark(t("description"))}
           </p>
         </div>
 
@@ -177,10 +178,10 @@ export default function Section4() {
                   style={{ transform: `translateX(${(i - currentIdx) * 100}%)` }}
                 >
                   <h3 className="text-2xl font-semibold leading-snug">
-                    {t(`items.${item.key}.heading`)}
+                    {renderTextWithIpHintWordmark(t(`items.${item.key}.heading`))}
                   </h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
-                    {t(`items.${item.key}.description`)}
+                    {renderTextWithIpHintWordmark(t(`items.${item.key}.description`))}
                   </p>
                 </div>
               ))}

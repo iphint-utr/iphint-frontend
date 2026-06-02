@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 
 export default function AboutSection() {
   const t = useTranslations("services.about");
@@ -36,10 +37,10 @@ export default function AboutSection() {
         {/* Center text */}
         <div className="flex-1 text-center px-4 sm:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            {t("title")}
+            {renderTextWithIpHintWordmark(t("title"))}
           </h2>
           <p className="mt-3 text-base font-semibold text-gray-800 sm:text-lg">
-            {t("subtitle")}
+            {renderTextWithIpHintWordmark(t("subtitle"))}
           </p>
         </div>
 

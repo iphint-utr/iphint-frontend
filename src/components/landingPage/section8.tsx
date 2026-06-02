@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import ContactSalesButton from "@/components/contact/ContactSalesButton";
+import IpHintWordmark from "@/components/IpHintWordmark";
 
 export default function Section8() {
   const t = useTranslations("Landing.section8");
@@ -9,7 +10,7 @@ export default function Section8() {
       <div className="flex flex-1 max-w-7xl mx-auto bg-slate-100 rounded-[40px] py-16 px-10 flex-col md:flex-row items-center justify-between gap-8">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center md:text-left">
           {t("titleBeforeBrand")}
-          <span className="font-extrabold">{t("brand")}</span>
+          <IpHintWordmark as="span" className="font-extrabold [font-family:var(--font-google-sans)]" />
           {t("titleAfterBrand")}
         </h2>
         
@@ -17,9 +18,9 @@ export default function Section8() {
           <button className="btn-primary">
             {t("primaryCta")}
           </button>
-          <Link href="/contact" className="btn-secondary">
+          <ContactSalesButton className="btn-secondary">
             {t("secondaryCta")}
-          </Link>
+          </ContactSalesButton>
         </div>
       </div>
     </section>

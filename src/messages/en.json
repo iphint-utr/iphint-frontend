@@ -574,8 +574,8 @@
       "title": "Protect your ideas and\nbrand growth with IpHint.",
       "subtitle": "Never lose sight of your visual assets with our non-stop tracking system",
       "description": "Raw data alone is meaningless. We prioritize precision detection on high-risk global sites, reporting only the essential information that directly impacts your rights.",
-      "primaryCta": "Get Started Now",
-      "secondaryCta": "Start Now",
+      "primaryCta": "Start for free",
+      "secondaryCta": "Contact Sales",
       "imageAlt": "Hero illustration"
     },
     "section2": {
@@ -741,7 +741,9 @@
     "description": "We will prepare a customized plan and get back to you shortly!",
     "submitErrorRequired": "Please fill in Full Name, Work Email, and Inquiry Message.",
     "submitSuccess": "Thanks for contacting us. Your inquiry was sent successfully. Redirecting to home...",
+    "submitSuccessModal": "Thanks for contacting us. Your inquiry was sent successfully.",
     "submitError": "Failed to send your inquiry. Please try again.",
+    "closeDialogAria": "Close contact dialog",
     "labels": {
       "fullName": "Full Name",
       "companyName": "Company Name",
