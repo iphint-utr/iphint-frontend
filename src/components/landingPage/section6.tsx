@@ -2,10 +2,10 @@ import { useTranslations } from "next-intl";
 import { renderTextWithIpHintWordmark } from "@/components/IpHintWordmark";
 
 const blogPosts = [
-  { id: 1 },
-  { id: 2 },
-  { id: 3 },
-  { id: 4 },
+  { id: 1, href: "https://luminous-beat-885.notion.site/Content-IP-theft-is-rarely-absent-it-is-simply-undiscovered-33af70a1e02e819ab00adba0ba23b2c8?pvs=25" },
+  { id: 2, href: "https://luminous-beat-885.notion.site/Does-AI-Art-Have-No-Copyright-The-Moment-Your-Brand-Becomes-Public-Property-33af70a1e02e8133b548e92336357492?pvs=25" },
+  { id: 3, href: "https://luminous-beat-885.notion.site/Used-One-Image-and-Got-a-Settlement-Demand-Surviving-the-Predatory-Lawsuit-Trap-33af70a1e02e81599b08dcaf2294c653?pvs=25" },
+  { id: 4, href: "https://luminous-beat-885.notion.site/Your-Brand-as-a-Target-The-K-Content-Crisis-on-Ali-and-Temu-33af70a1e02e81cdb287d1f45627e275?pvs=25" },
 ];
 
 export default function Section6() {
@@ -19,7 +19,9 @@ export default function Section6() {
           {blogPosts.map((post) => (
             <a
               key={post.id}
-              href="#"
+              href={post.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center justify-between py-8 border-b border-gray-100 hover:bg-slate-50 transition-colors px-4"
             >
               <h3 className="text-lg font-semibold text-slate-900 pr-8 leading-snug">

@@ -198,7 +198,7 @@ export default function Header() {
 
       {/* ── Mobile Menu ── */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-6 pb-6 pt-4 space-y-1">
+        <div className="md:hidden fixed top-16 left-0 right-0 h-[calc(100vh-64px)] border-t border-gray-100 bg-white px-6 pb-6 pt-4 space-y-1 overflow-y-auto z-50">
           {navLinks.map((link) => (
             <Link
               key={link.href}

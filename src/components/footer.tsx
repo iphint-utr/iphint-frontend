@@ -28,11 +28,11 @@ function FooterLangSwitcher({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center gap-2 px-4 py-[7px] rounded-full border border-gray-300 bg-gray-100 hover:bg-gray-200 transition-colors duration-150 text-[12px] font-semibold text-gray-700 tracking-wide"
+        className="flex items-center gap-1 px-3 py-[7px] rounded-full border border-gray-300 bg-gray-100 hover:bg-gray-200 transition-colors duration-150 text-[12px] font-semibold text-gray-700 tracking-wide"
       >
         {/* Globe */}
         <svg
-          width="13" height="13" viewBox="0 0 24 24" fill="none"
+          width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="1.8"
           strokeLinecap="round" strokeLinejoin="round"
           aria-hidden="true"
@@ -43,7 +43,7 @@ function FooterLangSwitcher({
         <span className="uppercase">{current?.label}</span>
         {/* Triangle ▼ */}
         <svg
-          width="9" height="9" viewBox="0 0 24 24" fill="currentColor"
+          width="15" height="15" viewBox="0 0 24 24" fill="currentColor"
           aria-hidden="true"
         >
           <path d="M7 10l5 5 5-5z" />
@@ -119,7 +119,7 @@ export default function Footer() {
           </div>
 
           {/* Columns — hugging the right edge, gap between them */}
-          <div className="grid gap-8 sm:grid-cols-2 md:ml-auto md:flex md:items-start md:gap-20 lg:gap-28">
+          <div className="grid grid-cols-2 gap-8 w-full md:w-auto md:ml-auto md:flex md:items-start md:gap-20 lg:gap-28">
 
             {/* Column 1 */}
             <div className="flex flex-col gap-5">
@@ -178,11 +178,11 @@ export default function Footer() {
 
       {/* ── Bottom bar ──────────────────────────────────────────────────────── */}
       <div className="border-t border-gray-200">
-        <div className="max-w-[1200px] mx-auto flex min-h-[56px] flex-col gap-3 px-4 py-4 sm:h-[56px] sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-0">
-          <span className="text-center text-[13px] text-gray-500 sm:text-left">
+        <div className="max-w-[1200px] mx-auto flex min-h-[56px] flex-row items-center justify-between gap-3 px-4 py-4 sm:h-[56px] sm:px-10 sm:py-0">
+          <span className="text-[13px] text-gray-500">
             {renderTextWithIpHintWordmark(t("copyright"))}
           </span>
-          <div className="self-center sm:self-auto">
+          <div>
             <FooterLangSwitcher
               selected={locale}
               labels={languages}
