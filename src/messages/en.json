@@ -592,7 +592,7 @@
       "hints": {
         "totalVisitors": "All visitors in the selected date range.",
         "uniqueVisitors": "First-time users captured in the selected period.",
-        "activeVisitors": "Live active visitors from GA4 realtime where available.",
+        "activeVisitors": "Active users in the selected date range from GA4 reports.",
         "pageViews": "Total tracked page views for public pages.",
         "sessions": "Total sessions initiated in the selected date range.",
         "engagementRate": "Sessions considered engaged by GA4.",

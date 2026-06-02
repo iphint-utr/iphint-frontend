@@ -278,122 +278,59 @@ export default function AdminAnalyticsPage() {
           value={formatAdminNumber(analytics?.summary.totalVisitors ?? 0, locale)}
           hint={t('hints.totalVisitors')}
           icon={<Users className="h-5 w-5" />}
-          accent="teal"
+          accent="googleBlue"
         />
         <AdminMetricCard
           title={t('metrics.uniqueVisitors')}
           value={formatAdminNumber(analytics?.summary.uniqueVisitors ?? 0, locale)}
           hint={t('hints.uniqueVisitors')}
           icon={<Users className="h-5 w-5" />}
-          accent="slate"
+          accent="googleGreen"
         />
         <AdminMetricCard
           title={t('metrics.activeVisitors')}
           value={formatAdminNumber(analytics?.summary.activeVisitors ?? 0, locale)}
           hint={t('hints.activeVisitors')}
           icon={<Activity className="h-5 w-5" />}
-          accent="emerald"
+          accent="googleBlue"
         />
         <AdminMetricCard
           title={t('metrics.pageViews')}
           value={formatAdminNumber(analytics?.summary.pageViews ?? 0, locale)}
           hint={t('hints.pageViews')}
           icon={<Eye className="h-5 w-5" />}
-          accent="slate"
+          accent="googleBlue"
         />
         <AdminMetricCard
           title={t('metrics.sessions')}
           value={formatAdminNumber(analytics?.summary.sessions ?? 0, locale)}
           hint={t('hints.sessions')}
           icon={<Activity className="h-5 w-5" />}
-          accent="teal"
+          accent="googleGreen"
         />
         <AdminMetricCard
           title={t('metrics.engagementRate')}
           value={formatPercent(analytics?.summary.engagementRate ?? 0)}
           hint={t('hints.engagementRate')}
           icon={<MousePointerClick className="h-5 w-5" />}
-          accent="amber"
+          accent="googleGreen"
         />
         <AdminMetricCard
           title={t('metrics.bounceRate')}
           value={formatPercent(analytics?.summary.bounceRate ?? 0)}
           hint={t('hints.bounceRate')}
           icon={<Activity className="h-5 w-5" />}
-          accent="rose"
+          accent="googleRed"
         />
         <AdminMetricCard
           title={t('metrics.averageSessionDuration')}
           value={toReadableDuration(analytics?.summary.averageSessionDurationSeconds ?? 0)}
           hint={t('hints.averageSessionDuration')}
           icon={<Clock3 className="h-5 w-5" />}
-          accent="indigo"
+          accent="googleYellow"
         />
       </div>
       )}
-
-      {showInitialLoading ? (
-        <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
-          <AnalyticsPanelSkeleton heightClassName="h-56" />
-        </AdminPanel>
-      ) : realtime ? (
-        <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
-          <div className="grid gap-4 lg:grid-cols-5">
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('realtime.totalActiveUsers')}</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-100">
-                {formatAdminNumber(realtime.totalActiveUsers || analytics.summary.activeVisitors || 0, locale)}
-              </p>
-            </div>
-
-            {[{
-              key: 'topCountries',
-              title: t('realtime.locationCountries'),
-              items: realtime.topCountries,
-            }, {
-              key: 'topCities',
-              title: t('realtime.locationCities'),
-              items: realtime.topCities,
-            }, {
-              key: 'devices',
-              title: t('realtime.devices'),
-              items: realtime.devices,
-            }, {
-              key: 'browsers',
-              title: t('realtime.browsers'),
-              items: realtime.browsers,
-            }].map((section) => (
-              <div key={section.key} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{section.title}</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-700 dark:text-slate-200">
-                  {section.items?.length ? section.items.slice(0, 5).map((item) => (
-                    <li key={item.label} className="flex items-center justify-between gap-2">
-                      <span className="truncate" title={item.label}>{item.label}</span>
-                      <span className="font-semibold">{formatAdminNumber(item.activeUsers, locale)}</span>
-                    </li>
-                  )) : (
-                    <li className="text-xs text-slate-500 dark:text-slate-400">{t('realtime.noActiveUsers')}</li>
-                  )}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('realtime.activePages')}</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {realtime.activePages?.length ? realtime.activePages.slice(0, 8).map((item) => (
-                <div key={item.path} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
-                  <span className="truncate" title={item.path}>{item.path}</span>
-                  <span className="shrink-0 font-semibold">{formatAdminNumber(item.activeUsers, locale)}</span>
-                </div>
-              )) : (
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t('realtime.noActiveUsers')}</p>
-              )}
-            </div>
-          </div>
-        </AdminPanel>
-      ) : null}
 
       {showInitialLoading ? (
         <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
@@ -624,7 +561,7 @@ export default function AdminAnalyticsPage() {
                     <XAxis dataKey="path" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
-                    <Bar dataKey="views" fill="#334155" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="views" fill={GA_COLORS.visitors} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
