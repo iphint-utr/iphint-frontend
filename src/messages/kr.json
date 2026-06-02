@@ -441,7 +441,9 @@
     "description": "맞춤형 플랜을 준비해 빠르게 답변드리겠습니다.",
     "submitErrorRequired": "이름, 업무용 이메일, 문의 내용을 입력해 주세요.",
     "submitSuccess": "문의가 정상적으로 접수되었습니다. 잠시 후 홈으로 이동합니다...",
+    "submitSuccessModal": "문의가 정상적으로 접수되었습니다.",
     "submitError": "문의 전송에 실패했습니다. 다시 시도해 주세요.",
+    "closeDialogAria": "문의 다이얼로그 닫기",
     "labels": {
       "fullName": "이름",
       "companyName": "회사명",

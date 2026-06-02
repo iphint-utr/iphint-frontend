@@ -13,6 +13,7 @@ import { getMessages } from 'next-intl/server';
 import AppLayoutRouter from '@/components/layout/AppLayoutRouter';
 import ExtensionAttrSuppressor from '@/components/ExtensionAttrSuppressor';
 import FontProvider from '@/components/layout/FontProvider';
+import ContactSalesModal from '@/components/contact/ContactSalesModal';
 import { notFound } from "next/navigation";
 
 const notoSans = Noto_Sans({
@@ -56,6 +57,7 @@ export default async function RootLayout({
           <StoreProvider>
             <FontProvider />
             <AppLayoutRouter>{children}</AppLayoutRouter>
+            <ContactSalesModal />
           </StoreProvider>
         </NextIntlClientProvider>
         

@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import ContactSalesButton from "@/components/contact/ContactSalesButton";
 
 export default function Section8() {
   const t = useTranslations("Landing.section8");
@@ -17,9 +17,9 @@ export default function Section8() {
           <button className="btn-primary">
             {t("primaryCta")}
           </button>
-          <Link href="/contact" className="btn-secondary">
+          <ContactSalesButton className="btn-secondary">
             {t("secondaryCta")}
-          </Link>
+          </ContactSalesButton>
         </div>
       </div>
     </section>

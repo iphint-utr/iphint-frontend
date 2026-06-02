@@ -731,7 +731,9 @@
     "description": "We will prepare a customized plan and get back to you shortly!",
     "submitErrorRequired": "Please fill in Full Name, Work Email, and Inquiry Message.",
     "submitSuccess": "Thanks for contacting us. Your inquiry was sent successfully. Redirecting to home...",
+    "submitSuccessModal": "Thanks for contacting us. Your inquiry was sent successfully.",
     "submitError": "Failed to send your inquiry. Please try again.",
+    "closeDialogAria": "Close contact dialog",
     "labels": {
       "fullName": "Full Name",
       "companyName": "Company Name",

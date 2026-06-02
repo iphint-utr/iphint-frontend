@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import ContactSalesButton from "@/components/contact/ContactSalesButton";
 
 type Section1Props = {
   locale: "en" | "kr";
@@ -16,9 +17,9 @@ export default function Section1({ locale }: Section1Props) {
         {t("primaryCta")}
       </Link>
 
-      <Link href="/contact" className="btn-secondary btn-lg">
+      <ContactSalesButton className="btn-secondary btn-lg">
         {t("secondaryCta")}
-      </Link>
+      </ContactSalesButton>
     </>
   );
 
