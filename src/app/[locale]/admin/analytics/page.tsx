@@ -232,8 +232,6 @@ export default function AdminAnalyticsPage() {
       .slice(0, 6);
   }, [analytics?.topContent]);
 
-  const realtime = analytics?.realtime;
-
   const handleRangeChange = (range: AdminAnalyticsDateRange) => {
     dispatch(fetchAdminWebsiteAnalytics({ range }));
   };
