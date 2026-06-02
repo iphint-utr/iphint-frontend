@@ -87,6 +87,16 @@ const toReadableDuration = (seconds: number): string => {
 
 const formatPercent = (value: number): string => `${Number(value || 0).toFixed(1)}%`;
 
+const isHttpUrl = (value: string): boolean => /^https?:\/\//i.test(value || '');
+
+const formatShortDate = (value: string): string => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+
+  return value.slice(5);
+};
+
 const EmptyPanelState = ({ label }: { label: string }) => (
   <div className="flex h-70 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-400">
     {label}
@@ -113,12 +123,17 @@ export default function AdminAnalyticsPage() {
   const analyticsState = useAppSelector((state) => state.admin.analytics);
 
   useEffect(() => {
-    if (!analyticsState.data) {
+    dispatch(fetchAdminWebsiteAnalytics({ range: analyticsState.range }));
+
+    const intervalId = setInterval(() => {
       dispatch(fetchAdminWebsiteAnalytics({ range: analyticsState.range }));
-    }
-  }, [analyticsState.data, analyticsState.range, dispatch]);
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, [analyticsState.range, dispatch]);
 
   const analytics = analyticsState.data;
+  const realtime = analytics?.realtime;
   const showInitialLoading = analyticsState.loading && !analytics;
 
   const growthSeries = useMemo(() => {
@@ -383,6 +398,69 @@ export default function AdminAnalyticsPage() {
       ) : null}
 
       {showInitialLoading ? (
+        <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
+          <AnalyticsPanelSkeleton heightClassName="h-56" />
+        </AdminPanel>
+      ) : realtime ? (
+        <AdminPanel title={t('panels.liveActiveVisitorsTitle')} description={t('panels.liveActiveVisitorsDescription')}>
+          <div className="grid gap-4 lg:grid-cols-5">
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('realtime.totalActiveUsers')}</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-100">
+                {formatAdminNumber(realtime.totalActiveUsers || analytics.summary.activeVisitors || 0, locale)}
+              </p>
+            </div>
+
+            {[{
+              key: 'topCountries',
+              title: t('realtime.locationCountries'),
+              items: realtime.topCountries,
+            }, {
+              key: 'topCities',
+              title: t('realtime.locationCities'),
+              items: realtime.topCities,
+            }, {
+              key: 'devices',
+              title: t('realtime.devices'),
+              items: realtime.devices,
+            }, {
+              key: 'browsers',
+              title: t('realtime.browsers'),
+              items: realtime.browsers,
+            }].map((section) => (
+              <div key={section.key} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{section.title}</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-700 dark:text-slate-200">
+                  {section.items?.length ? section.items.slice(0, 5).map((item) => (
+                    <li key={item.label} className="flex items-center justify-between gap-2">
+                      <span className="truncate" title={item.label}>{item.label}</span>
+                      <span className="font-semibold">{formatAdminNumber(item.activeUsers, locale)}</span>
+                    </li>
+                  )) : (
+                    <li className="text-xs text-slate-500 dark:text-slate-400">{t('realtime.noActiveUsers')}</li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('realtime.activePages')}</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {realtime.activePages?.length ? realtime.activePages.slice(0, 8).map((item) => (
+                <div key={item.path} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+                  <span className="truncate" title={item.path}>{item.path}</span>
+                  <span className="shrink-0 font-semibold">{formatAdminNumber(item.activeUsers, locale)}</span>
+                </div>
+              )) : (
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('realtime.noActiveUsers')}</p>
+              )}
+            </div>
+          </div>
+        </AdminPanel>
+      ) : null}
+
+      {showInitialLoading ? (
         <>
           <div className="grid gap-6 xl:grid-cols-2">
             <AdminPanel title={t('charts.dailyVisitorsTitle')} description={t('charts.dailyVisitorsDescription')}>
@@ -421,7 +499,7 @@ export default function AdminAnalyticsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={growthSeries} margin={{ top: 12, right: 12, left: 0, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} tickFormatter={formatShortDate} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip formatter={(value) => formatAdminNumber(Number(value || 0), locale)} />
                     <Legend />
@@ -624,7 +702,19 @@ export default function AdminAnalyticsPage() {
                 <ul className="mt-3 space-y-2 text-sm text-slate-700">
                   {(analytics.referrers || []).slice(0, 6).map((item) => (
                     <li key={item.label} className="flex items-center justify-between gap-3">
-                      <span className="truncate dark:text-slate-200" title={item.label}>{item.label}</span>
+                      {isHttpUrl(item.label) ? (
+                        <a
+                          href={item.label}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="truncate text-sky-700 underline decoration-sky-300 underline-offset-2 transition-colors hover:text-sky-900 dark:text-sky-300 dark:hover:text-sky-200"
+                          title={item.label}
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <span className="truncate dark:text-slate-200" title={item.label}>{item.label}</span>
+                      )}
                       <span className="font-semibold">{formatAdminNumber(item.sessions, locale)}</span>
                     </li>
                   ))}
