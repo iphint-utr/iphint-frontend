@@ -38,8 +38,13 @@ const UserSidebar = ({ t, onClose }: UserSidebarProps) => {
   ];
 
   const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('lastActivityAt');
+    }
     dispatch(logout());
-    window.location.href = "/login";
+    window.location.href = "/login?loggedOut=1";
   };
 
   return (

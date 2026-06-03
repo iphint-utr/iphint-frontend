@@ -681,7 +681,7 @@ export default function ScanPage() {
                 onClick={() => (window.location.href = '/user/billing')}
                 className="flex-1 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
-                {planPromptMode === 'renew' ? t('planPrompt.renewPlan') : t('planPrompt.upgradePlan')}
+                {t('planPrompt.upgradePlan')}
               </button>
             </div>
           </div>

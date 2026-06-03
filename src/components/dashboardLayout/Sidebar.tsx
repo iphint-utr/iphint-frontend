@@ -51,7 +51,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const isAdmin = user.role === 'admin';
   const showUpgradeAction =
     hasSubscriptionPlan &&
-    (planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired');
+    (planInfo.tier === 'starter' || planInfo.tier === 'pro');
 
   const isItemActive = (href: string) => {
     if (href === '/user') return pathname === '/user';
@@ -59,8 +59,13 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   };
 
   const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('lastActivityAt');
+    }
     dispatch(logout());
-    router.replace('/login');
+    router.replace('/login?loggedOut=1');
   };
 
   useEffect(() => {
@@ -140,9 +145,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                   }}
                   className="mt-2 w-full cursor-pointer rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
                 >
-                  {planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired'
-                    ? dashboardT('sidebar.renewPlan')
-                    : dashboardT('sidebar.upgradePlan')}
+                  {dashboardT('sidebar.upgradePlan')}
                 </button>
               )}
             </div>

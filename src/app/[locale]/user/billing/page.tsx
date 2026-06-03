@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   cancelPlanSubscription,
   fetchBillingPageData,
+  pauseSubscription,
   resumeAutoRenew,
   resumeSubscription,
   upgradeSubscription,
@@ -92,7 +93,7 @@ const getPaymentErrorMessage = (error: unknown, fallback: string) => {
 
 export default function BillingPage() {
   const dispatch = useAppDispatch();
-  const { plans, loading, error, savingPlan, cancelLoading, resumeLoading, resumeAutoRenewLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
+  const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, resumeAutoRenewLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -344,6 +345,15 @@ export default function BillingPage() {
       showPopup('success', 'Your subscription was cancelled.');
     } catch (err) {
       showPopup('error', getPaymentErrorMessage(err, 'Unable to cancel subscription.'));
+    }
+  };
+
+  const handlePause = async () => {
+    try {
+      await dispatch(pauseSubscription()).unwrap();
+      showPopup('success', 'Your subscription will pause at the end of this billing period.');
+    } catch (err) {
+      showPopup('error', getPaymentErrorMessage(err, 'Unable to pause subscription.'));
     }
   };
 
@@ -650,14 +660,25 @@ export default function BillingPage() {
 
             {/* Cancel — only for active + paddle-managed */}
             {snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged && (
-              <button
-                type="button"
-                onClick={cancelSubscription}
-                disabled={cancelLoading || isCancelScheduled}
-                className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
-              >
-                {cancelLoading ? 'Cancelling...' : isCancelScheduled ? 'Cancellation scheduled' : 'Cancel at period end'}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={handlePause}
+                  disabled={pauseLoading || isCancelScheduled}
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                >
+                  {pauseLoading ? 'Pausing...' : isCancelScheduled ? 'Unavailable while cancellation is scheduled' : 'Pause at period end'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={cancelSubscription}
+                  disabled={cancelLoading || isCancelScheduled}
+                  className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
+                >
+                  {cancelLoading ? 'Cancelling...' : isCancelScheduled ? 'Cancellation scheduled' : 'Cancel at period end'}
+                </button>
+              </>
             )}
           </div>
         </div>
