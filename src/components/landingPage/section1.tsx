@@ -26,7 +26,7 @@ export default function Section1({ locale }: Section1Props) {
 
   return (
     <section className="w-full py-16 md:py-24">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-6 lg:px-0 xl:gap-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-5 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] md:gap-8 lg:grid-cols-[minmax(0,1fr)_520px] lg:gap-6 lg:px-10 xl:gap-8 xl:px-0">
         
         {/* LEFT CONTENT */}
         <div className="space-y-6 lg:w-[calc(100%-50px)] lg:pr-4">

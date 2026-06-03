@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import ContactSalesButton from "@/components/contact/ContactSalesButton";
 import IpHintWordmark from "@/components/IpHintWordmark";
 
@@ -15,9 +16,9 @@ export default function Section8() {
         </h2>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <button className="btn-primary">
+          <Link href="/signup" className="btn-primary">
             {t("primaryCta")}
-          </button>
+          </Link>
           <ContactSalesButton className="btn-secondary">
             {t("secondaryCta")}
           </ContactSalesButton>
