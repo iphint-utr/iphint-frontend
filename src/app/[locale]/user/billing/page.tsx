@@ -33,6 +33,7 @@ interface BillingSnapshot {
   subscription: {
     id?: string;
     status: 'active' | 'trialing' | 'past_due' | 'paused' | 'cancelled' | 'expired' | 'pending';
+    hasAccess?: boolean;
     billingCycle: BillingCycle;
     grantSource?: 'paid' | 'trial' | 'referral';
     isTrial?: boolean;
@@ -187,8 +188,12 @@ export default function BillingPage() {
     }
   }, [dispatch]);
 
-  const currentTier = snapshot?.plan?.tier || 'starter';
   const currentSubscription = snapshot?.subscription ?? null;
+  const hasEffectivePlan =
+    !!currentSubscription &&
+    (currentSubscription.hasAccess === true || ['active', 'trialing', 'past_due'].includes(currentSubscription.status));
+  const currentTier: PlanTier | null = hasEffectivePlan ? (snapshot?.plan?.tier ?? null) : null;
+  const currentPlanName = hasEffectivePlan ? (snapshot?.plan?.name ?? '--') : '--';
   const isProTrial =
     currentTier === 'pro' &&
     !!currentSubscription &&
@@ -209,7 +214,7 @@ export default function BillingPage() {
     : null;
 
   const tierOrder: PlanTier[] = ['starter', 'pro', 'premium'];
-  const currentTierIndex = tierOrder.indexOf(currentTier);
+  const currentTierIndex = currentTier ? tierOrder.indexOf(currentTier) : -1;
 
   const getPlanCtaLabel = (planTier: PlanTier, isWorking: boolean) => {
     if (isWorking) return 'Processing...';
@@ -220,6 +225,10 @@ export default function BillingPage() {
     }
 
     const planIndex = tierOrder.indexOf(planTier);
+    if (!hasEffectivePlan) {
+      return `Buy ${plans.find((p) => p.tier === planTier)?.name || planTier}`;
+    }
+
     if (isPaddleActive) {
       if (planIndex > currentTierIndex) return `Upgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
       if (planIndex < currentTierIndex) return `Downgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
@@ -248,7 +257,7 @@ export default function BillingPage() {
     const limit = snapshot.usage.imageUploadLimit;
     if (!limit) return `${used} uploads this month (unlimited plan)`;
     return `${used}/${limit} uploads used this month`;
-  }, [snapshot]);
+  }, [snapshot, hasEffectivePlan]);
 
   const searchUsage = useMemo(() => {
     if (!snapshot) {
@@ -566,23 +575,23 @@ export default function BillingPage() {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-gray-900">Current Plan: {snapshot?.plan?.name || 'Starter'}</p>
-            <p className="mt-1 text-xs text-gray-500">{usageLabel}</p>
-            {snapshot && (
+            <p className="text-sm font-semibold text-gray-900">Current Plan: {currentPlanName}</p>
+            <p className="mt-1 text-xs text-gray-500">{hasEffectivePlan ? usageLabel : 'No active plan. Buy a plan to continue.'}</p>
+            {snapshot && hasEffectivePlan && (
               <p className="mt-1 text-xs text-gray-500">
                 {searchUsage.unlimited
                   ? 'Unlimited searches remaining'
                   : `${searchUsage.remaining} searches remaining`}
               </p>
             )}
-            {snapshot?.alertsRemaining != null && (
+            {hasEffectivePlan && snapshot?.alertsRemaining != null && (
               <p className="mt-1 text-xs text-gray-500">
                 {snapshot.alertsRemaining === -1 ? 'Unlimited alerts' : `${snapshot.alertsRemaining} alerts remaining`}
               </p>
             )}
 
             {/* Upload quota progress bar */}
-            {snapshot && snapshot.usage.imageUploadLimit > 0 && (() => {
+            {hasEffectivePlan && snapshot && snapshot.usage.imageUploadLimit > 0 && (() => {
               const used = searchUsage.used;
               const total = searchUsage.limit;
               const pct = Math.min(100, Math.max(0, Math.round((used / total) * 100)));
@@ -600,7 +609,7 @@ export default function BillingPage() {
             })()}
 
             {/* Alerts quota — unlimited indicator */}
-            {snapshot && snapshot.usage.alertLimit === 0 && (
+            {hasEffectivePlan && snapshot && snapshot.usage.alertLimit === 0 && (
               <div className="mt-3 max-w-xs">
                 <div className="mb-1 flex justify-between text-[10px] text-gray-400">
                   <span>Alerts</span>
@@ -688,7 +697,7 @@ export default function BillingPage() {
       <div id="plan-cards" className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {plans.map((plan) => {
           const price = cycle === 'annual' ? plan.pricing.annual : plan.pricing.monthly;
-          const isCurrent = plan.tier === currentTier;
+          const isCurrent = currentTier ? plan.tier === currentTier : false;
           const isCurrentPaidPlan =
             isCurrent &&
             !!currentSubscription &&
