@@ -54,6 +54,34 @@ interface NotificationItem {
   timestamp: string;
 }
 
+const normalizeNotificationActionUrl = (value?: string): string | null => {
+  if (!value) return null;
+
+  let path = value.trim();
+  if (!path) return null;
+
+  if (/^https?:\/\//i.test(path)) {
+    try {
+      path = new URL(path).pathname;
+    } catch {
+      return null;
+    }
+  }
+
+  path = path.replace(/^\/(en|kr)(?=\/|$)/i, '');
+
+  if (path === '/dashboard') return '/user';
+  if (path.startsWith('/dashboard/')) {
+    return `/user${path.slice('/dashboard'.length)}`;
+  }
+
+  if (!path.startsWith('/')) {
+    path = `/${path}`;
+  }
+
+  return path;
+};
+
 export default function SettingsPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -289,8 +317,9 @@ export default function SettingsPage() {
         await dispatch(markNotificationRead(item._id)).unwrap();
       }
 
-      if (item.actionUrl) {
-        router.push(item.actionUrl);
+      const targetPath = normalizeNotificationActionUrl(item.actionUrl);
+      if (targetPath) {
+        router.push(targetPath);
       }
     } catch {
       showMessage('Could not open notification.', true);

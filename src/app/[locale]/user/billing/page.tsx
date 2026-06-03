@@ -620,7 +620,7 @@ export default function BillingPage() {
                 </div>
               </div>
             )}
-            {snapshot?.subscription?.nextBillingDate && (
+            {hasEffectivePlan && snapshot?.subscription?.nextBillingDate && (
               <p className="mt-1 text-xs text-gray-500">
                 Next billing: {new Date(snapshot.subscription.nextBillingDate).toLocaleDateString()}
               </p>
