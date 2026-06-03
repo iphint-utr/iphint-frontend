@@ -24,6 +24,14 @@ export const getAdminStatusToken = (value: string) => {
       return 'notReviewed';
     case 'reviewed':
       return 'reviewed';
+    case 'takedownrequest':
+      return 'takedownRequest';
+    case 'reportinfringement':
+      return 'reportInfringement';
+    case 'dispute':
+      return 'dispute';
+    case 'legalsupportrequest':
+      return 'legalSupportRequest';
     case 'underanalysis':
       return 'underAnalysis';
     case 'approved':

@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { apiClient } from '@/lib/api';
+import { apiClient, getApiErrorMessage } from '@/lib/api';
 
 export type ReviewStatus =
   | 'not_reviewed'
-  | 'reviewed'
-  | 'rights_given'
+  | 'takedown_request'
+  | 'report_infringement'
   | 'dispute'
-  | 'escalated';
+  | 'legal_support_request';
 
 export interface MonitoringSearch {
   searchId: string;
@@ -60,6 +60,185 @@ interface MonitoringState {
   total: number;
 }
 
+interface MonitoringSearchesPayload {
+  data: MonitoringSearch[];
+  pagination?: {
+    page?: number;
+    pages?: number;
+    total?: number;
+  };
+}
+
+interface MonitoringResultsPayload {
+  search: MonitoringState['selectedSearch'];
+  results: MonitoringResult[];
+  planLimits: MonitoringState['planLimits'];
+}
+
+type MonitoringPlanLimits = NonNullable<MonitoringState['planLimits']>;
+
+const unwrapData = <T>(payload: unknown): T => {
+  const candidate = payload as { data?: T } | undefined;
+  return (candidate?.data ?? payload) as T;
+};
+
+const normalizePaginationValue = (value: unknown, fallback: number) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizePlanTier = (value: unknown): MonitoringPlanLimits['tier'] => {
+  if (value === 'pro' || value === 'premium') {
+    return value;
+  }
+
+  return 'starter';
+};
+
+const normalizeMonitoringSearch = (search: Record<string, unknown>): MonitoringSearch => ({
+  searchId: String(search.searchId ?? search._id ?? ''),
+  image: String(search.image ?? ''),
+  status: String(search.status ?? 'unknown'),
+  time: String(search.time ?? search.date ?? search.createdAt ?? ''),
+  folderId:
+    search.folderId === undefined || search.folderId === null || search.folderId === ''
+      ? null
+      : String(search.folderId),
+  fileName: String(search.fileName ?? search.imageName ?? 'monitoring-image'),
+  totalResults: Number(search.totalResults ?? search.resultCount ?? search.totalMatches ?? 0),
+  reviewedResults: Number(search.reviewedResults ?? search.reviewCount ?? 0),
+  analysisStatus: String(
+    search.analysisStatus ?? search.monitoringStatus ?? search.status ?? 'pending_review',
+  ) as MonitoringSearch['analysisStatus'],
+});
+
+const normalizeMonitoringResult = (result: Record<string, unknown>): MonitoringResult => ({
+  _id: String(result._id ?? result.resultId ?? ''),
+  image: String(result.image ?? ''),
+  isLocked: Boolean(result.isLocked ?? false),
+  details:
+    typeof result.details === 'object' && result.details !== null
+      ? {
+          title:
+            typeof (result.details as { title?: unknown }).title === 'string'
+              ? (result.details as { title?: string }).title
+              : undefined,
+          link:
+            typeof (result.details as { link?: unknown }).link === 'string'
+              ? (result.details as { link?: string }).link
+              : undefined,
+          source:
+            typeof (result.details as { source?: unknown }).source === 'string'
+              ? (result.details as { source?: string }).source
+              : undefined,
+        }
+      : undefined,
+  reviewStatus: String(result.reviewStatus ?? 'not_reviewed') as ReviewStatus,
+  reviewedAt: result.reviewedAt ? String(result.reviewedAt) : null,
+});
+
+const normalizeMonitoringSearchesPayload = (payload: unknown): MonitoringSearchesPayload => {
+  const rawPayload = Array.isArray(payload) ? payload : null;
+  const outer = (payload && typeof payload === 'object' ? payload : {}) as Record<string, unknown>;
+  const data =
+    typeof outer.data === 'object' && outer.data !== null && !Array.isArray(outer.data)
+      ? (outer.data as Record<string, unknown>)
+      : outer;
+  const searches =
+    rawPayload ??
+    (Array.isArray(outer.data)
+      ? outer.data
+      : Array.isArray(data.data)
+        ? data.data
+        : Array.isArray(data.searches)
+          ? data.searches
+          : []);
+  const pagination =
+    typeof outer.pagination === 'object' && outer.pagination !== null
+      ? (outer.pagination as { page?: unknown; pages?: unknown; total?: unknown })
+      : typeof data.pagination === 'object' && data.pagination !== null
+        ? (data.pagination as { page?: unknown; pages?: unknown; total?: unknown })
+      : undefined;
+
+  return {
+    data: Array.isArray(searches)
+      ? searches.map((item) => normalizeMonitoringSearch((item ?? {}) as Record<string, unknown>))
+      : [],
+    pagination: pagination
+      ? {
+          page: normalizePaginationValue(pagination.page, 1),
+          pages: normalizePaginationValue(pagination.pages, 1),
+          total: normalizePaginationValue(pagination.total, 0),
+        }
+      : undefined,
+  };
+};
+
+const normalizeMonitoringResultsPayload = (payload: unknown): MonitoringResultsPayload => {
+  const rawPayload = Array.isArray(payload) ? payload : null;
+  const data = rawPayload ? {} : unwrapData<Record<string, unknown>>(payload) ?? {};
+  const rawSearch =
+    typeof data.search === 'object' && data.search !== null
+      ? (data.search as Record<string, unknown>)
+      : data;
+  const rawResults =
+    rawPayload ??
+    (Array.isArray(data.results)
+      ? data.results
+      : Array.isArray(data.data)
+        ? data.data
+        : []);
+
+  return {
+    search:
+      rawSearch && (rawSearch.searchId || rawSearch._id)
+        ? {
+            searchId: String(rawSearch.searchId ?? rawSearch._id ?? ''),
+            image: String(rawSearch.image ?? ''),
+            status: String(rawSearch.status ?? 'unknown'),
+            time: String(rawSearch.time ?? rawSearch.date ?? rawSearch.createdAt ?? ''),
+            fileName: String(rawSearch.fileName ?? rawSearch.imageName ?? 'monitoring-image'),
+          }
+        : null,
+    results: rawResults.map((item) => normalizeMonitoringResult((item ?? {}) as Record<string, unknown>)),
+    planLimits:
+      typeof data.planLimits === 'object' && data.planLimits !== null
+        ? {
+            tier: normalizePlanTier((data.planLimits as { tier?: unknown }).tier),
+            maxResults: Number((data.planLimits as { maxResults?: unknown }).maxResults ?? 0),
+            pdfEnabled: Boolean((data.planLimits as { pdfEnabled?: unknown }).pdfEnabled ?? false),
+            lockedCount: Number((data.planLimits as { lockedCount?: unknown }).lockedCount ?? 0),
+          }
+        : null,
+  };
+};
+
+const normalizeUpdatedResult = (payload: unknown) => {
+  const data = unwrapData<Record<string, unknown>>(payload) ?? {};
+  const result =
+    typeof data.result === 'object' && data.result !== null
+      ? (data.result as Record<string, unknown>)
+      : data;
+
+  return {
+    _id: String(result._id ?? result.resultId ?? ''),
+    reviewStatus: String(result.reviewStatus ?? 'not_reviewed') as ReviewStatus,
+    reviewedAt: result.reviewedAt ? String(result.reviewedAt) : null,
+  };
+};
+
+const normalizeDeletedIds = (payload: unknown) => {
+  const data = unwrapData<Record<string, unknown>>(payload) ?? {};
+  const deletedIds =
+    Array.isArray(data.deletedIds)
+      ? data.deletedIds
+      : Array.isArray(data.resultIds)
+        ? data.resultIds
+        : [];
+
+  return deletedIds.map((item) => String(item));
+};
+
 const initialState: MonitoringState = {
   searches: [],
   selectedSearch: null,
@@ -83,10 +262,10 @@ export const fetchMonitoringSearches = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const response = await apiClient.get('/user-details/monitoring', { params });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to load monitoring data');
+      const response = await apiClient.get('/user/monitoring', { params });
+      return normalizeMonitoringSearchesPayload(response.data);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to load monitoring data'));
     }
   },
 );
@@ -95,10 +274,10 @@ export const fetchMonitoringSearchResults = createAsyncThunk(
   'monitoring/fetchSearchResults',
   async (searchId: string, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(`/user-details/monitoring/${searchId}/results`);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to load search results');
+      const response = await apiClient.get(`/user/monitoring/${searchId}/results`);
+      return normalizeMonitoringResultsPayload(response.data);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to load search results'));
     }
   },
 );
@@ -111,13 +290,12 @@ export const updateMonitoringResultStatus = createAsyncThunk(
   ) => {
     try {
       const response = await apiClient.patch(
-        `/user-details/monitoring/result/${payload.resultId}/status`,
+        `/user/monitoring/result/${payload.resultId}/status`,
         { reviewStatus: payload.reviewStatus },
-      );
-
-      return response.data.result;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update status');
+    );
+      return normalizeUpdatedResult(response.data);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to update status'));
     }
   },
 );
@@ -126,10 +304,10 @@ export const deleteMonitoringResult = createAsyncThunk(
   'monitoring/deleteResult',
   async (resultId: string, { rejectWithValue }) => {
     try {
-      await apiClient.delete(`/user-details/monitoring/result/${resultId}`);
+      await apiClient.delete(`/user/monitoring/result/${resultId}`);
       return resultId;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete result');
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to delete result'));
     }
   },
 );
@@ -138,12 +316,12 @@ export const bulkDeleteMonitoringResults = createAsyncThunk(
   'monitoring/bulkDeleteResults',
   async (resultIds: string[], { rejectWithValue }) => {
     try {
-      const response = await apiClient.post('/user-details/monitoring/results/bulk-delete', {
+      const response = await apiClient.post('/user/monitoring/results/bulk-delete', {
         resultIds,
       });
-      return response.data.deletedIds as string[];
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to bulk delete results');
+      return normalizeDeletedIds(response.data);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to bulk delete results'));
     }
   },
 );

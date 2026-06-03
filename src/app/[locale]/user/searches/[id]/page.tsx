@@ -62,10 +62,10 @@ type DeleteConfirmState =
 
 const REVIEW_STATUS_OPTIONS: Array<{ value: ReviewStatus; label: string }> = [
 	{ value: 'not_reviewed', label: 'Not Reviewed' },
-	{ value: 'reviewed', label: 'Reviewed' },
-	{ value: 'rights_given', label: 'Rights Given' },
+	{ value: 'takedown_request', label: 'Takedown Request' },
+	{ value: 'report_infringement', label: 'Report Infringement' },
 	{ value: 'dispute', label: 'Dispute' },
-	{ value: 'escalated', label: 'Escalated' },
+	{ value: 'legal_support_request', label: 'Legal Support Request' },
 ];
 
 const BULK_ACTION_OPTIONS: Array<{ value: BulkAction; label: string }> = [
@@ -156,7 +156,7 @@ export default function SearchDetailsPage() {
 	const reviewedCount = useMemo(
 		() =>
 			results.filter((result) =>
-				['reviewed', 'rights_given', 'dispute', 'escalated'].includes(result.reviewStatus),
+				['takedown_request', 'report_infringement', 'dispute', 'legal_support_request'].includes(result.reviewStatus),
 			).length,
 		[results],
 	);
