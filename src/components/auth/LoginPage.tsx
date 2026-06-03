@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
 import {
   loginUser,
+  logout,
   clearError,
   selectIsAuthenticated,
   selectAuthLoading,
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const authLoading = useSelector(selectAuthLoading);
   const authError = useSelector(selectAuthError);
   const searchParams = useSearchParams();
+  const dispatch = useDispatch<AppDispatch>();
   const [hasSessionToken, setHasSessionToken] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const [verificationFailed, setVerificationFailed] = useState(false);
@@ -30,6 +32,23 @@ export default function LoginPage() {
   const [resendFailed, setResendFailed] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const alertRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (searchParams.get('loggedOut') !== '1') return;
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('lastActivityAt');
+    dispatch(logout());
+    setHasSessionToken(false);
+
+    if (window.history?.replaceState) {
+      const current = new URL(window.location.href);
+      current.searchParams.delete('loggedOut');
+      window.history.replaceState(null, '', `${current.pathname}${current.search}`);
+    }
+  }, [dispatch, searchParams]);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -67,7 +86,6 @@ export default function LoginPage() {
     verify();
   }, [searchParams, t]);
 
-  const dispatch = useDispatch<AppDispatch>();
   const loading = authLoading;
 
   const oauthError =

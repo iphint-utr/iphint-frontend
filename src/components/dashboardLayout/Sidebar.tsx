@@ -7,8 +7,10 @@ import { Link, usePathname } from '@/i18n/routing';
 import { LayoutDashboard, Search, Activity, CreditCard, Settings, LogOut, UserCircle2, FileText, Crown, Users, ShieldCheck } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { logout } from '@/lib/store/slices/userSlice';
+import { fetchCurrentUserProfile, logout } from '@/lib/store/slices/userSlice';
 import { fetchSubscriptionSnapshot } from '@/lib/store/slices/accountSlice';
+
+const PLACEHOLDER_NAMES = new Set(['user', 'new user', 'unknown user']);
 
 const closeOnMobileOnly = (onClose: () => void) => {
   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -25,10 +27,15 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const user = useAppSelector((state) => state.user);
   const subscriptionSnapshot = useAppSelector((state) => state.account.subscription.data);
   const subscriptionLoading = useAppSelector((state) => state.account.subscription.loading);
-  const hasSubscriptionPlan = !!subscriptionSnapshot?.plan;
+  const hasEffectivePlan =
+    !!subscriptionSnapshot?.subscription &&
+    ((subscriptionSnapshot.subscription.hasAccess === true) ||
+      ['active', 'trialing', 'past_due'].includes(subscriptionSnapshot.subscription.status || ''));
   const planInfo = {
-    name: subscriptionSnapshot?.plan?.name ?? (subscriptionLoading ? dashboardT('sidebar.loadingPlan') : '--'),
-    tier: subscriptionSnapshot?.plan?.tier ?? null,
+    name: hasEffectivePlan
+      ? (subscriptionSnapshot?.plan?.name ?? '--')
+      : (subscriptionLoading ? dashboardT('sidebar.loadingPlan') : '--'),
+    tier: hasEffectivePlan ? (subscriptionSnapshot?.plan?.tier ?? null) : null,
     subscriptionStatus: subscriptionSnapshot?.subscription?.status || null,
   };
   const menu = [
@@ -50,8 +57,9 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const company = user.role || dashboardT('sidebar.organizationFallback');
   const isAdmin = user.role === 'admin';
   const showUpgradeAction =
-    hasSubscriptionPlan &&
-    (planInfo.tier === 'starter' || planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired');
+    !hasEffectivePlan ||
+    planInfo.tier === 'starter' ||
+    planInfo.tier === 'pro';
 
   const isItemActive = (href: string) => {
     if (href === '/user') return pathname === '/user';
@@ -59,13 +67,31 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   };
 
   const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('lastActivityAt');
+    }
     dispatch(logout());
-    router.replace('/login');
+    router.replace('/login?loggedOut=1');
   };
 
   useEffect(() => {
     dispatch(fetchSubscriptionSnapshot());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!user.token) {
+      return;
+    }
+
+    const normalizedName = (user.name || '').trim().toLowerCase();
+    const shouldHydrateProfile = !user.email || !normalizedName || PLACEHOLDER_NAMES.has(normalizedName);
+
+    if (shouldHydrateProfile) {
+      dispatch(fetchCurrentUserProfile());
+    }
+  }, [dispatch, user.email, user.name, user.token]);
 
   return (
     <>
@@ -140,9 +166,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                   }}
                   className="mt-2 w-full cursor-pointer rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
                 >
-                  {planInfo.subscriptionStatus === 'cancelled' || planInfo.subscriptionStatus === 'expired'
-                    ? dashboardT('sidebar.renewPlan')
-                    : dashboardT('sidebar.upgradePlan')}
+                  {!hasEffectivePlan ? 'Buy now' : dashboardT('sidebar.upgradePlan')}
                 </button>
               )}
             </div>

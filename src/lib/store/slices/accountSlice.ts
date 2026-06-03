@@ -24,6 +24,7 @@ export interface BillingSnapshot {
   subscription: {
     id?: string;
     status: 'active' | 'trialing' | 'past_due' | 'paused' | 'cancelled' | 'expired' | 'pending';
+    hasAccess?: boolean;
     billingCycle: BillingCycle;
     grantSource?: 'paid' | 'trial' | 'referral';
     isTrial?: boolean;

@@ -43,8 +43,13 @@ export default function AdminSidebar({
 	};
 
 	const handleLogout = () => {
+		if (typeof window !== 'undefined') {
+			localStorage.removeItem('token');
+			localStorage.removeItem('user');
+			localStorage.removeItem('lastActivityAt');
+		}
 		dispatch(logout());
-		router.replace('/login');
+		router.replace('/login?loggedOut=1');
 	};
 
 	return (

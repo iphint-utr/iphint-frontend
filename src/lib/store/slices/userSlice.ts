@@ -189,6 +189,26 @@ export const registerUser = createAsyncThunk<
   }
 });
 
+export const fetchCurrentUserProfile = createAsyncThunk<
+  UserData,
+  void,
+  { rejectValue: string }
+>('user/fetchCurrentUserProfile', async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await apiClient.get<AuthResponse>('/auth/me');
+    const user = data?.data;
+
+    if (!user) {
+      return rejectWithValue('Failed to load user profile.');
+    }
+
+    localStorage.setItem('user', JSON.stringify(user));
+    return user;
+  } catch (err) {
+    return rejectWithValue(getApiErrorMessage(err, 'Failed to load user profile.'));
+  }
+});
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const userSlice = createSlice({
@@ -327,6 +347,18 @@ const userSlice = createSlice({
         state.authLoading = false;
         state.authError = action.payload ?? 'Something went wrong';
         state.authNotice = null;
+      })
+
+      // ── Hydrate Current User Profile ───────────────────────────────────────
+      .addCase(fetchCurrentUserProfile.fulfilled, (state, action) => {
+        const data = action.payload;
+        state.id = data.id;
+        state.name = data.name;
+        state.email = data.email;
+        state.role = data.role;
+        state.credits = data.credits;
+        state.referralCode = data.referralCode;
+        state.referralCount = data.referralCount;
       });
   },
 });

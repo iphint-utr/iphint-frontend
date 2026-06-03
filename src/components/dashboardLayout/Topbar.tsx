@@ -22,6 +22,39 @@ interface NotificationItem {
 	timestamp: string;
 }
 
+const normalizeNotificationActionUrl = (value?: string): string | null => {
+	if (!value) return null;
+
+	let path = value.trim();
+	if (!path) return null;
+
+	// Handle absolute URLs copied into stored notifications.
+	if (/^https?:\/\//i.test(path)) {
+		try {
+			path = new URL(path).pathname;
+		} catch {
+			return null;
+		}
+	}
+
+	// Strip locale prefix if present.
+	path = path.replace(/^\/(en|kr)(?=\/|$)/i, '');
+
+	// Migrate legacy dashboard links to current user routes.
+	if (path === '/dashboard') {
+		return '/user';
+	}
+	if (path.startsWith('/dashboard/')) {
+		return `/user${path.slice('/dashboard'.length)}`;
+	}
+
+	if (!path.startsWith('/')) {
+		path = `/${path}`;
+	}
+
+	return path;
+};
+
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	const t = useTranslations('Dashboard.topbar');
 	const dispatch = useAppDispatch();
@@ -130,8 +163,9 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 		if (!item.isRead) {
 			await markRead(item._id);
 		}
-		if (item.actionUrl) {
-			router.push(item.actionUrl);
+		const targetPath = normalizeNotificationActionUrl(item.actionUrl);
+		if (targetPath) {
+			router.push(targetPath);
 			setNotificationOpen(false);
 		}
 	};

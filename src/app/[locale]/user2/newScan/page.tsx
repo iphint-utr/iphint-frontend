@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -32,6 +33,7 @@ import { fetchSubscriptionSnapshot } from '@/lib/store/slices/accountSlice';
 
 export default function ScanPage() {
   const t = useTranslations('Dashboard.scan');
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { results, loading, error, searchId, folders, currentFolderId, foldersLoading } = useAppSelector((state) => state.scan);
   const planSnapshot = useAppSelector((state) => state.account.subscription.data);
@@ -53,6 +55,10 @@ export default function ScanPage() {
   const openPlanPrompt = (mode: 'upgrade' | 'renew' | 'near_limit') => {
     setPlanPromptMode(mode);
     setPlanPromptOpen(true);
+  };
+
+  const goToBilling = () => {
+    router.push('/user/billing');
   };
 
   const evaluateActionAgainstPlan = () => {
@@ -293,7 +299,7 @@ export default function ScanPage() {
                   {isLimitError && (
                     <button
                       type="button"
-                      onClick={() => (window.location.href = '/user/billing')}
+                      onClick={goToBilling}
                       className="mt-3 rounded-md bg-red-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-800"
                     >
                       {t('upgradePlan')}
@@ -440,7 +446,7 @@ export default function ScanPage() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => (window.location.href = '/user/billing')}
+                            onClick={goToBilling}
                             className="rounded-md bg-amber-700 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-amber-800"
                           >
                             {t('upgradePlan')}
@@ -513,7 +519,7 @@ export default function ScanPage() {
                             ) : (
                               <button
                                 type="button"
-                                onClick={() => (window.location.href = '/user/billing')}
+                                onClick={goToBilling}
                                 className="rounded-md bg-amber-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-800"
                               >
                                 {t('upgradeNow')}
@@ -588,7 +594,7 @@ export default function ScanPage() {
                         {result.isLocked && (
                           <button
                             type="button"
-                            onClick={() => (window.location.href = '/user/billing')}
+                            onClick={goToBilling}
                             className="mt-3 rounded-md bg-amber-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-800"
                           >
                             {t('upgradeNow')}
@@ -678,10 +684,10 @@ export default function ScanPage() {
               </button>
               <button
                 type="button"
-                onClick={() => (window.location.href = '/user/billing')}
+                onClick={goToBilling}
                 className="flex-1 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
-                {planPromptMode === 'renew' ? t('planPrompt.renewPlan') : t('planPrompt.upgradePlan')}
+                {t('planPrompt.upgradePlan')}
               </button>
             </div>
           </div>
