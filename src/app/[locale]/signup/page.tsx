@@ -43,7 +43,15 @@ function SignupForm() {
     password: '',
     confirmPassword: '',
   });
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string;
+    companyName?: string;
+    specificRole?: string;
+    phoneNumber?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
 
   const passwordChecks = useMemo(
     () => ({
@@ -71,22 +79,69 @@ function SignupForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     dispatch(clearError());
-    setPasswordError(null);
+    if (e.target.name in fieldErrors) {
+      setFieldErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isPasswordStrong) {
-      setPasswordError(t('passwordRequirementsError'));
+    const nextFieldErrors: {
+      name?: string;
+      companyName?: string;
+      specificRole?: string;
+      phoneNumber?: string;
+      email?: string;
+      password?: string;
+      confirmPassword?: string;
+    } = {};
+
+    if (!formData.name.trim()) {
+      nextFieldErrors.name = t('validationNameRequired');
+    }
+
+    if (!formData.companyName.trim()) {
+      nextFieldErrors.companyName = t('validationBusinessRequired');
+    }
+
+    if (!formData.specificRole.trim()) {
+      nextFieldErrors.specificRole = t('validationRoleRequired');
+    }
+
+    const phoneOnly = formData.phoneNumber.trim();
+    if (!phoneOnly) {
+      nextFieldErrors.phoneNumber = t('validationContactRequired');
+    } else if (!/^[0-9\-()\s]{6,20}$/.test(phoneOnly)) {
+      nextFieldErrors.phoneNumber = t('validationContactInvalid');
+    }
+
+    const email = formData.email.trim();
+    if (!email) {
+      nextFieldErrors.email = t('validationEmailRequired');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextFieldErrors.email = t('validationEmailInvalid');
+    }
+
+    if (!formData.password) {
+      nextFieldErrors.password = t('validationPasswordRequired');
+    } else if (!isPasswordStrong) {
+      nextFieldErrors.password = t('passwordRequirementsError');
+    }
+
+    if (!formData.confirmPassword) {
+      nextFieldErrors.confirmPassword = t('validationConfirmPasswordRequired');
+    } else if (!passwordsMatch) {
+      nextFieldErrors.confirmPassword = t('passwordMismatchError');
+    }
+
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
       return;
     }
 
-    if (!passwordsMatch) {
-      setPasswordError(t('passwordMismatchError'));
-      return;
-    }
+    setFieldErrors({});
 
     const fullPhone = `${formData.phoneCode}${formData.phoneNumber}`;
 
@@ -121,6 +176,9 @@ function SignupForm() {
       <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
           <div>
+            {fieldErrors.name && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.name}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('nameLabel')}</label>
             <input
               name="name"
@@ -134,10 +192,14 @@ function SignupForm() {
           </div>
 
           <div>
+            {fieldErrors.companyName && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.companyName}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('businessLabel')}</label>
             <input
               name="companyName"
               type="text"
+              required
               placeholder={t('businessPlaceholder')}
               value={formData.companyName}
               onChange={handleChange}
@@ -146,10 +208,14 @@ function SignupForm() {
           </div>
 
           <div>
+            {fieldErrors.specificRole && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.specificRole}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('roleLabel')}</label>
             <input
               name="specificRole"
               type="text"
+              required
               placeholder={t('rolePlaceholder')}
               value={formData.specificRole}
               onChange={handleChange}
@@ -158,6 +224,9 @@ function SignupForm() {
           </div>
 
           <div>
+            {fieldErrors.phoneNumber && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.phoneNumber}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('contactLabel')}</label>
             <div className="flex border border-gray-300 rounded-[12px] overflow-hidden focus-within:ring-2 focus-within:ring-black transition-all bg-white h-14">
               <select
@@ -175,6 +244,7 @@ function SignupForm() {
               <input
                 name="phoneNumber"
                 type="tel"
+                required
                 placeholder={t('phonePlaceholder')}
                 value={formData.phoneNumber}
                 onChange={handleChange}
@@ -209,6 +279,9 @@ function SignupForm() {
           </div>
 
           <div>
+            {fieldErrors.email && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.email}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('emailLabel')}</label>
             <input
               name="email"
@@ -222,6 +295,9 @@ function SignupForm() {
           </div>
 
           <div>
+            {fieldErrors.password && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.password}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('passwordLabel')}</label>
             <input
               name="password"
@@ -254,6 +330,9 @@ function SignupForm() {
           </div>
 
           <div>
+            {fieldErrors.confirmPassword && (
+              <p className="mb-1 text-xs font-medium text-red-600">{fieldErrors.confirmPassword}</p>
+            )}
             <label className="block text-sm sm:text-base font-semibold text-black mb-2">{t('confirmPasswordLabel')}</label>
             <input
               name="confirmPassword"
@@ -281,16 +360,6 @@ function SignupForm() {
               <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
             </svg>
             {authError}
-          </div>
-        )}
-
-        {passwordError && (
-          <div className="text-red-600 bg-red-50 p-4 rounded-xl flex items-center gap-3 text-sm font-medium">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="#EF4444" />
-              <path d="M12 8V12M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            {passwordError}
           </div>
         )}
 
