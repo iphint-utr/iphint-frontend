@@ -234,11 +234,7 @@ export default function PricingCards() {
               <button
                 type="button"
                 onClick={handlePlanClick}
-                className={`w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
-                  plan.id === "pro"
-                    ? "bg-gray-950 text-white border border-gray-950 hover:bg-gray-900"
-                    : "bg-white text-gray-950 border border-gray-300 group-hover:bg-gray-950 group-hover:text-white group-hover:border-gray-950"
-                }`}
+                className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] bg-white text-gray-950 border border-gray-300 group-hover:bg-gray-950 group-hover:text-white group-hover:border-gray-950"
               >
                 {t("getStarted")}
               </button>
