@@ -822,7 +822,7 @@
         },
         "2": {
           "source": "The New York Times",
-          "title": "Global war against counterfeit goods: Use ImgMov (iphint.com) to ..."
+          "title": "Global war against counterfeit goods: Use IpHint (iphint.com) to ..."
         },
         "3": {
           "source": "The New York Times",
@@ -905,7 +905,7 @@
   },
   "services": {
     "about": {
-      "title": "About ImgMov",
+      "title": "About IpHint",
       "subtitle": "The easiest way to monitor your content."
     },
     "commonReality": {
