@@ -64,23 +64,46 @@ interface UserState extends DashboardState {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const getStorage = (): Storage | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.localStorage;
+};
+
 const saveSession = (token: string, user: UserData): void => {
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
+  const storage = getStorage();
+  if (!storage) {
+    return;
+  }
+
+  storage.setItem('token', token);
+  storage.setItem('user', JSON.stringify(user));
 };
 
 const clearSession = (): void => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  const storage = getStorage();
+  if (!storage) {
+    return;
+  }
+
+  storage.removeItem('token');
+  storage.removeItem('user');
 };
 
 const loadSession = (): { token: string | null; user: UserData | null } => {
-  const token = localStorage.getItem('token') || null;
+  const storage = getStorage();
+  if (!storage) {
+    return { token: null, user: null };
+  }
+
+  const token = storage.getItem('token') || null;
 
   try {
     return {
       token,
-      user: JSON.parse(localStorage.getItem('user') || 'null'),
+      user: JSON.parse(storage.getItem('user') || 'null'),
     };
   } catch {
     // Keep token even if user JSON is corrupted; profile can be re-hydrated later.
@@ -89,8 +112,13 @@ const loadSession = (): { token: string | null; user: UserData | null } => {
 };
 
 const patchStoredUser = (patch: UserProfilePatch): void => {
+  const storage = getStorage();
+  if (!storage) {
+    return;
+  }
+
   try {
-    const current = JSON.parse(localStorage.getItem('user') || 'null') as UserData | null;
+    const current = JSON.parse(storage.getItem('user') || 'null') as UserData | null;
     if (!current) {
       return;
     }
@@ -101,7 +129,7 @@ const patchStoredUser = (patch: UserProfilePatch): void => {
       ...(typeof patch.email === 'string' ? { email: patch.email } : {}),
     };
 
-    localStorage.setItem('user', JSON.stringify(next));
+    storage.setItem('user', JSON.stringify(next));
   } catch {
     // Ignore localStorage corruption and let fresh auth flows re-hydrate session.
   }
@@ -205,7 +233,8 @@ export const fetchCurrentUserProfile = createAsyncThunk<
       return rejectWithValue('Failed to load user profile.');
     }
 
-    localStorage.setItem('user', JSON.stringify(user));
+    const storage = getStorage();
+    storage?.setItem('user', JSON.stringify(user));
     return user;
   } catch (err) {
     return rejectWithValue(getApiErrorMessage(err, 'Failed to load user profile.'));

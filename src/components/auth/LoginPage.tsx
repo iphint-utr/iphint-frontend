@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
@@ -17,6 +17,7 @@ import { AppDispatch } from '@/lib/store/store';
 import { Link, useRouter } from '@/i18n/routing';
 
 export default function LoginPage() {
+  const locale = useLocale();
   const t = useTranslations('Auth');
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -186,6 +187,7 @@ export default function LoginPage() {
   };
 
   const shouldShowResendVerification = !validationError && !!authError && /verify your email/i.test(authError);
+  const illustrationSrc = locale === 'kr' ? '/login_kr.svg' : '/login.svg';
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
@@ -193,7 +195,7 @@ export default function LoginPage() {
         <div
           aria-hidden="true"
           className="hidden lg:block lg:min-h-screen bg-slate-100 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/login.svg')" }}
+          style={{ backgroundImage: `url('${illustrationSrc}')` }}
         />
 
         <div className="flex items-center justify-center px-6 py-10 sm:px-10 lg:px-16 xl:px-20">

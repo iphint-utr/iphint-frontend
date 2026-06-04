@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, clearError } from '../../../lib/store/slices/userSlice';
@@ -394,7 +394,9 @@ function SignupForm() {
 }
 
 export default function SignupPage() {
+  const locale = useLocale();
   const t = useTranslations('Auth');
+  const illustrationSrc = locale === 'kr' ? '/signup_kr.svg' : '/signup2.svg';
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
@@ -402,7 +404,7 @@ export default function SignupPage() {
         <div
           aria-hidden="true"
           className="hidden lg:block lg:min-h-screen bg-slate-100 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/signup2.svg')" }}
+          style={{ backgroundImage: `url('${illustrationSrc}')` }}
         />
 
         <div className="flex items-start justify-center px-6 sm:px-10 py-10 lg:py-12 w-full">
