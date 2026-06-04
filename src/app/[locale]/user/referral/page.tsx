@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   Copy,
@@ -18,6 +19,7 @@ export default function ReferralPage() {
   const user = useAppSelector((state) => state.user);
   const { data: status, loading, error } = useAppSelector((state) => state.account.referral);
   const [copied, setCopied] = useState(false);
+  const t = useTranslations('UserPanel.referral');
 
   useEffect(() => {
     dispatch(fetchReferralStatus());
@@ -75,9 +77,9 @@ export default function ReferralPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Referral Program</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900">{t('title')}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Share your referral link anytime. Refer 5 users who sign up and log in to unlock permanent PDF &amp; Reports access.
+          {t('description')}
         </p>
       </div>
 
@@ -96,19 +98,19 @@ export default function ReferralPage() {
               <Trophy size={20} className={status?.milestoneReached ? 'text-white' : 'text-gray-700'} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">Milestone Reward</p>
-              <p className="text-xs text-gray-500">Refer {status?.milestoneTarget ?? 5} users → Permanent PDF &amp; Reports access</p>
+              <p className="text-sm font-semibold text-gray-900">{t('milestoneTitle')}</p>
+              <p className="text-xs text-gray-500">{t('milestoneDescription', { target: status?.milestoneTarget ?? 5 })}</p>
             </div>
           </div>
           {status?.milestoneReached && (
-            <span className="shrink-0 rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">Unlocked ✓</span>
+            <span className="shrink-0 rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">{t('milestoneUnlocked')}</span>
           )}
         </div>
 
         {!status?.milestoneReached && (
           <div className="mt-5">
             <div className="mb-1 flex justify-between text-xs text-gray-500">
-              <span>Progress</span>
+              <span>{t('progress')}</span>
               <span>{status?.completedInWindow ?? 0} / {status?.milestoneTarget ?? 5}</span>
             </div>
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
@@ -126,17 +128,17 @@ export default function ReferralPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
           <Users size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.totalReferrals ?? 0}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Total signups</p>
+          <p className="text-xs text-gray-500 mt-0.5">{t('totalSignups')}</p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
           <Check size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.completedInWindow ?? 0}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Completed referrals</p>
+          <p className="text-xs text-gray-500 mt-0.5">{t('completedReferrals')}</p>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
           <Gift size={20} className="mx-auto mb-1 text-gray-700" />
           <p className="text-2xl font-bold text-gray-900">{status?.milestoneReached ? '1' : '0'}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Rewards earned</p>
+          <p className="text-xs text-gray-500 mt-0.5">{t('rewardsEarned')}</p>
         </div>
       </div>
 
@@ -144,7 +146,7 @@ export default function ReferralPage() {
       <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4">
         <div className="flex items-center gap-2">
           <Link2 size={18} className="text-gray-500" />
-          <h2 className="text-sm font-semibold text-gray-900">Your Referral Link</h2>
+          <h2 className="text-sm font-semibold text-gray-900">{t('referralLinkTitle')}</h2>
         </div>
 
         {/* URL display */}
@@ -157,13 +159,13 @@ export default function ReferralPage() {
             }`}
           >
             {copied ? <Check size={13} strokeWidth={3} /> : <Copy size={13} />}
-            {copied ? 'Copied!' : 'Copy'}
+            {copied ? t('copied') : t('copy')}
           </button>
         </div>
 
         <p className="text-xs text-gray-400">
-          Code: <span className="font-mono font-semibold text-gray-600">{referralCode}</span>
-          &nbsp;· New users who sign up with your link get 1 month free Premium.
+          {t('codeLabel')} <span className="font-mono font-semibold text-gray-600">{referralCode}</span>
+          &nbsp;· {t('codeNote')}
         </p>
       </div>
 
@@ -171,22 +173,22 @@ export default function ReferralPage() {
       <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-4">
         <div className="flex items-center gap-2">
           <Link2 size={18} className="text-gray-500" />
-          <h2 className="text-sm font-semibold text-gray-900">Referral Status</h2>
+          <h2 className="text-sm font-semibold text-gray-900">{t('referralStatusTitle')}</h2>
         </div>
 
         <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-500">
-          Referral link is always active. Completed referrals are tracked continuously.
+          {t('referralStatusNote')}
         </div>
       </div>
 
       {/* How it works */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-gray-900">How It Works</h2>
+        <h2 className="mb-4 text-sm font-semibold text-gray-900">{t('howItWorksTitle')}</h2>
         <ol className="space-y-3">
           {[
-            { step: '1', text: 'Share your referral link. Friends who sign up using your link get 1 month free Premium.' },
-            { step: '2', text: 'A referral is "completed" only when the new user logs in for the first time.' },
-            { step: '3', text: 'Get 5 completed referrals to permanently unlock PDF & Reports access.' },
+            { step: '1', text: t('step1') },
+            { step: '2', text: t('step2') },
+            { step: '3', text: t('step3') },
           ].map(({ step, text }) => (
             <li key={step} className="flex items-start gap-3 text-sm text-gray-600">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, CheckCircle2, Mail, Palette, RefreshCcw, Search, Shield, Trash2, UserCircle2 } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useRouter } from '@/i18n/routing';
 import {
@@ -86,6 +86,7 @@ export default function SettingsPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations('UserPanel.settings');
   const {
     profile: storedProfile,
     notificationPreferences: storedNotificationPrefs,
@@ -185,28 +186,28 @@ export default function SettingsPage() {
     try {
       const updatedProfile = await dispatch(updateProfileSettings(profile)).unwrap();
       dispatch(syncUserProfile({ name: updatedProfile.name, email: updatedProfile.email }));
-      showMessage('Profile updated successfully.');
+      showMessage(t('profileSaved'));
     } catch (err) {
-      showMessage(typeof err === 'string' ? err : 'Could not update profile.', true);
+      showMessage(typeof err === 'string' ? err : t('profileSaveFailed'), true);
     }
   };
 
   const handleSavePreferences = async () => {
     try {
       await dispatch(updateNotificationPreferences(notificationPrefs)).unwrap();
-      showMessage('Notification preferences saved.');
+      showMessage(t('preferencesSaved'));
     } catch (err) {
-      showMessage(typeof err === 'string' ? err : 'Could not update notification preferences.', true);
+      showMessage(typeof err === 'string' ? err : t('preferencesSaveFailed'), true);
     }
   };
 
   const handleUpdatePassword = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      showMessage('New password and confirmation do not match.', true);
+      showMessage(t('passwordMismatch'), true);
       return;
     }
     if (passwordForm.newPassword.length < 8) {
-      showMessage('New password must be at least 8 characters.', true);
+      showMessage(t('passwordTooShort'), true);
       return;
     }
 
@@ -216,9 +217,9 @@ export default function SettingsPage() {
         newPassword: passwordForm.newPassword,
       })).unwrap();
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      showMessage('Password updated successfully.');
+      showMessage(t('passwordSaved'));
     } catch (err) {
-      showMessage(typeof err === 'string' ? err : 'Could not update password.', true);
+      showMessage(typeof err === 'string' ? err : t('passwordSaveFailed'), true);
     }
   };
 
@@ -227,7 +228,7 @@ export default function SettingsPage() {
     try {
       await loadNotifications(status, notificationQuery);
     } catch {
-      showMessage('Failed to load notifications.', true);
+      showMessage(t('notificationsFailed'), true);
     }
   };
 
@@ -235,9 +236,9 @@ export default function SettingsPage() {
     try {
       await dispatch(deleteNotification(id)).unwrap();
       await loadNotifications(notificationFilter, notificationQuery);
-      showMessage('Notification deleted.');
+      showMessage(t('notificationDeleted'));
     } catch {
-      showMessage('Could not delete notification.', true);
+      showMessage(t('notificationDeleteFailed'), true);
     }
   };
 
@@ -278,9 +279,9 @@ export default function SettingsPage() {
   const handleDeleteAllNotifications = async () => {
     try {
       await dispatch(deleteAllNotifications()).unwrap();
-      showMessage('All notifications deleted.');
+      showMessage(t('allDeleted'));
     } catch {
-      showMessage('Could not delete all notifications.', true);
+      showMessage(t('allDeleteFailed'), true);
     }
   };
 
@@ -288,7 +289,7 @@ export default function SettingsPage() {
     try {
       await loadNotifications(notificationFilter, notificationQuery);
     } catch {
-      showMessage('Failed to search notifications.', true);
+      showMessage(t('searchFailed'), true);
     }
   };
 
@@ -297,7 +298,7 @@ export default function SettingsPage() {
       await dispatch(markNotificationRead(id)).unwrap();
       await loadNotifications(notificationFilter, notificationQuery);
     } catch {
-      showMessage('Could not update notification.', true);
+      showMessage(t('markReadFailed'), true);
     }
   };
 
@@ -305,9 +306,9 @@ export default function SettingsPage() {
     try {
       await dispatch(markAllNotificationsRead()).unwrap();
       await loadNotifications(notificationFilter, notificationQuery);
-      showMessage('All notifications marked as read.');
+      showMessage(t('allMarkedRead'));
     } catch {
-      showMessage('Could not mark all notifications as read.', true);
+      showMessage(t('markAllReadFailed'), true);
     }
   };
 
@@ -322,7 +323,7 @@ export default function SettingsPage() {
         router.push(targetPath);
       }
     } catch {
-      showMessage('Could not open notification.', true);
+      showMessage(t('openFailed'), true);
     }
   };
 
@@ -341,13 +342,13 @@ export default function SettingsPage() {
       <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
             <p className="mt-1 text-sm text-gray-500">
-              Manage your profile, security, and notification channels from one place.
+              {t('description')}
             </p>
           </div>
           <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-            Unread notifications: <span className="font-semibold text-gray-900">{unreadCount}</span>
+            {t('unreadLabel')} <span className="font-semibold text-gray-900">{unreadCount}</span>
           </div>
         </div>
 
@@ -365,7 +366,7 @@ export default function SettingsPage() {
             ].join(' ')}
           >
             <UserCircle2 className="h-4 w-4" />
-            Profile & Security
+            {t('tabProfile')}
           </button>
           <button
             type="button"
@@ -380,7 +381,7 @@ export default function SettingsPage() {
             ].join(' ')}
           >
             <Bell className="h-4 w-4" />
-            Notifications
+            {t('tabNotifications')}
             {unreadCount > 0 && (
               <span
                 className={[
@@ -405,7 +406,7 @@ export default function SettingsPage() {
             ].join(' ')}
           >
             <Palette className="h-4 w-4" />
-            Appearance
+            {t('tabAppearance')}
           </button>
         </div>
       </div>
@@ -417,12 +418,12 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center gap-2 text-gray-900">
           <UserCircle2 className="h-5 w-5" />
-          <h2 className="text-lg font-semibold">Profile</h2>
+          <h2 className="text-lg font-semibold">{t('profileTitle')}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="text-sm text-gray-600">
-            Full Name
+            {t('fullName')}
             <input
               value={profile.name}
               onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
@@ -431,7 +432,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="text-sm text-gray-600">
-            Email
+            {t('email')}
             <input
               value={profile.email}
               disabled
@@ -440,7 +441,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="text-sm text-gray-600">
-            Organization
+            {t('organization')}
             <input
               value={profile.affiliation}
               onChange={(e) => setProfile((p) => ({ ...p, affiliation: e.target.value }))}
@@ -449,7 +450,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="text-sm text-gray-600">
-            Job Title
+            {t('jobTitle')}
             <input
               value={profile.jobTitle}
               onChange={(e) => setProfile((p) => ({ ...p, jobTitle: e.target.value }))}
@@ -458,7 +459,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="text-sm text-gray-600">
-            Country
+            {t('country')}
             <input
               value={profile.country}
               onChange={(e) => setProfile((p) => ({ ...p, country: e.target.value }))}
@@ -467,7 +468,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="text-sm text-gray-600">
-            Phone Number
+            {t('phoneNumber')}
             <input
               value={profile.phoneNumber}
               onChange={(e) => setProfile((p) => ({ ...p, phoneNumber: e.target.value }))}
@@ -477,8 +478,8 @@ export default function SettingsPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-          <span>Role: {profile.role || 'general'}</span>
-          <span>Joined: {joinDateLabel}</span>
+          <span>{t('roleLabel')} {profile.role || 'general'}</span>
+          <span>{t('joinedLabel')} {joinDateLabel}</span>
         </div>
 
         <button
@@ -486,7 +487,7 @@ export default function SettingsPage() {
           disabled={profileSaving}
           className="mt-5 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {profileSaving ? 'Saving...' : 'Save Profile'}
+          {profileSaving ? t('saving') : t('saveProfile')}
         </button>
       </section>
       )}
@@ -495,16 +496,16 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center gap-2 text-gray-900">
           <Mail className="h-5 w-5" />
-          <h2 className="text-lg font-semibold">Notifications & Weekly Monitoring</h2>
+          <h2 className="text-lg font-semibold">{t('notificationsTitle')}</h2>
         </div>
 
         <p className="mb-4 text-sm text-gray-500">
-          Monitoring re-scan runs automatically every 7 days for uploaded images.
+          {t('notificationsDescription')}
         </p>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700">
-            Email notifications
+            {t('emailNotifications')}
             <input
               type="checkbox"
               checked={notificationPrefs.emailEnabled}
@@ -514,7 +515,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700">
-            In-app notifications
+            {t('inAppNotifications')}
             <input
               type="checkbox"
               checked={notificationPrefs.inAppEnabled}
@@ -524,7 +525,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700">
-            Weekly re-scan on uploaded images
+            {t('weeklyRescan')}
             <input
               type="checkbox"
               checked={notificationPrefs.weeklyRescanEnabled}
@@ -534,7 +535,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700">
-            Notify only when new matches appear
+            {t('notifyMatches')}
             <input
               type="checkbox"
               checked={notificationPrefs.notifyOnNewMatches}
@@ -544,7 +545,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="text-sm text-gray-600">
-            Digest frequency
+            {t('digestFrequency')}
             <select
               value={notificationPrefs.summaryFrequency}
               onChange={(e) =>
@@ -552,9 +553,9 @@ export default function SettingsPage() {
               }
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-400 focus:outline-none"
             >
-              <option value="instant">Instant</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
+              <option value="instant">{t('instant')}</option>
+              <option value="daily">{t('daily')}</option>
+              <option value="weekly">{t('weekly')}</option>
             </select>
           </label>
         </div>
@@ -564,7 +565,7 @@ export default function SettingsPage() {
           disabled={prefsSaving}
           className="mt-5 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {prefsSaving ? 'Saving...' : 'Save Preferences'}
+          {prefsSaving ? t('saving') : t('savePreferences')}
         </button>
       </section>
       )}
@@ -573,12 +574,12 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center gap-2 text-gray-900">
           <Shield className="h-5 w-5" />
-          <h2 className="text-lg font-semibold">Security</h2>
+          <h2 className="text-lg font-semibold">{t('securityTitle')}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <label className="text-sm text-gray-600">
-            Current Password
+            {t('currentPassword')}
             <input
               type="password"
               value={passwordForm.currentPassword}
@@ -587,7 +588,7 @@ export default function SettingsPage() {
             />
           </label>
           <label className="text-sm text-gray-600">
-            New Password
+            {t('newPassword')}
             <input
               type="password"
               value={passwordForm.newPassword}
@@ -596,7 +597,7 @@ export default function SettingsPage() {
             />
           </label>
           <label className="text-sm text-gray-600">
-            Confirm Password
+            {t('confirmPassword')}
             <input
               type="password"
               value={passwordForm.confirmPassword}
@@ -611,7 +612,7 @@ export default function SettingsPage() {
           disabled={passwordSaving}
           className="mt-5 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {passwordSaving ? 'Updating...' : 'Update Password'}
+          {passwordSaving ? t('updating') : t('updatePassword')}
         </button>
       </section>
       )}
@@ -621,22 +622,22 @@ export default function SettingsPage() {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-gray-900">
             <Bell className="h-5 w-5" />
-            <h2 className="text-lg font-semibold">Notification Inbox</h2>
+            <h2 className="text-lg font-semibold">{t('inboxTitle')}</h2>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-700">Unread: {unreadCount}</span>
+            <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-700">{t('unreadCount', { count: unreadCount })}</span>
             <button
               onClick={handleMarkAllRead}
               className="rounded-lg border border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
             >
-              Mark all read
+              {t('markAllRead')}
             </button>
             <button
               onClick={handleDeleteAllNotifications}
               className="rounded-lg border border-red-200 px-3 py-1.5 text-red-600 hover:bg-red-50"
             >
-              Delete all
+              {t('deleteAll')}
             </button>
           </div>
         </div>
@@ -650,7 +651,7 @@ export default function SettingsPage() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleNotificationSearch();
               }}
-              placeholder="Search alerts"
+              placeholder={t('searchAlerts')}
               className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none focus:border-gray-400"
             />
           </div>
@@ -658,33 +659,33 @@ export default function SettingsPage() {
             onClick={handleNotificationSearch}
             className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
           >
-            Search
+            {t('search')}
           </button>
           <button
             onClick={() => applyNotificationFilter('all')}
             className={`rounded-lg px-3 py-1.5 text-sm ${notificationFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
-            All
+            {t('all')}
           </button>
           <button
             onClick={() => applyNotificationFilter('unread')}
             className={`rounded-lg px-3 py-1.5 text-sm ${notificationFilter === 'unread' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
-            Unread
+            {t('unread')}
           </button>
           <button
             onClick={() => applyNotificationFilter(notificationFilter)}
             className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
           >
             <RefreshCcw className="h-3.5 w-3.5" />
-            Refresh
+            {t('refresh')}
           </button>
         </div>
 
         <div className="space-y-3">
           {notifications.length === 0 ? (
             <p className="rounded-lg border border-dashed border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
-              No notifications found for this filter.
+              {t('noNotifications')}
             </p>
           ) : (
             notifications.map((item) => (
@@ -709,7 +710,7 @@ export default function SettingsPage() {
                         className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-1 text-xs text-emerald-700 hover:bg-emerald-50"
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" />
-                        Mark read
+                        {t('markRead')}
                       </button>
                     )}
                     <div className="relative">
@@ -722,7 +723,7 @@ export default function SettingsPage() {
                         className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
-                        Delete
+                        {t('delete')}
                       </button>
 
                       {pendingDeleteNotificationId === item._id && (
@@ -731,21 +732,21 @@ export default function SettingsPage() {
                           onClick={(event) => event.stopPropagation()}
                           className="absolute bottom-full right-0 z-30 mb-1.5 w-32 rounded-lg border border-gray-200 bg-white px-2 py-1.5 shadow-lg"
                         >
-                          <p className="text-center text-[11px] font-semibold text-black">Delete?</p>
+                          <p className="text-center text-[11px] font-semibold text-black">{t('deleteConfirm')}</p>
                           <div className="mt-1.5 flex items-center justify-center gap-1.5">
                             <button
                               type="button"
                               onClick={() => setPendingDeleteNotificationId(null)}
                               className="rounded-md border border-black px-2 py-0.5 text-[10px] font-medium text-black hover:bg-gray-100"
                             >
-                              No
+                              {t('no')}
                             </button>
                             <button
                               type="button"
                               onClick={confirmDeleteNotification}
                               className="rounded-md bg-black px-2 py-0.5 text-[10px] font-medium text-white hover:bg-gray-900"
                             >
-                              Yes
+                              {t('yes')}
                             </button>
                           </div>
                         </div>
@@ -764,14 +765,14 @@ export default function SettingsPage() {
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center gap-2 text-gray-900">
           <Palette className="h-5 w-5" />
-          <h2 className="text-lg font-semibold">Appearance</h2>
+          <h2 className="text-lg font-semibold">{t('appearanceTitle')}</h2>
         </div>
 
         <div className="space-y-8">
           {/* Font Family */}
           <div>
-            <p className="mb-1 text-sm font-semibold text-gray-900">Font Family</p>
-            <p className="mb-3 text-xs text-gray-500">Font family is applied automatically by language across the entire app.</p>
+            <p className="mb-1 text-sm font-semibold text-gray-900">{t('fontFamilyTitle')}</p>
+            <p className="mb-3 text-xs text-gray-500">{t('fontFamilyDescription')}</p>
             <div className="flex flex-wrap gap-2">
               <span
                 className={[
@@ -794,13 +795,13 @@ export default function SettingsPage() {
                 Pretendard
               </span>
             </div>
-            <p className="mt-3 text-xs text-gray-500">English uses Noto Sans. Korean uses Pretendard.</p>
+            <p className="mt-3 text-xs text-gray-500">{t('fontNote')}</p>
           </div>
 
           {/* Font Size */}
           <div>
-            <p className="mb-1 text-sm font-semibold text-gray-900">Font Size</p>
-            <p className="mb-3 text-xs text-gray-500">Scales text across the entire app.</p>
+            <p className="mb-1 text-sm font-semibold text-gray-900">{t('fontSizeTitle')}</p>
+            <p className="mb-3 text-xs text-gray-500">{t('fontSizeDescription')}</p>
             <div className="flex flex-wrap gap-2">
               {(Object.keys(FONT_SIZE_LABELS) as FontSizeKey[]).map((key) => (
                 <button
@@ -822,7 +823,7 @@ export default function SettingsPage() {
 
           {/* Live Preview */}
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gray-400">Preview</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gray-400">{t('previewLabel')}</p>
             <p className="text-2xl font-bold text-gray-900">The quick brown fox</p>
             <p className="text-base text-gray-600">jumps over the lazy dog. 0123456789</p>
             <p className="mt-1 text-sm text-gray-400">ABCDEFGHIJKLMNOPQRSTUVWXYZ · abcdefghijklmnopqrstuvwxyz</p>

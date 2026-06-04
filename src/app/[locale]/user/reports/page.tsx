@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Download, Eye, FileText, Image as ImageIcon, Lock } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchReportsPageData, requestReportPdf } from '@/lib/store/slices/accountSlice';
@@ -29,6 +30,7 @@ export default function ReportsPage() {
     actionLoading: Record<string, 'download' | 'preview' | null>;
   };
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const t = useTranslations('UserPanel.reports');
 
   useEffect(() => {
     dispatch(fetchReportsPageData());
@@ -63,9 +65,9 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Reports</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Generate branded PDF evidence reports from your reverse image search results.
+          {t('description')}
         </p>
       </div>
 
@@ -94,23 +96,23 @@ export default function ReportsPage() {
           <div className="mb-4 rounded-2xl bg-gray-100 p-4">
             <Lock className="h-8 w-8 text-gray-700" />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">PDF reports are locked on your current plan</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('lockedTitle')}</h2>
           <p className="mt-2 max-w-md text-sm text-gray-500">
-            Upgrade your plan to unlock report preview and download. Pro and Premium include full PDF exports.
+            {t('lockedDescription')}
           </p>
           <button
             type="button"
             onClick={() => (window.location.href = '/user/billing')}
             className="btn-primary mt-5"
           >
-            Upgrade plan to unlock this feature
+            {t('lockedCta')}
           </button>
         </div>
       ) : reports.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white py-20 text-center">
           <FileText className="mb-3 h-10 w-10 text-gray-300" />
-          <p className="text-sm font-medium text-gray-600">No reports yet</p>
-          <p className="mt-1 text-xs text-gray-400">Run an image search to generate your first report.</p>
+          <p className="text-sm font-medium text-gray-600">{t('emptyTitle')}</p>
+          <p className="mt-1 text-xs text-gray-400">{t('emptyDescription')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -129,7 +131,7 @@ export default function ReportsPage() {
                   {report.image ? (
                     <img
                       src={report.image}
-                      alt="Search image"
+                      alt={t('searchImageAlt')}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -143,14 +145,14 @@ export default function ReportsPage() {
                 <div className="flex flex-1 flex-col gap-3 p-4">
                   <div>
                     <p className="truncate text-sm font-semibold text-gray-900">
-                      Search Report
+                      {t('cardTitle')}
                     </p>
                     <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
                       <span>{new Date(report.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       <span className="text-gray-300">•</span>
-                      <span>{report.matchCount} {report.matchCount === 1 ? 'match' : 'matches'}</span>
+                      <span>{report.matchCount} {report.matchCount === 1 ? t('match') : t('matches')}</span>
                       <span className="text-gray-300">•</span>
-                      <span>{pages} {pages === 1 ? 'page' : 'pages'}</span>
+                      <span>{pages} {pages === 1 ? t('page') : t('pages')}</span>
                     </div>
                   </div>
 
@@ -163,7 +165,7 @@ export default function ReportsPage() {
                       className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <Download className="h-3.5 w-3.5" />
-                      {isDownloading ? 'Generating…' : 'Download'}
+                      {isDownloading ? t('generating') : t('download')}
                     </button>
                     <button
                       type="button"
@@ -172,7 +174,7 @@ export default function ReportsPage() {
                       className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-800 bg-gray-800 px-3 py-2 text-xs font-medium text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <Eye className="h-3.5 w-3.5" />
-                      {isPreviewing ? 'Opening…' : 'Preview'}
+                      {isPreviewing ? t('opening') : t('preview')}
                     </button>
                   </div>
                 </div>
@@ -188,9 +190,9 @@ export default function ReportsPage() {
             <div className="mx-auto mb-3 w-fit rounded-2xl bg-gray-100 p-3">
               <Lock className="h-6 w-6 text-gray-700" />
             </div>
-            <h3 className="text-center text-lg font-semibold text-gray-900">Feature unavailable on current plan</h3>
+            <h3 className="text-center text-lg font-semibold text-gray-900">{t('modalTitle')}</h3>
             <p className="mt-2 text-center text-sm text-gray-500">
-              PDF reports are available on Pro and Premium. Upgrade now to export and share professional reports.
+              {t('modalDescription')}
             </p>
             <div className="mt-5 flex gap-2">
               <button
@@ -198,14 +200,14 @@ export default function ReportsPage() {
                 onClick={() => setUpgradeModalOpen(false)}
                 className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                Maybe later
+                {t('maybeLater')}
               </button>
               <button
                 type="button"
                 onClick={() => (window.location.href = '/user/billing')}
                 className="flex-1 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
-                Upgrade plan
+                {t('upgradePlan')}
               </button>
             </div>
           </div>

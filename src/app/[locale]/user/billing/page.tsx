@@ -2,6 +2,7 @@
 
 import type { CheckoutOpenOptions, Paddle, PaddleEventData } from '@paddle/paddle-js';
 import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Check, Crown } from 'lucide-react';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
 import { formatPriceByCountry, isKoreanCountry } from '@/lib/currency';
@@ -96,6 +97,7 @@ export default function BillingPage() {
   const dispatch = useAppDispatch();
   const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, resumeAutoRenewLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
+  const t = useTranslations('UserPanel.billing');
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<PlanTier | null>(null);
@@ -189,8 +191,7 @@ export default function BillingPage() {
     }
 
     if (event.name === 'checkout.error' || event.name === 'checkout.failed') {
-      setCheckoutPlan(null);
-      setCheckoutError('Paddle could not complete the payment. Please try again.');
+      setCheckoutPlan(null);      setCheckoutError(t('checkoutError'));
       return;
     }
 
@@ -354,7 +355,7 @@ export default function BillingPage() {
         },
       } as unknown as CheckoutOpenOptions);
       const planName = plans.find((plan) => plan.tier === tier)?.name || tier;
-      showPopup('info', `Checkout opened for ${planName}. Complete payment to activate it.`);
+      showPopup('info', t('checkoutOpened', { plan: planName }));
     } catch (paymentError) {
       setCheckoutPlan(null);
       setCheckoutError(getPaymentErrorMessage(paymentError, 'Unable to start Paddle checkout.'));
@@ -365,7 +366,7 @@ export default function BillingPage() {
   const cancelSubscription = async () => {
     try {
       await dispatch(cancelPlanSubscription()).unwrap();
-      showPopup('success', 'Your subscription was cancelled.');
+      showPopup('success', t('subscriptionCancelled'));
     } catch (err) {
       showPopup('error', getPaymentErrorMessage(err, 'Unable to cancel subscription.'));
     }
@@ -374,7 +375,7 @@ export default function BillingPage() {
   const handlePause = async () => {
     try {
       await dispatch(pauseSubscription()).unwrap();
-      showPopup('success', 'Your subscription will pause at the end of this billing period.');
+      showPopup('success', t('subscriptionPausedSuccess'));
     } catch (err) {
       showPopup('error', getPaymentErrorMessage(err, 'Unable to pause subscription.'));
     }
@@ -383,7 +384,7 @@ export default function BillingPage() {
   const handleResume = async () => {
     try {
       await dispatch(resumeSubscription()).unwrap();
-      showPopup('success', 'Your subscription has been resumed.');
+      showPopup('success', t('subscriptionResumed'));
     } catch (err) {
       showPopup('error', getPaymentErrorMessage(err, 'Unable to resume subscription.'));
     }
@@ -392,7 +393,7 @@ export default function BillingPage() {
   const handleResumeAutoRenew = async () => {
     try {
       await dispatch(resumeAutoRenew()).unwrap();
-      showPopup('success', 'Auto-renew has been turned back on.');
+      showPopup('success', t('autoRenewResumed'));
     } catch (err) {
       showPopup('error', getPaymentErrorMessage(err, 'Unable to resume auto-renew.'));
     }
@@ -474,9 +475,9 @@ export default function BillingPage() {
       )}
 
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Billing</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Manage your plan and check out securely with Paddle. Paid plans renew automatically until you cancel them here.
+          {t('description')}
         </p>
       </div>
 
@@ -485,17 +486,17 @@ export default function BillingPage() {
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           <span className="font-semibold">
             {snapshot.subscription.trialDaysLeft != null
-              ? `Pro Trial: ${snapshot.subscription.trialDaysLeft} day${snapshot.subscription.trialDaysLeft !== 1 ? 's' : ''} remaining.`
-              : 'Pro Trial is active.'}
+              ? t('trialDaysLeft', { days: snapshot.subscription.trialDaysLeft, unit: snapshot.subscription.trialDaysLeft !== 1 ? t('days') : t('day') })
+              : t('trialActive')}
           </span>{' '}
-          Subscribe now to convert to a paid Pro subscription immediately.
+          {t('trialConvert')}
         </div>
       )}
 
       {/* Past-due warning */}
       {snapshot?.subscription?.status === 'past_due' && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          <span className="font-semibold">Payment failed — please update your payment method to avoid losing access.</span>
+          <span className="font-semibold">{t('pastDueWarning')}</span>
           {snapshot.subscription.paddleManaged && (
             <button
               type="button"
@@ -503,7 +504,7 @@ export default function BillingPage() {
               onClick={handleUpdatePayment}
               className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
             >
-              {updatePaymentLoading ? 'Loading...' : 'Update Payment Method'}
+              {updatePaymentLoading ? t('loadingPayment') : t('updatePaymentMethod')}
             </button>
           )}
         </div>
@@ -513,10 +514,10 @@ export default function BillingPage() {
       {snapshot?.subscription?.status === 'paused' && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
           <span>
-            <span className="mr-2 inline-block rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold uppercase text-gray-700">Paused</span>
-            Your subscription is paused.
+            <span className="mr-2 inline-block rounded-full bg-gray-300 px-2 py-0.5 text-xs font-semibold uppercase text-gray-700">{t('pausedBadge')}</span>
+            {t('subscriptionPaused')}
             {snapshot.subscription.currentPeriodEnd && (
-              <> Resumes or expires on {new Date(snapshot.subscription.currentPeriodEnd).toLocaleDateString()}.</>
+              <> {t('resumeOrExpire', { date: new Date(snapshot.subscription.currentPeriodEnd).toLocaleDateString() })}</>
             )}
           </span>
           {snapshot.subscription.paddleManaged && (
@@ -526,7 +527,7 @@ export default function BillingPage() {
               onClick={handleResume}
               className="rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-60"
             >
-              {resumeLoading ? 'Resuming...' : 'Resume'}
+              {resumeLoading ? t('resuming') : t('resume')}
             </button>
           )}
         </div>
@@ -536,11 +537,10 @@ export default function BillingPage() {
       {isCancelScheduled && cancelEffectiveDate && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <span>
-            <span className="mr-2 inline-block rounded-full bg-amber-600 px-2 py-0.5 text-xs font-semibold uppercase text-white">Auto-renew off</span>
-            Cancellation is scheduled for{' '}
-            <span className="font-semibold">{cancelEffectiveDate.toLocaleDateString()}</span>.
+            <span className="mr-2 inline-block rounded-full bg-amber-600 px-2 py-0.5 text-xs font-semibold uppercase text-white">{t('autoRenewOffBadge')}</span>
+            {t('cancellationScheduled', { date: cancelEffectiveDate.toLocaleDateString() })}
             {scheduledCancelDaysLeft != null && (
-              <> {scheduledCancelDaysLeft} day{scheduledCancelDaysLeft !== 1 ? 's' : ''} remaining in this billing period.</>
+              <> {t('daysRemaining', { days: scheduledCancelDaysLeft, unit: scheduledCancelDaysLeft !== 1 ? t('days') : t('day') })}</>
             )}
           </span>
           <button
@@ -549,7 +549,7 @@ export default function BillingPage() {
             disabled={resumeAutoRenewLoading}
             className="rounded-md bg-amber-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-800 disabled:opacity-60"
           >
-            {resumeAutoRenewLoading ? 'Resuming...' : 'Resume auto-renew'}
+            {resumeAutoRenewLoading ? t('resuming') : t('resumeAutoRenew')}
           </button>
         </div>
       )}
@@ -558,15 +558,14 @@ export default function BillingPage() {
       {snapshot?.subscription?.status === 'cancelled' && snapshot.subscription.cancelDate && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <span>
-            Your plan is cancelled. Access continues until{' '}
-            <span className="font-semibold">{new Date(snapshot.subscription.cancelDate).toLocaleDateString()}</span>.
+            {t('cancelledAccess', { date: new Date(snapshot.subscription.cancelDate).toLocaleDateString() })}
           </span>
           <button
             type="button"
             onClick={() => document.getElementById('plan-cards')?.scrollIntoView({ behavior: 'smooth' })}
             className="rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
           >
-            Re-subscribe
+            {t('resubscribe')}
           </button>
         </div>
       )}
@@ -581,7 +580,7 @@ export default function BillingPage() {
 
       {!paddleClientToken && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Paid plans on this screen use Paddle checkout. Set NEXT_PUBLIC_PADDLE_CLIENT_TOKEN to enable paid subscriptions.
+          {t('paddleNotConfigured')}
         </div>
       )}
 
@@ -589,18 +588,18 @@ export default function BillingPage() {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-gray-900">Current Plan: {currentPlanName}</p>
-            <p className="mt-1 text-xs text-gray-500">{hasEffectivePlan ? usageLabel : 'No active plan. Buy a plan to continue.'}</p>
+            <p className="text-sm font-semibold text-gray-900">{t('currentPlanLabel', { name: currentPlanName })}</p>
+            <p className="mt-1 text-xs text-gray-500">{hasEffectivePlan ? usageLabel : t('noActivePlan')}</p>
             {snapshot && hasEffectivePlan && (
               <p className="mt-1 text-xs text-gray-500">
                 {searchUsage.unlimited
-                  ? 'Unlimited searches remaining'
-                  : `${searchUsage.remaining} searches remaining`}
+                  ? t('unlimitedSearches')
+                  : t('searchesRemaining', { count: searchUsage.remaining })}
               </p>
             )}
             {hasEffectivePlan && snapshot?.alertsRemaining != null && (
               <p className="mt-1 text-xs text-gray-500">
-                {snapshot.alertsRemaining === -1 ? 'Unlimited alerts' : `${snapshot.alertsRemaining} alerts remaining`}
+                {snapshot.alertsRemaining === -1 ? t('unlimitedAlerts') : t('alertsRemaining', { count: snapshot.alertsRemaining })}
               </p>
             )}
 
@@ -612,7 +611,7 @@ export default function BillingPage() {
               return (
                 <div className="mt-3 max-w-xs">
                   <div className="mb-1 flex justify-between text-[10px] text-gray-400">
-                    <span>Uploads used</span>
+                    <span>{t('uploadsUsed')}</span>
                     <span>{used} / {total}</span>
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
@@ -626,8 +625,8 @@ export default function BillingPage() {
             {hasEffectivePlan && snapshot && snapshot.usage.alertLimit === 0 && (
               <div className="mt-3 max-w-xs">
                 <div className="mb-1 flex justify-between text-[10px] text-gray-400">
-                  <span>Alerts</span>
-                  <span>Unlimited</span>
+                  <span>{t('alerts')}</span>
+                  <span>{t('unlimited')}</span>
                 </div>
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                   <div className="h-full w-full rounded-full bg-emerald-500" />
@@ -636,23 +635,22 @@ export default function BillingPage() {
             )}
             {hasEffectivePlan && snapshot?.subscription?.nextBillingDate && (
               <p className="mt-1 text-xs text-gray-500">
-                Next billing: {new Date(snapshot.subscription.nextBillingDate).toLocaleDateString()}
+                {t('nextBilling', { date: new Date(snapshot.subscription.nextBillingDate).toLocaleDateString() })}
               </p>
             )}
             {autoPayEnabled && snapshot?.subscription?.billingCycle && !isCancelScheduled && (
               <p className="mt-1 text-xs text-gray-500">
-                Auto-pay is active via Paddle and renews every{' '}
-                {snapshot.subscription.billingCycle === 'annual' ? 'year' : 'month'} until cancelled.
+                {t('autoPayActive', { cycle: snapshot.subscription.billingCycle === 'annual' ? t('year') : t('month') })}
               </p>
             )}
             {isCancelScheduled && cancelEffectiveDate && (
               <p className="mt-1 text-xs text-amber-700">
-                Auto-renew is off. Access remains active until {cancelEffectiveDate.toLocaleDateString()}.
+                {t('autoRenewOffAccess', { date: cancelEffectiveDate.toLocaleDateString() })}
               </p>
             )}
             {!snapshot?.subscription?.paddleManaged && snapshot?.subscription && (
               <p className="mt-1 text-xs text-gray-400">
-                Subscribe to a paid plan to manage billing options.
+                {t('subscribeToPaidPlan')}
               </p>
             )}
           </div>
@@ -667,7 +665,7 @@ export default function BillingPage() {
                   cycle === 'monthly' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100',
                 ].join(' ')}
               >
-                Monthly
+                {t('monthly')}
               </button>
               <button
                 type="button"
@@ -677,7 +675,7 @@ export default function BillingPage() {
                   cycle === 'annual' ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100',
                 ].join(' ')}
               >
-                Annual
+                {t('annual')}
               </button>
             </div>
 
@@ -690,7 +688,7 @@ export default function BillingPage() {
                   disabled={pauseLoading || isCancelScheduled}
                   className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
                 >
-                  {pauseLoading ? 'Pausing...' : isCancelScheduled ? 'Unavailable while cancellation is scheduled' : 'Pause at period end'}
+                  {pauseLoading ? t('pausing') : isCancelScheduled ? t('pauseUnavailable') : t('pauseAtPeriodEnd')}
                 </button>
 
                 <button
@@ -699,7 +697,7 @@ export default function BillingPage() {
                   disabled={cancelLoading || isCancelScheduled}
                   className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
                 >
-                  {cancelLoading ? 'Cancelling...' : isCancelScheduled ? 'Cancellation scheduled' : 'Cancel at period end'}
+                  {cancelLoading ? t('cancelling') : isCancelScheduled ? t('cancellationScheduledBtn') : t('cancelAtPeriodEnd')}
                 </button>
               </>
             )}
@@ -740,31 +738,31 @@ export default function BillingPage() {
               {isCurrentPaidPlan && (
                 <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                   <Crown className="h-3 w-3" />
-                  Current
+                  {t('currentBadge')}
                 </span>
               )}
 
               {isCurrentTrialPlan && (
                 <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                   <Crown className="h-3 w-3" />
-                  Pro Trial
+                  {t('proTrialBadge')}
                 </span>
               )}
 
               <h2 className="text-lg font-semibold text-gray-900">{plan.name}</h2>
               <p className="mt-2 text-2xl font-bold text-gray-900">{formatPrice(price)}</p>
-              <p className="text-xs text-gray-500">per month ({cycle === 'annual' ? 'billed annually' : 'billed monthly'})</p>
+              <p className="text-xs text-gray-500">{t('perMonth')} ({cycle === 'annual' ? t('billedAnnually') : t('billedMonthly')})</p>
 
               {isCurrentTrialPlan && (
                 <p className="mt-2 text-xs font-medium text-gray-700">
                   {currentSubscription?.trialDaysLeft != null
-                    ? `${currentSubscription.trialDaysLeft} day${currentSubscription.trialDaysLeft !== 1 ? 's' : ''} left. Subscribe now to activate paid Pro immediately.`
-                    : 'Trial active. Subscribe now to activate paid Pro immediately.'}
+                    ? t('trialDaysLeftCard', { days: currentSubscription.trialDaysLeft, unit: currentSubscription.trialDaysLeft !== 1 ? t('days') : t('day') })
+                    : t('trialActiveCard')}
                 </p>
               )}
 
               <p className="mt-2 text-xs text-gray-500">
-                Auto-pay starts after checkout and renews {cycle === 'annual' ? 'yearly' : 'monthly'} until you cancel.
+                {t('autoPayStarts', { cycle: cycle === 'annual' ? t('yearly') : t('monthly') })}
               </p>
 
               <div className="mt-4 space-y-2 text-sm text-gray-700">
@@ -783,7 +781,7 @@ export default function BillingPage() {
                 className={planButtonClass}
               >
                 {isCurrentPaidPlan
-                  ? 'Current plan'
+                  ? t('currentPlanButton')
                   : getPlanCtaLabel(plan.tier, isWorking)}
               </button>
             </div>
@@ -795,8 +793,8 @@ export default function BillingPage() {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Billing history</h2>
-            <p className="mt-1 text-xs text-gray-500">View your past charges and open the Paddle invoice portal to download receipts.</p>
+            <h2 className="text-lg font-semibold text-gray-900">{t('billingHistoryTitle')}</h2>
+            <p className="mt-1 text-xs text-gray-500">{t('billingHistoryDescription')}</p>
           </div>
           <button
             type="button"
@@ -804,7 +802,7 @@ export default function BillingPage() {
             disabled={portalLoading}
             className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
           >
-            {portalLoading ? 'Opening...' : 'Open invoice portal'}
+            {portalLoading ? t('openingPortal') : t('openInvoicePortal')}
           </button>
         </div>
 
@@ -813,18 +811,18 @@ export default function BillingPage() {
         )}
 
         {historyLoading ? (
-          <div className="text-sm text-gray-500">Loading billing history...</div>
+          <div className="text-sm text-gray-500">{t('loadingHistory')}</div>
         ) : historyItems.length === 0 ? (
-          <div className="text-sm text-gray-500">No billing records yet.</div>
+          <div className="text-sm text-gray-500">{t('noHistory')}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-2 py-2">Date</th>
-                  <th className="px-2 py-2">Amount</th>
-                  <th className="px-2 py-2">Status</th>
-                  <th className="px-2 py-2">Transaction</th>
+                  <th className="px-2 py-2">{t('dateHeader')}</th>
+                  <th className="px-2 py-2">{t('amountHeader')}</th>
+                  <th className="px-2 py-2">{t('statusHeader')}</th>
+                  <th className="px-2 py-2">{t('transactionHeader')}</th>
                 </tr>
               </thead>
               <tbody>
