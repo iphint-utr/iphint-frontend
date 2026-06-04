@@ -54,6 +54,33 @@ const clearStoredSession = () => {
   localStorage.removeItem('user');
 };
 
+const OPTIONAL_401_PATH_PREFIXES = ['/user-details/notifications'];
+
+let isAuthRedirectInProgress = false;
+
+const extractRequestPath = (rawUrl?: string) => {
+  if (!rawUrl) return '';
+
+  const withoutQuery = rawUrl.split('?')[0] || '';
+
+  if (withoutQuery.startsWith('http://') || withoutQuery.startsWith('https://')) {
+    try {
+      return new URL(withoutQuery).pathname;
+    } catch {
+      return withoutQuery;
+    }
+  }
+
+  return withoutQuery;
+};
+
+const isOptional401Request = (rawUrl?: string) => {
+  const path = extractRequestPath(rawUrl);
+  if (!path) return false;
+
+  return OPTIONAL_401_PATH_PREFIXES.some((prefix) => path.startsWith(prefix));
+};
+
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -66,13 +93,18 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    if (isOptional401Request(error.config?.url)) {
+      return Promise.reject(error);
+    }
+
     const currentPath = window.location.pathname || '/';
     const locale = parseLocaleFromPathname(currentPath);
     const isAuthPage = /^\/(en|kr)\/(login|signup|forgot-password|reset-password)\/?$/.test(currentPath);
 
     clearStoredSession();
 
-    if (!isAuthPage) {
+    if (!isAuthPage && !isAuthRedirectInProgress) {
+      isAuthRedirectInProgress = true;
       const redirectTarget = `${window.location.pathname}${window.location.search || ''}`;
       const loginPath = `/${locale}/login?redirect=${encodeURIComponent(redirectTarget)}`;
       window.location.replace(loginPath);

@@ -75,13 +75,16 @@ const clearSession = (): void => {
 };
 
 const loadSession = (): { token: string | null; user: UserData | null } => {
+  const token = localStorage.getItem('token') || null;
+
   try {
     return {
-      token: localStorage.getItem('token') || null,
+      token,
       user: JSON.parse(localStorage.getItem('user') || 'null'),
     };
   } catch {
-    return { token: null, user: null };
+    // Keep token even if user JSON is corrupted; profile can be re-hydrated later.
+    return { token, user: null };
   }
 };
 
