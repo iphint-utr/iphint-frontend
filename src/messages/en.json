@@ -1012,8 +1012,8 @@
       "heading": "Plan Comparison",
       "planNames": ["STARTER", "PRO", "PREMIUM"],
       "rows": [
-        { "label": "Billed Yearly (Monthly)", "starter": "$5.30", "pro": "$13.57", "premium": "$19.66" },
-        { "label": "Billed Monthly", "starter": "$6.62", "pro": "$19.39", "premium": "$32.77" },
+        { "label": "Billed Yearly (Monthly)", "starter": "$5.28", "pro": "$13.51", "premium": "$19.62" },
+        { "label": "Billed Monthly", "starter": "$6.60", "pro": "$19.30", "premium": "$32.70" },
         { "label": "Yearly Discount", "starter": "20%", "pro": "30%", "premium": "40%" },
         { "label": "Contents Monitored", "starter": "Up to 10", "pro": "Up to 50", "premium": "Up to 100" },
         { "label": "Alert Limited", "starter": "1,000 alerts", "pro": "5,000 alerts", "premium": "Unlimited" },

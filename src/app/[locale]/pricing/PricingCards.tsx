@@ -10,8 +10,8 @@ const PLAN_DATA = {
   en: [
     {
       id: "starter" as const,
-      monthlyPrice: 6.62,
-      yearlyPrice: 5.3,
+      monthlyPrice: 6.6,
+      yearlyPrice: 5.28,
       perUnitYearly: 0.53,
       discount: 20,
       subtextLink: true,
@@ -20,8 +20,8 @@ const PLAN_DATA = {
     },
     {
       id: "pro" as const,
-      monthlyPrice: 19.39,
-      yearlyPrice: 13.57,
+      monthlyPrice: 19.3,
+      yearlyPrice: 13.51,
       perUnitYearly: 0.27,
       discount: 30,
       subtextLink: false,
@@ -30,8 +30,8 @@ const PLAN_DATA = {
     },
     {
       id: "premium" as const,
-      monthlyPrice: 32.77,
-      yearlyPrice: 19.66,
+      monthlyPrice: 32.7,
+      yearlyPrice: 19.62,
       perUnitYearly: 0.2,
       discount: 40,
       subtextLink: false,
