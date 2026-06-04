@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [resendFailed, setResendFailed] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const alertRef = useRef<HTMLDivElement | null>(null);
+  const logoutRequested = searchParams.get('loggedOut') === '1';
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -51,11 +52,15 @@ export default function LoginPage() {
   }, [dispatch, searchParams]);
 
   useEffect(() => {
+    if (logoutRequested) {
+      return;
+    }
+
     if (!authLoading && isAuthenticated) {
       const redirectTarget = searchParams.get('redirect');
       router.push(redirectTarget || '/user');
     }
-  }, [authLoading, isAuthenticated, router, searchParams]);
+  }, [authLoading, isAuthenticated, logoutRequested, router, searchParams]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
