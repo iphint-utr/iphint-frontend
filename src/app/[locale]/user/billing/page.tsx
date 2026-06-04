@@ -160,20 +160,31 @@ export default function BillingPage() {
     if (event.name === 'checkout.completed') {
       setCheckoutPlan(null);
       setCheckoutError(null);
-      // Poll until subscription is active and Paddle-managed
-      let attempts = 0;
-      const poll = () => {
-        if (attempts >= 10) return;
-        attempts++;
-        pollTimerRef.current = setTimeout(async () => {
-          const result = await dispatch(fetchBillingPageData());
-          const sub = (result as { payload?: { snapshot?: BillingSnapshot | null } }).payload?.snapshot?.subscription;
-          if (sub?.status === 'active' && sub?.paddleManaged) return;
-          poll();
-        }, 2000);
-      };
-      poll();
-      startTransition(() => { void dispatch(fetchBillingPageData()); });
+
+      // Immediately sync from Paddle API in case webhook delivery is delayed.
+      // This force-writes the paid subscription state to the DB so the UI
+      // doesn't remain stuck on the trial badge.
+      void (async () => {
+        try {
+          await apiClient.post('/billing/sync', {});
+        } catch {
+          // Non-fatal — polling below will still refresh via the standard endpoint.
+        }
+        // Poll until subscription is active and Paddle-managed
+        let attempts = 0;
+        const poll = () => {
+          if (attempts >= 12) return;
+          attempts++;
+          pollTimerRef.current = setTimeout(async () => {
+            const result = await dispatch(fetchBillingPageData());
+            const sub = (result as { payload?: { snapshot?: BillingSnapshot | null } }).payload?.snapshot?.subscription;
+            if (sub?.status === 'active' && sub?.paddleManaged) return;
+            poll();
+          }, 2500);
+        };
+        poll();
+        startTransition(() => { void dispatch(fetchBillingPageData()); });
+      })();
       return;
     }
 
@@ -194,9 +205,12 @@ export default function BillingPage() {
     (currentSubscription.hasAccess === true || ['active', 'trialing', 'past_due'].includes(currentSubscription.status));
   const currentTier: PlanTier | null = hasEffectivePlan ? (snapshot?.plan?.tier ?? null) : null;
   const currentPlanName = hasEffectivePlan ? (snapshot?.plan?.name ?? '--') : '--';
+  // Paid active status MUST take priority over trial flags.
+  // If status is 'active' the user has converted to a paid plan — never show trial badge.
   const isProTrial =
     currentTier === 'pro' &&
     !!currentSubscription &&
+    currentSubscription.status !== 'active' &&
     (currentSubscription.status === 'trialing' || currentSubscription.isTrialing || currentSubscription.isTrial);
   const autoPayEnabled = snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged;
   const isPaddleActive = snapshot?.subscription?.status === 'active' && snapshot?.subscription?.paddleManaged;
