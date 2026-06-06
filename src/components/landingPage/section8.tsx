@@ -16,7 +16,7 @@ export default function Section8() {
         </h2>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <Link href="/signup" className="btn-primary">
+          <Link href="/login" className="btn-primary">
             {t("primaryCta")}
           </Link>
           <ContactSalesButton className="btn-secondary">
