@@ -2,10 +2,10 @@
 
 import type { CheckoutOpenOptions, Paddle, PaddleEventData } from '@paddle/paddle-js';
 import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Check, Crown } from 'lucide-react';
 import { apiClient, getApiErrorMessage } from '@/lib/api';
-import { formatPriceByCountry, isKoreanCountry } from '@/lib/currency';
+import { formatPriceByCountry } from '@/lib/currency';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import {
   cancelPlanSubscription,
@@ -98,6 +98,7 @@ export default function BillingPage() {
   const { plans, loading, error, savingPlan, cancelLoading, pauseLoading, resumeLoading, resumeAutoRenewLoading, upgradeLoading, countryCode } = useAppSelector((state) => state.account.billing);
   const snapshot = useAppSelector((state) => state.account.subscription.data) as BillingSnapshot | null;
   const t = useTranslations('UserPanel.billing');
+  const locale = useLocale();
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutPlan, setCheckoutPlan] = useState<PlanTier | null>(null);
@@ -112,7 +113,7 @@ export default function BillingPage() {
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isKorean = isKoreanCountry(countryCode);
+  const isKoreanLocale = locale === 'kr';
 
   const formatPrice = (usd: number) => {
     return formatPriceByCountry(usd, countryCode);
@@ -133,7 +134,7 @@ export default function BillingPage() {
 
   useEffect(() => {
     dispatch(fetchBillingPageData());
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   useEffect(() => {
     let active = true;
@@ -198,7 +199,7 @@ export default function BillingPage() {
     if (event.name === 'checkout.closed') {
       setCheckoutPlan(null);
     }
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   const currentSubscription = snapshot?.subscription ?? null;
   const hasEffectivePlan =
@@ -261,30 +262,30 @@ export default function BillingPage() {
   };
 
   const getLocalizedPlanFeatures = (plan: Plan) => {
-    if (!isKorean) return plan.features;
+    if (!isKoreanLocale) return plan.features;
     return koreanPlanFeatures[plan.tier] ?? plan.features;
   };
 
   const getPlanName = (planTier: PlanTier) => plans.find((p) => p.tier === planTier)?.name || planTier;
 
   const getPlanCtaLabel = (planTier: PlanTier, isWorking: boolean) => {
-    if (isWorking) return isKorean ? '처리 중...' : 'Processing...';
+    if (isWorking) return isKoreanLocale ? '처리 중...' : 'Processing...';
 
     if (isProTrial) {
-      if (planTier === 'pro') return isKorean ? '지금 구독' : 'Subscribe now';
-      if (planTier === 'premium') return isKorean ? 'Premium으로 업그레이드' : 'Upgrade to Premium';
+      if (planTier === 'pro') return isKoreanLocale ? '지금 구독' : 'Subscribe now';
+      if (planTier === 'premium') return isKoreanLocale ? 'Premium으로 업그레이드' : 'Upgrade to Premium';
     }
 
     const planIndex = tierOrder.indexOf(planTier);
     if (!hasEffectivePlan) {
-      return isKorean ? `${getPlanName(planTier)} 구매` : `Buy ${getPlanName(planTier)}`;
+      return isKoreanLocale ? `${getPlanName(planTier)} 구매` : `Buy ${getPlanName(planTier)}`;
     }
 
     if (isPaddleActive) {
-      if (planIndex > currentTierIndex) return isKorean ? `${getPlanName(planTier)}로 업그레이드` : `Upgrade to ${getPlanName(planTier)}`;
-      if (planIndex < currentTierIndex) return isKorean ? `${getPlanName(planTier)}로 다운그레이드` : `Downgrade to ${getPlanName(planTier)}`;
+      if (planIndex > currentTierIndex) return isKoreanLocale ? `${getPlanName(planTier)}로 업그레이드` : `Upgrade to ${getPlanName(planTier)}`;
+      if (planIndex < currentTierIndex) return isKoreanLocale ? `${getPlanName(planTier)}로 다운그레이드` : `Downgrade to ${getPlanName(planTier)}`;
     }
-    return isKorean ? `${getPlanName(planTier)} 구독` : `Subscribe to ${getPlanName(planTier)}`;
+    return isKoreanLocale ? `${getPlanName(planTier)} 구독` : `Subscribe to ${getPlanName(planTier)}`;
   };
 
   const handlePlanAction = async (tier: PlanTier) => {
@@ -308,7 +309,7 @@ export default function BillingPage() {
     const limit = snapshot.usage.imageUploadLimit;
     if (!limit) return `${used} uploads this month (unlimited plan)`;
     return `${used}/${limit} uploads used this month`;
-  }, [snapshot, hasEffectivePlan]);
+  }, [snapshot]);
 
   const searchUsage = useMemo(() => {
     if (!snapshot) {

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, Bell, Check, Search, Trash2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/routing';
 import LocaleSwitcher from '@/components/layout/LocaleSwitcher';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -57,6 +57,7 @@ const normalizeNotificationActionUrl = (value?: string): string | null => {
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 	const t = useTranslations('Dashboard.topbar');
+	const locale = useLocale();
 	const dispatch = useAppDispatch();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -170,6 +171,26 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 		}
 	};
 
+	const localizeNotificationText = (value?: string) => {
+		if (!value || locale !== 'kr') return value;
+
+		const normalized = value.trim();
+
+		if (/^Your free trial has ended\. Upgrade to continue using the service\.?$/i.test(normalized)) {
+			return '무료 체험이 종료되었습니다. 서비스를 계속 이용하려면 업그레이드하세요.';
+		}
+
+		const trialEndingMatch = normalized.match(
+			/^Your free trial ends in (\d+) day(?:s)?\. Upgrade to keep access\.?$/i,
+		);
+		if (trialEndingMatch) {
+			const days = trialEndingMatch[1];
+			return `무료 체험이 ${days}일 후 종료됩니다. 이용을 유지하려면 업그레이드하세요.`;
+		}
+
+		return value;
+	};
+
 	return (
 		<header className="sticky top-0 z-20 h-16 border-b border-gray-200 bg-white shadow-sm">
 			<div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6">
@@ -243,8 +264,8 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 														onClick={() => goToNotification(item)}
 														className="min-w-0 flex-1 cursor-pointer text-left"
 													>
-														<p className="line-clamp-1 text-xs font-semibold text-gray-900">{item.title}</p>
-														{item.message && <p className="mt-0.5 line-clamp-2 text-xs text-gray-600">{item.message}</p>}
+														<p className="line-clamp-1 text-xs font-semibold text-gray-900">{localizeNotificationText(item.title)}</p>
+														{item.message && <p className="mt-0.5 line-clamp-2 text-xs text-gray-600">{localizeNotificationText(item.message)}</p>}
 														<p className="mt-1 text-[10px] text-gray-400">{new Date(item.timestamp).toLocaleString()}</p>
 													</button>
 

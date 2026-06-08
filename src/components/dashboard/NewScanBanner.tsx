@@ -12,7 +12,7 @@ export const NewScanBanner: React.FC<{ t: any }> = ({ t }) => {
 	return (
 		<div className="flex flex-col gap-5 rounded-xl bg-gray-950 p-5 text-white shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-6 lg:p-8">
 			<div className="min-w-0 flex-1">
-				<h2 className="mb-2 max-w-full truncate text-xl font-bold sm:text-2xl" title={t('startScanTitle')}>
+				<h2 className="mb-2 max-w-full truncate text-xl font-bold text-white sm:text-2xl" title={t('startScanTitle')}>
 					{t('startScanTitle')}
 				</h2>
 				<p className="mb-5 max-w-full truncate text-sm text-gray-300 sm:mb-6" title={t('startScanSub')}>

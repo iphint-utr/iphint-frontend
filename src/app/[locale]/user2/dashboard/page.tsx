@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { fetchDashboardData, fetchAlerts } from '@/lib/store/slices/userSlice';
@@ -19,7 +19,28 @@ import {
 
 export default function DashboardPage() {
   const t = useTranslations('Dashboard');
+  const locale = useLocale();
   const dispatch = useAppDispatch();
+
+  const localizeNotificationText = (value: string) => {
+    if (!value || locale !== 'kr') return value;
+
+    const normalized = value.trim();
+
+    if (/^Your free trial has ended\. Upgrade to continue using the service\.?$/i.test(normalized)) {
+      return '무료 체험이 종료되었습니다. 서비스를 계속 이용하려면 업그레이드하세요.';
+    }
+
+    const trialEndingMatch = normalized.match(
+      /^Your free trial ends in (\d+) day(?:s)?\. Upgrade to keep access\.?$/i,
+    );
+    if (trialEndingMatch) {
+      const days = trialEndingMatch[1];
+      return `무료 체험이 ${days}일 후 종료됩니다. 이용을 유지하려면 업그레이드하세요.`;
+    }
+
+    return value;
+  };
   
   // Get user data for name and referral code
   const user = useAppSelector((state) => state.user);
@@ -217,7 +238,7 @@ export default function DashboardPage() {
                       {index === 0 ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold leading-snug text-gray-900" title={alert.title}>{alert.title}</p>
+                      <p className="truncate text-sm font-bold leading-snug text-gray-900" title={localizeNotificationText(alert.title)}>{localizeNotificationText(alert.title)}</p>
                       <p className="mt-1 truncate text-[10px] font-medium text-gray-400" title={new Date(alert.timestamp).toLocaleString()}>
                         {new Date(alert.timestamp).toLocaleString()}
                       </p>
