@@ -963,7 +963,7 @@
       "usagePolicy": "Usage Policy",
       "refundPolicy": "Refund Policy"
     },
-    "copyright": "©2026 IPHINT. All Rights Reserved.",
+    "copyright": "©2026 UTRBOX. All Rights Reserved.",
     "languages": {
       "kr": "Korean",
       "en": "English"
@@ -1080,7 +1080,7 @@
       "heading": "Plan Comparison",
       "planNames": ["STARTER", "PRO", "PREMIUM"],
       "rows": [
-        { "label": "Billed Yearly (Monthly)", "starter": "$5.28", "pro": "$13.51", "premium": "$19.62" },
+        { "label": "Billed Yearly (Monthly)", "starter": "$5.30", "pro": "$13.50", "premium": "$19.60" },
         { "label": "Billed Monthly", "starter": "$6.60", "pro": "$19.30", "premium": "$32.70" },
         { "label": "Yearly Discount", "starter": "20%", "pro": "30%", "premium": "40%" },
         { "label": "Contents Monitored", "starter": "Up to 10", "pro": "Up to 50", "premium": "Up to 100" },

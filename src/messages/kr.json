@@ -23,7 +23,7 @@
       "usagePolicy": "사용정책",
       "refundPolicy": "환불 정책"
     },
-    "copyright": "©2026 IPHINT. All Rights Reserved.",
+    "copyright": "©2026 UTRBOX. All Rights Reserved.",
     "languages": {
       "kr": "한국어",
       "en": "영어"
@@ -148,16 +148,16 @@
       "title": "블로그",
       "posts": {
         "1": {
-          "title": "Content IP theft is rarely absent; it is simply undiscovered."
+          "title": "콘텐츠 IP 도용, 침해는 찾지 못할 뿐, 도용되지 않은 작품은 거의 없습니다."
         },
         "2": {
-          "title": "Does AI Art Have No Copyright? The Moment Your Brand Becomes 'Public Property'"
+          "title": "AI 아트는 저작권이 없나요? 브랜드가 '공유 재산'이 되는 순간"
         },
         "3": {
-          "title": "Used One Image and Got a Settlement Demand? Surviving the 'Predatory Lawsuit' Trap"
+          "title": "한 이미지를 사용하고 합의 요구를 받았다면? '약탈적 소송' 함정에서 살아남기"
         },
         "4": {
-          "title": "Your Brand as a Target: The K-Content Crisis on Ali and Temu"
+          "title": "당신의 브랜드가 표적이 될 때: Ali와 Temu에서의 K-콘텐츠 위기"
         }
       }
     },
