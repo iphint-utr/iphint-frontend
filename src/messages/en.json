@@ -883,6 +883,74 @@
     "submit": "Send Inquiry",
     "submitLoading": "Sending..."
   },
+  "AboutPage": {
+    "eyebrow": "About Us",
+    "title": "About IPHINT",
+    "subtitle": "Built by Engineers. Designed for Everyone.",
+    "illustrationSrc": "/login.svg",
+    "illustrationAlt": "IPHINT login illustration",
+    "sections": [
+      {
+        "title": "Built by Engineers. Designed for Everyone.",
+        "paragraphs": [
+          "IPHINT was founded by two brothers, both computer engineers.",
+          "For a long time, we observed a recurring problem: powerful technologies and tools existed, but most were built exclusively for enterprises, making them too complex and expensive for individuals. Image theft detection was no exception.",
+          "The sophisticated technology was there, but the number of people who could actually use it was extremely limited."
+        ],
+        "callout": "Why can't individuals have access to this technology?"
+      },
+      {
+        "title": "Making Enterprise Technology Accessible",
+        "paragraphs": [
+          "IPHINT aims to bring enterprise-level image detection technology to everyone. Our system is designed to protect your content without requiring complex setups or specialized technical knowledge.",
+          "While we make the technology simple to use, we never compromise on its performance or core capabilities."
+        ]
+      },
+      {
+        "title": "Built by Engineers Who Understand the Problem",
+        "paragraphs": [
+          "We didn't just build a service; we understood the problem and engineered the solution.",
+          "We have directly researched how images are modified, how they spread, and why traditional methods fail to detect them. As a result, we have built a detection system that works in real-world environments, going far beyond a simple search."
+        ]
+      },
+      {
+        "title": "From Tools to Infrastructure",
+        "paragraphs": [
+          "IPHINT is more than just a tool or a feature. It is an infrastructure that empowers everyone, from individuals to corporations, to protect their image IP."
+        ]
+      },
+      {
+        "title": "Our Mission",
+        "paragraphs": [
+          "Our mission is to bridge the technology gap. We exist to make technologies that were once reserved for large enterprises available to individuals. Through our service, creators and brands of all sizes can easily access digital content IP protection."
+        ]
+      }
+    ],
+    "teamTitle": "Our Team",
+    "teamMembers": [
+      {
+        "role": "Director",
+        "name": "Hyung-tae Kim"
+      },
+      {
+        "role": "UI/UX Designer",
+        "name": "Da-hyeon Kang"
+      },
+      {
+        "role": "AI Software",
+        "name": "Mohaiminul Islam"
+      },
+      {
+        "role": "Development",
+        "name": "Raju Ahmmed"
+      },
+      {
+        "role": "Information Security",
+        "name": "Seong-tae Kim"
+      }
+    ],
+    "backToMain": "Back to Main"
+  },
   "Footer": {
     "companyHeading": "IpHint",
     "policyHeading": "Terms & Policies",
