@@ -48,6 +48,12 @@ interface BillingSnapshot {
     nextBillingDate?: string;
     cancelDate?: string;
     paddleStatus?: string;
+    pendingPlan?: {
+      tier: PlanTier;
+      name: string;
+      billingCycle: BillingCycle;
+      effectiveAt?: string | null;
+    } | null;
   } | null;
   plan: Plan;
   credits?: number;
@@ -216,6 +222,8 @@ export default function BillingPage() {
     (currentSubscription.status === 'trialing' || currentSubscription.isTrialing || currentSubscription.isTrial);
   const autoPayEnabled = snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged;
   const isPaddleActive = snapshot?.subscription?.status === 'active' && snapshot?.subscription?.paddleManaged;
+  const pendingPlan = snapshot?.subscription?.pendingPlan ?? null;
+  const hasPendingDowngrade = !!pendingPlan;
   const cancelEffectiveDate = snapshot?.subscription?.cancelDate
     ? new Date(snapshot.subscription.cancelDate)
     : null;
@@ -283,8 +291,15 @@ export default function BillingPage() {
 
     if (isPaddleActive) {
       if (planIndex > currentTierIndex) return isKoreanLocale ? `${getPlanName(planTier)}로 업그레이드` : `Upgrade to ${getPlanName(planTier)}`;
-      if (planIndex < currentTierIndex) return isKoreanLocale ? `${getPlanName(planTier)}로 다운그레이드` : `Downgrade to ${getPlanName(planTier)}`;
+      if (planIndex < currentTierIndex) {
+        return isKoreanLocale ? `${getPlanName(planTier)}로 다운그레이드` : `Downgrade to ${getPlanName(planTier)}`;
+      }
     }
+
+    if (hasPendingDowngrade && currentTier && planTier === currentTier) {
+      return isKoreanLocale ? '현재 요금제 유지' : 'Keep current plan';
+    }
+
     return isKoreanLocale ? `${getPlanName(planTier)} 구독` : `Subscribe to ${getPlanName(planTier)}`;
   };
 
@@ -292,9 +307,20 @@ export default function BillingPage() {
     if (isPaddleActive) {
       setCheckoutError(null);
       try {
-        await dispatch(upgradeSubscription({ tier, billingCycle: cycle })).unwrap();
+        const targetTier = hasPendingDowngrade && currentTier && tier === currentTier
+          ? currentTier
+          : tier;
+        const targetCycle = hasPendingDowngrade && currentTier && tier === currentTier
+          ? currentSubscription?.billingCycle ?? cycle
+          : cycle;
+
+        await dispatch(upgradeSubscription({ tier: targetTier, billingCycle: targetCycle })).unwrap();
         const planName = plans.find((plan) => plan.tier === tier)?.name || tier;
-        showPopup('success', `Your plan was updated to ${planName}.`);
+        if (hasPendingDowngrade && currentTier && tier === currentTier) {
+          showPopup('success', isKoreanLocale ? '예약된 다운그레이드가 취소되었습니다.' : 'Scheduled downgrade has been canceled.');
+        } else {
+          showPopup('success', `Your plan was updated to ${planName}.`);
+        }
       } catch (err) {
         showPopup('error', getPaymentErrorMessage(err, 'Unable to change your plan right now.'));
       }
@@ -591,6 +617,19 @@ export default function BillingPage() {
         </div>
       )}
 
+      {hasPendingDowngrade && !isCancelScheduled && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+          <span>
+            {isKoreanLocale
+              ? `다운그레이드 예약됨: ${pendingPlan?.name} (${pendingPlan?.billingCycle === 'annual' ? '연간' : '월간'})`
+              : `Downgrade scheduled: ${pendingPlan?.name} (${pendingPlan?.billingCycle})`}
+            {pendingPlan?.effectiveAt && (
+              <> {isKoreanLocale ? `적용일 ${new Date(pendingPlan.effectiveAt).toLocaleDateString()}` : `on ${new Date(pendingPlan.effectiveAt).toLocaleDateString()}`}</>
+            )}
+          </span>
+        </div>
+      )}
+
       {/* Cancelled notice */}
       {snapshot?.subscription?.status === 'cancelled' && snapshot.subscription.cancelDate && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -716,27 +755,23 @@ export default function BillingPage() {
               </button>
             </div>
 
-            {/* Cancel — only for active + paddle-managed */}
+            {/* Renewal controls — only for active + paddle-managed */}
             {snapshot?.subscription?.status === 'active' && snapshot.subscription.paddleManaged && (
-              <>
-                <button
-                  type="button"
-                  onClick={handlePause}
-                  disabled={pauseLoading || isCancelScheduled}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
-                >
-                  {pauseLoading ? t('pausing') : isCancelScheduled ? t('pauseUnavailable') : t('pauseAtPeriodEnd')}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={cancelSubscription}
-                  disabled={cancelLoading || isCancelScheduled}
-                  className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
-                >
-                  {cancelLoading ? t('cancelling') : isCancelScheduled ? t('cancellationScheduledBtn') : t('cancelAtPeriodEnd')}
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={isCancelScheduled ? handleResumeAutoRenew : cancelSubscription}
+                disabled={cancelLoading || resumeAutoRenewLoading}
+                className={[
+                  'rounded-lg px-3 py-2 text-xs font-medium disabled:opacity-60',
+                  isCancelScheduled
+                    ? 'border border-red-200 text-red-600 hover:bg-red-50'
+                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50',
+                ].join(' ')}
+              >
+                {isCancelScheduled
+                  ? (resumeAutoRenewLoading ? t('resuming') : isKoreanLocale ? '갱신 재개' : 'Resume renewal')
+                  : (cancelLoading ? t('cancelling') : isKoreanLocale ? '자동 갱신 끄기' : 'Turn off renewal')}
+              </button>
             )}
           </div>
         </div>
@@ -756,7 +791,8 @@ export default function BillingPage() {
           const isCurrentTrialPlan = isCurrent && plan.tier === 'pro' && isProTrial;
           const isWorking = savingPlan === plan.tier || checkoutPlan === plan.tier || upgradeLoading === plan.tier;
           const isPaddleUnavailable = !paddleClientToken && !isPaddleActive;
-          const isDisabled = isWorking || isPaddleUnavailable || isCurrentPaidPlan;
+          const isPendingTargetPlan = !!pendingPlan && pendingPlan.tier === plan.tier;
+          const isDisabled = isWorking || isPaddleUnavailable || (isCurrentPaidPlan && !hasPendingDowngrade) || (isPendingTargetPlan && hasPendingDowngrade);
           const planButtonClass = [
             'mt-5 w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
             isCurrentPaidPlan
@@ -772,13 +808,6 @@ export default function BillingPage() {
                 isCurrent ? 'border-gray-900 ring-1 ring-gray-900/10' : 'border-gray-200',
               ].join(' ')}
             >
-              {isCurrentPaidPlan && (
-                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-                  <Crown className="h-3 w-3" />
-                  {t('currentBadge')}
-                </span>
-              )}
-
               {isCurrentTrialPlan && (
                 <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                   <Crown className="h-3 w-3" />

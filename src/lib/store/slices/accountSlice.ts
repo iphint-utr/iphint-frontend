@@ -38,6 +38,12 @@ export interface BillingSnapshot {
     nextBillingDate?: string;
     cancelDate?: string;
     paddleStatus?: string;
+    pendingPlan?: {
+      tier: PlanTier;
+      name: string;
+      billingCycle: BillingCycle;
+      effectiveAt?: string | null;
+    } | null;
   } | null;
   plan: BillingPlan;
   credits?: number;
