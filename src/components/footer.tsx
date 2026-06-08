@@ -132,17 +132,28 @@ export default function Footer() {
               </p>
               <ul className="flex flex-col gap-[15px]">
                 {[
-                  { href: "/research", label: t("links.research") },
+                  { href: "https://luminous-beat-885.notion.site/337f70a1e02e80babbede283c5a9350a", label: t("links.research"), external: true },
                   { href: "/api", label: t("links.api") },
                   { href: "/about", label: t("links.about") },
                 ].map((link) => (
                   <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[17px] font-normal text-gray-900 hover:text-gray-400 transition-colors duration-200"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[17px] font-normal text-gray-900 hover:text-gray-400 transition-colors duration-200"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-[17px] font-normal text-gray-900 hover:text-gray-400 transition-colors duration-200"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -230,25 +230,61 @@ export default function BillingPage() {
 
   const tierOrder: PlanTier[] = ['starter', 'pro', 'premium'];
   const currentTierIndex = currentTier ? tierOrder.indexOf(currentTier) : -1;
+  const koreanPlanFeatures: Record<PlanTier, string[]> = {
+    starter: [
+      '최대 10개 등록 항목 모니터링',
+      '검색당 최대 1,000개 결과 조회',
+      '누적 탐지 알림 1,000건',
+      '자동 중복 필터링',
+      '콘텐츠 노출 위험 분석',
+      '인앱 알림',
+    ],
+    pro: [
+      '최대 50개 등록 항목 모니터링',
+      '검색당 최대 5,000개 결과 조회',
+      '누적 탐지 알림 5,000건',
+      '자동 중복 필터링',
+      '콘텐츠 노출 위험 분석',
+      'PDF 보고서 생성',
+      '인앱 알림',
+    ],
+    premium: [
+      '최대 100개 등록 항목 모니터링',
+      '검색당 무제한 결과 조회',
+      '무제한 탐지 알림',
+      '자동 중복 필터링',
+      '콘텐츠 노출 위험 분석',
+      'PDF 보고서 생성',
+      '1:1 전담 매니저 배정',
+      '인앱 알림',
+    ],
+  };
+
+  const getLocalizedPlanFeatures = (plan: Plan) => {
+    if (!isKorean) return plan.features;
+    return koreanPlanFeatures[plan.tier] ?? plan.features;
+  };
+
+  const getPlanName = (planTier: PlanTier) => plans.find((p) => p.tier === planTier)?.name || planTier;
 
   const getPlanCtaLabel = (planTier: PlanTier, isWorking: boolean) => {
-    if (isWorking) return 'Processing...';
+    if (isWorking) return isKorean ? '처리 중...' : 'Processing...';
 
     if (isProTrial) {
-      if (planTier === 'pro') return 'Subscribe now';
-      if (planTier === 'premium') return 'Upgrade to Premium';
+      if (planTier === 'pro') return isKorean ? '지금 구독' : 'Subscribe now';
+      if (planTier === 'premium') return isKorean ? 'Premium으로 업그레이드' : 'Upgrade to Premium';
     }
 
     const planIndex = tierOrder.indexOf(planTier);
     if (!hasEffectivePlan) {
-      return `Buy ${plans.find((p) => p.tier === planTier)?.name || planTier}`;
+      return isKorean ? `${getPlanName(planTier)} 구매` : `Buy ${getPlanName(planTier)}`;
     }
 
     if (isPaddleActive) {
-      if (planIndex > currentTierIndex) return `Upgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
-      if (planIndex < currentTierIndex) return `Downgrade to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
+      if (planIndex > currentTierIndex) return isKorean ? `${getPlanName(planTier)}로 업그레이드` : `Upgrade to ${getPlanName(planTier)}`;
+      if (planIndex < currentTierIndex) return isKorean ? `${getPlanName(planTier)}로 다운그레이드` : `Downgrade to ${getPlanName(planTier)}`;
     }
-    return `Subscribe to ${plans.find(p => p.tier === planTier)?.name || planTier}`;
+    return isKorean ? `${getPlanName(planTier)} 구독` : `Subscribe to ${getPlanName(planTier)}`;
   };
 
   const handlePlanAction = async (tier: PlanTier) => {
@@ -766,7 +802,7 @@ export default function BillingPage() {
               </p>
 
               <div className="mt-4 space-y-2 text-sm text-gray-700">
-                {plan.features.map((feature) => (
+                {getLocalizedPlanFeatures(plan).map((feature) => (
                   <p key={feature} className="flex items-start gap-2">
                     <Check className="mt-0.5 h-4 w-4 text-emerald-600" />
                     <span>{feature}</span>

@@ -166,7 +166,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                   }}
                   className="mt-2 w-full cursor-pointer rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-gray-800"
                 >
-                  {!hasEffectivePlan ? 'Buy now' : dashboardT('sidebar.upgradePlan')}
+                  {!hasEffectivePlan ? dashboardT('sidebar.buyNow') : dashboardT('sidebar.upgradePlan')}
                 </button>
               )}
             </div>
