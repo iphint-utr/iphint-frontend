@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://www.iphint.com/sec1_svg_kr.svg",
+        url: "https://www.iphint.com/preview-iphint.svg",
         width: 1200,
         height: 630,
         alt: "아이피힌트",
