@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
     openGraph: {
-    title: "아이피힌트 - 창작은 자유롭게, 침해는 단호하게",
+    title: "아이피힌트",
 
     description:
       "당신의 아이디어와 브랜드의 성장을 보호하세요.",
