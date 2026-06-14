@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
     openGraph: {
-    title: "아이피힌트 - 창작은 자유롭게, 침해는 단호하게",
+    title: "아이피힌트",
 
     description:
-      "",
+      "창작은 자유롭게, 침해는 단호하게",
 
     url: "https://www.iphint.com",
 
