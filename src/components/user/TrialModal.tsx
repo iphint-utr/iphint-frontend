@@ -15,7 +15,7 @@ export default function TrialModal() {
 
   // Get subscription state from Redux
   const snapshot = useAppSelector((state) => state.account.subscription.data);
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => state.user);
 
   // Check if user is eligible for trial (no active subscription, trial not started)
   useEffect(() => {
