@@ -2,6 +2,7 @@
 
 import React, { useState, useSyncExternalStore } from "react";
 import UserSidebar from "@/components/user/UserSidebar";
+import TrialModal from "@/components/user/TrialModal";
 import { useTranslations } from "next-intl";
 import SidebarToggleButton from "@/components/layout/SidebarToggleButton";
 
@@ -75,6 +76,9 @@ export default function UserLayout({
           </div>
         </main>
       </div>
+
+      {/* Trial Modal - shown on all user pages */}
+      <TrialModal />
     </div>
   );
 }
