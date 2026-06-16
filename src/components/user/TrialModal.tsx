@@ -16,6 +16,7 @@ export default function TrialModal() {
   // Get subscription state from Redux
   const snapshot = useAppSelector((state) => state.account.subscription.data);
   const user = useAppSelector((state) => state.user);
+  const isReferred = user?.isReferred;
 
   // Check if user is eligible for trial (no active subscription, trial not started)
   useEffect(() => {
@@ -85,13 +86,13 @@ export default function TrialModal() {
 
           {/* Heading */}
           <h2 className="mb-2 text-center text-2xl font-bold text-gray-900">
-            {t('startProTrial') || 'Start Your 7-Day Pro Trial'}
+            {t('startProTrial') || (isReferred ? 'Start Your 1-Month Pro Trial' : 'Start Your 7-Day Pro Trial')}
           </h2>
 
           {/* Description */}
           <p className="mb-6 text-center text-gray-600">
             {t('trialModalDescription') ||
-              'Unlock Pro features for 7 days free. No credit card required. Upgrade anytime.'}
+              (isReferred ? 'Unlock Pro features for 1 month free. No credit card required. Upgrade anytime.' : 'Unlock Pro features for 7 days free. No credit card required. Upgrade anytime.')}
           </p>
 
           {/* Features */}
@@ -161,7 +162,7 @@ export default function TrialModal() {
             >
               {isLoading
                 ? (t('loading') || 'Starting...')
-                : (t('startTrialButton') || 'Start 7-Day Trial')}
+                : (t('startTrialButton') || (isReferred ? 'Start 1-Month Trial' : 'Start 7-Day Trial'))}
             </button>
             <button
               onClick={handleDismiss}
@@ -174,7 +175,7 @@ export default function TrialModal() {
           {/* Footer note */}
           <p className="mt-4 text-center text-xs text-gray-500">
             {t('trialFooter') ||
-              'Your trial will expire after 7 days. You can upgrade anytime.'}
+              (isReferred ? 'Your trial will expire after 1 month. You can upgrade anytime.' : 'Your trial will expire after 7 days. You can upgrade anytime.')}
           </p>
         </div>
       </div>
