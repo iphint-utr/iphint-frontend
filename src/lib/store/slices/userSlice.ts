@@ -11,7 +11,8 @@ interface UserData {
   role: string;
   credits: number;
   referralCode: string;
-  referralCount: number;\n  isReferred?: boolean;
+  referralCount: number;
+  isReferred?: boolean;
 }
 
 interface AuthResponse {
@@ -59,7 +60,8 @@ interface UserState extends DashboardState {
   // User dashboard fields
   credits: number;
   referralCode: string | null;
-  referralCount: number;\n  isReferred?: boolean;
+  referralCount: number;
+  isReferred?: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -259,7 +261,8 @@ const userSlice = createSlice({
         role: null,
         credits: 0,
         referralCode: null,
-        referralCount: 0,\n        isReferred: false,
+        referralCount: 0,
+        isReferred: false,
         authLoading: false,
         authError: null,
         authNotice: null,
